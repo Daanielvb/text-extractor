@@ -1,36 +1,19 @@
-from os import listdir
-from os.path import isfile, join
-import fnmatch
-import os
-import PyPDF2
-import pdfminer
-import sys
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
 from pdfminer.layout import LAParams
+from src.parser.FileUtil import *
 import io
 
 
 class PDFReader:
 
     def __init__(self):
+        self.extensions = ["*.pdf"]
         pass
 
     @staticmethod
-    def read_pdf_content(file_paths):
-        result = []
-        for path in file_paths:
-            pdf_file_object = open(path, 'rb')
-            pdf_reader = PyPDF2.PdfFileReader(pdf_file_object)
-            content = ''
-            for page_idx in range(pdf_reader.getNumPages()):
-                content += pdf_reader.getPage(page_idx).extractText()
-            result.append(content)
-        return result
-
-    @staticmethod
-    def extract_pdf_content(files_path):
+    def extract_content(files_path):
         result = []
         for file in files_path:
             fp = open(file, 'rb')
@@ -51,24 +34,8 @@ class PDFReader:
             result.append(' '.join(pdf_content))
         return result
 
-    @staticmethod
-    def write_file(folder, file_name, file_contents, extension):
-        for file, content in file_contents, file_name:
-            with open(file + extension, 'w') as f:
-                f.write(content)
-
-    @staticmethod
-    def get_files_for_extraction(folder_path):
-        return [f for f in listdir(folder_path) if isfile(join(folder_path, f))]
-
-    @staticmethod
-    def get_files(folder_path):
-        result = []
-        for path, dirs, files in os.walk(folder_path):
-            for f in fnmatch.filter(files, '*.pdf'):
-                fullname = os.path.abspath(os.path.join(path, f))
-                result.append(fullname)
-        return result
+    def get_files(self, folder_path):
+        return FileUtil().get_files_by_extension(folder_path, self.extensions)
 
 
 
