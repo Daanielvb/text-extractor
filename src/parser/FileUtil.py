@@ -2,7 +2,7 @@ import os
 import functools
 import itertools
 import fnmatch
-
+from src.parser.StudentConstant import *
 
 class FileUtil:
 
@@ -32,3 +32,12 @@ class FileUtil:
         for file, content in file_contents, files:
             with open(folder + file + extension, 'w') as f:
                 f.write(content)
+
+    @staticmethod
+    def remove_student_names(file_contents):
+        result = []
+        for f in file_contents:
+            for std in StudentConstant.NAMES:
+                f = f.replace(std.upper(), '')
+            result.append(f)
+        return result

@@ -20,7 +20,8 @@ def convert_docs(base_path):
 
 
 if __name__ == '__main__':
-    pdfs = convert_pdfs('../../data/pdf')
-    docs = convert_docs('../../data/doc')
+    #pdfs = convert_pdfs('../../data/pdf')
+    docs = convert_docs('../../data/doc/A6')
+    clean_contents = FileUtil.remove_student_names(docs)
 
 

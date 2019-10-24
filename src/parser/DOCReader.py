@@ -13,7 +13,7 @@ class DOCReader:
         result = []
         for file in file_paths:
             extracted_text = docx2txt.process(file)
-            result.append(extracted_text)
+            result.append(extracted_text.upper())
         return result
 
     def get_files(self, folder_path):

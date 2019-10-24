@@ -3,7 +3,9 @@ import re
 
 class Cleaner:
 
-    STUDENT_PATTERN = "((Aluno|Aluna|Autor|Autora|Discente) *:+\D*)\n*"
+    STUDENT_PATTERN = "((Aluno|Aluna|Alunos|Alunos|Grupo|Equipe|Aluna|Autor|Autora|Discente) *:+\D*)\n*"
+    # TODO: Consider adding a ; instead of just : after the student name
+    # TODO: This regex is cleaning all the content for some texts, like A6/julia marley
     TEACHER_PATTERN = "((Professor|Professora|Docente) *:+\D*)\n*"
     COURSE_PATTERN = "(Disciplina|Materia|Cadeira|Curso) *:+\D*\n*"
     PERIOD_PATTERN = "(Periodo|Período|Ano|Ano/Semestre|Semestre) *:+\w*\n*"
