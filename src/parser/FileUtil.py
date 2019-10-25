@@ -2,7 +2,7 @@ import os
 import functools
 import itertools
 import fnmatch
-from src.parser.StudentConstant import *
+
 
 class FileUtil:
 
@@ -28,16 +28,20 @@ class FileUtil:
                 yield os.path.join(root_dir, file_name)
 
     @staticmethod
-    def write_files(folder, files, file_contents, extension):
-        for file, content in file_contents, files:
-            with open(folder + file + extension, 'w') as f:
-                f.write(content)
+    def get_file_name(file_paths):
+        return [os.path.splitext(os.path.basename(os.path.normpath(path)))[0] for path in file_paths]
 
     @staticmethod
-    def remove_student_names(file_contents):
-        result = []
-        for f in file_contents:
-            for std in StudentConstant.NAMES:
-                f = f.replace(std.upper(), '')
-            result.append(f)
-        return result
+    def write_files(folder_path, files, file_contents, extension):
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+        for idx, content in enumerate(file_contents):
+            counter = 0
+            file_name = folder_path + files[idx] + extension
+            #TODO: Check why this approach is not working, might be stuck in a loop
+            while not os.path.isfile(file_name) and counter < 10:
+                counter += 1
+                file_name = folder_path + files[idx] + str(counter) + extension
+                with open(file_name, 'w') as f:
+                    f.write(content[0])
+

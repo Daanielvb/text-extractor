@@ -1,0 +1,14 @@
+matplotlib
+mock
+nltk
+nose
+numpy
+pandas
+pydot
+pyparsing
+python-dateutil
+pytz
+scikit-learn
+scipy
+six
+stylometry

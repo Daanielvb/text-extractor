@@ -3,10 +3,11 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
 from pdfminer.layout import LAParams
 from src.parser.FileUtil import *
+from src.Cleaner import *
 import io
 
 
-class PDFReader:
+class PDFReader(FileUtil):
 
     def __init__(self):
         self.extensions = ["*.pdf"]
@@ -34,8 +35,12 @@ class PDFReader:
             result.append(' '.join(pdf_content))
         return result
 
-    def get_files(self, folder_path):
-        return FileUtil().get_files_by_extension(folder_path, self.extensions)
+    @staticmethod
+    def convert_pdfs(base_path):
+        contents, file_names = PDFReader().extract_content(PDFReader().get_files_by_extension(base_path, PDFReader().extensions))
+        clean_content = Cleaner().remove_headers(contents)
+        PDFReader().write_files('../../data/parsed-data/', file_names, clean_content, '.txt')
+
 
 
 
