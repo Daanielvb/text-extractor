@@ -49,18 +49,15 @@ class FileUtil:
         return result
 
     @staticmethod
-    def write_files(folder_path, files, file_contents):
-        if not os.path.exists(folder_path):
-            os.mkdir(folder_path)
-        with open(folder_path + 'data.csv', 'w', encoding="utf-8") as csvfile:
-            filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-            filewriter.writerow(['Text', 'Author'])
-            for idx, content in enumerate(file_contents):
-                filewriter.writerow([content[0], files[idx].upper()])
-
-    @staticmethod
     def merge_contents(*args):
         result = []
         for arg in args:
             result.extend(arg)
         return result
+
+    @staticmethod
+    def convert_author_name(name):
+        if ';' not in name:
+            return ''.join([name[0] for name in name.split(" ")[::-1]])
+        else:
+            return ''.join([name[0] for name in name.split(";")[::-1]])

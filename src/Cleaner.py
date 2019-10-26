@@ -1,5 +1,5 @@
 import re
-from src.parser.StudentConstant import *
+from src.util.StudentConstant import *
 
 class Cleaner:
 
@@ -20,7 +20,7 @@ class Cleaner:
     @staticmethod
     def remove_student_names(file_content):
         result = []
-        for std in StudentConstant.NAMES:
+        for std in StudentConstant.STOPWORDS:
             file_content = file_content.replace(std.upper(), '')
         result.append(file_content)
         return result

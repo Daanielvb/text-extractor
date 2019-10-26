@@ -3,7 +3,7 @@ class StudentConstant:
     def __init__(self):
         pass
 
-    NAMES = [
+    STOPWORDS = [
         'Anna beatriz amorim santos',
         'Bianca chalon',
         'Cleonice Juliana',
@@ -23,6 +23,11 @@ class StudentConstant:
         'Mariana fraga de oliveira galvão',
         'Melina genu',
         'Rodrigo Leandro Lira',
-        'Vinicius gonzalo dos santos']
+        'Vinicius gonzalo dos santos',
+        'CONGREGAÇÃO DE SANTA DOROTEIA DO BRASIL',
+        'Dinabel',
+        'VILAS-BOAS'
+        'CURSO DE CIÊNCIAS BIOLÓGICAS',
+        'METODOLOGIA DO ENSINO DE CIÊNCIAS E BIOLOGIA']
 
 

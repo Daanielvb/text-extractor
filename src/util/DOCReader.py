@@ -1,5 +1,5 @@
 import docx2txt
-from src.parser.FileUtil import *
+from src.util.FileUtil import *
 from src.Cleaner import *
 
 

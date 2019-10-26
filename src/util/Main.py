@@ -1,5 +1,6 @@
-from src.parser.PDFReader import *
-from src.parser.DOCReader import *
+from src.util.PDFReader import *
+from src.util.DOCReader import *
+from src.util.CSVReader import *
 
 
 def convert_data(base_path):
@@ -9,10 +10,13 @@ def convert_data(base_path):
 
     files_content = FileUtil.merge_contents(clean_txt_content, clean_doc_content, clean_pdf_content)
     file_names = FileUtil.merge_contents(txt_file_names, doc_file_names, pdf_file_names)
-    FileUtil.write_files('../../data/parsed-data/', file_names, files_content)
+    CSVReader.write_files('../../data/parsed-data/', file_names, files_content)
 
 
 if __name__ == '__main__':
-    convert_data('../../data/students_exercises/')
+    results = CSVReader.read_csv('../../data/parsed-data/data.csv')
+    for result in results:
+        result.text_output()
+    #convert_data('../../data/students_exercises/')
 
 

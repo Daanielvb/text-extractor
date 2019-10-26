@@ -205,7 +205,7 @@ class StyloCorpus(object):
         return documents_by_author
 
     def output_csv(self, out_file, author=None):
-        print out_file
+        print (out_file)
         csv_data = StyloDocument.csv_header() + '\n'
         if not author:
             for a in self.documents_by_author.keys():
