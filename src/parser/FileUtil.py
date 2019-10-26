@@ -2,11 +2,14 @@ import os
 import functools
 import itertools
 import fnmatch
+import csv
+from src.Cleaner import *
 
 
 class FileUtil:
 
     def __init__(self):
+        self.extensions = ["*.txt"]
         pass
 
     @staticmethod
@@ -32,16 +35,32 @@ class FileUtil:
         return [os.path.splitext(os.path.basename(os.path.normpath(path)))[0] for path in file_paths]
 
     @staticmethod
-    def write_files(folder_path, files, file_contents, extension):
+    def convert_files(base_path):
+        files = FileUtil().get_files_by_extension(base_path, FileUtil().extensions)
+        content = Cleaner().remove_headers(FileUtil.extract_file_content(files))
+        return content, FileUtil.get_file_name(files)
+
+    @staticmethod
+    def extract_file_content(file_paths):
+        result = []
+        for path in file_paths:
+            with open(path, 'r') as file:
+                result.append(file.read().upper())
+        return result
+
+    @staticmethod
+    def write_files(folder_path, files, file_contents):
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
-        for idx, content in enumerate(file_contents):
-            counter = 0
-            file_name = folder_path + files[idx] + extension
-            #TODO: Check why this approach is not working, might be stuck in a loop
-            while not os.path.isfile(file_name) and counter < 10:
-                counter += 1
-                file_name = folder_path + files[idx] + str(counter) + extension
-                with open(file_name, 'w') as f:
-                    f.write(content[0])
+        with open(folder_path + 'data.csv', 'w', encoding="utf-8") as csvfile:
+            filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+            filewriter.writerow(['Text', 'Author'])
+            for idx, content in enumerate(file_contents):
+                filewriter.writerow([content[0], files[idx].upper()])
 
+    @staticmethod
+    def merge_contents(*args):
+        result = []
+        for arg in args:
+            result.extend(arg)
+        return result

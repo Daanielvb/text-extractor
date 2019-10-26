@@ -36,7 +36,12 @@ class Cleaner:
             text = re.sub(Cleaner.PERIOD_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.SPECIAL_PATTERNS[0], '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.DATE_PATTERN, '', text, flags=re.IGNORECASE)
+            text = Cleaner().format(text)
             result.append(Cleaner().remove_student_names(text))
         return result
 
-
+    @staticmethod
+    def format(text):
+        text = re.sub('\n', ' ', text)
+        text = re.sub('\n{2,}', '', text)
+        return text.strip()
