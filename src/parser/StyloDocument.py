@@ -17,6 +17,9 @@ class StyloDocument(object):
         self.sentence_word_length = [len(sent.split()) for sent in self.sentences]
         self.paragraphs = [p for p in self.file_content.split("\n\n") if len(p) > 0 and not p.isspace()]
         self.paragraph_word_length = [len(p.split()) for p in self.paragraphs]
+        self.collocations = self.text.collocations()
+        self.punctuation = [".", ",", ";", "-", ":"]
+
 
     def term_per_thousand(self, term):
         """
@@ -46,6 +49,9 @@ class StyloDocument(object):
     def std_paragraph_len(self):
         return np.std(self.paragraph_word_length)
 
+    def vocabulary(self):
+        return [v for v in sorted(set(self.sentences)) if v not in self.punctuation]
+
     def mean_word_len(self):
         words = set(word_tokenize(self.file_content, language='portuguese'))
         word_chars = [len(word) for word in words]
@@ -54,8 +60,8 @@ class StyloDocument(object):
     def type_token_ratio(self):
         return (len(set(self.text)) / len(self.text)) * 100
 
-    def unique_words_per_thousand(self):
-        return self.type_token_ratio() / 100.0 * 1000.0 / len(self.text)
+    def unique_words_per_hundred(self):
+        return self.type_token_ratio() / 100.0 * 100.0 / len(self.text)
 
     def document_len(self):
         return sum(self.sentence_chars)
