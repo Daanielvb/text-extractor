@@ -2,13 +2,14 @@ DEFAULT_AUTHOR = "Unknown"
 from nltk import sent_tokenize, word_tokenize, Text
 from nltk.probability import FreqDist
 import numpy as np
+from src.parser.PortugueseTextualProcessing import *
 
 
 class StyloDocument(object):
 
     def __init__(self, file_content, author=DEFAULT_AUTHOR):
         self.author = author
-        self.file_content = file_content
+        self.file_content = file_content.lower()
         self.tokens = word_tokenize(self.file_content, language='portuguese')
         self.text = Text(self.tokens)
         self.fdist = FreqDist(self.text)
@@ -19,7 +20,8 @@ class StyloDocument(object):
         self.paragraph_word_length = [len(p.split()) for p in self.paragraphs]
         self.collocations = self.text.collocations()
         self.punctuation = [".", ",", ";", "-", ":"]
-
+        self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
+        self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
 
     def term_per_thousand(self, term):
         """

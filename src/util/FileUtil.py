@@ -2,7 +2,7 @@ import os
 import functools
 import itertools
 import fnmatch
-import csv
+from pickle import dump
 from src.Cleaner import *
 
 
@@ -47,6 +47,12 @@ class FileUtil:
             with open(path, 'r') as file:
                 result.append(file.read().upper())
         return result
+
+    @staticmethod
+    def write_pickle_file(file_name, content):
+        output = open(file_name, 'wb')
+        dump(content, output, -1)
+        output.close()
 
     @staticmethod
     def merge_contents(*args):

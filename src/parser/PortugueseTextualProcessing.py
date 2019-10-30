@@ -2,13 +2,15 @@ import nltk
 from nltk import tokenize
 from nltk.stem import RSLPStemmer
 from nltk.corpus import floresta
-import pickle
+from pickle import load
+from src.util import FileUtil
 
 
 class PortugueseTextualProcessing:
+    STOPWORDS = set(nltk.corpus.stopwords.words('portuguese'))
+    TAGGER = load(open('t2.pkl', 'rb'))
 
     def __init__(self):
-        self.stopwords = set(nltk.corpus.stopwords.words('portuguese'))
         pass
 
     @staticmethod
@@ -22,31 +24,29 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def remove_stopwords(tokenized_text):
-        return [w for w in tokenized_text if w not in PortugueseTextualProcessing().stopwords]
+        return [w for w in tokenized_text if w not in PortugueseTextualProcessing().STOPWORDS]
 
     @staticmethod
     def postag(tokenized_text):
-        taggger = PortugueseTextualProcessing().retrieve_tagger()
-        return [taggger.tag(token) for token in tokenized_text]
+        result = []
+        for token in tokenized_text:
+            result.append(PortugueseTextualProcessing().TAGGER.tag([token.lower()]))
+        return result
 
     @staticmethod
-    def retrieve_tagger():
-        #TODO: Fix this method to work with the latest version of NLTK
+    def build_tagger():
         tsents = floresta.tagged_sents()
         tsents = [[(w.lower(), PortugueseTextualProcessing().simplify_tag(t)) for (w, t) in sent] for sent in tsents if
                   sent]
         train = tsents[100:]
         test = tsents[:100]
 
-        tagger0 = nltk.DefaultTagger('n')
-        nltk.tagger0.accuracy(tagger0, test)
-
-        tagger1 = nltk.UnigramTagger(train, backoff=tagger0)
-        nltk.tag.accuracy(tagger1, test)
-
-        tagger2 = nltk.BigramTagger(train, backoff=tagger1)
-        nltk.tag.accuracy(tagger2, test)
-        return tagger2
+        t0 = nltk.DefaultTagger('NN')
+        t1 = nltk.UnigramTagger(train, backoff=t0)
+        t2 = nltk.BigramTagger(test, backoff=t1)
+        print(t2.evaluate(test))
+        FileUtil().write_pickle_file('pttag.pkl', t2)
+        return t2
 
     @staticmethod
     def simplify_tag(t):
