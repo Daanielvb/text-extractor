@@ -3,7 +3,7 @@ from nltk import tokenize
 from nltk.stem import RSLPStemmer
 from nltk.corpus import floresta
 from pickle import load
-from src.util import FileUtil
+from src.util.FileUtil import *
 
 
 class PortugueseTextualProcessing:
@@ -38,14 +38,16 @@ class PortugueseTextualProcessing:
         tsents = floresta.tagged_sents()
         tsents = [[(w.lower(), PortugueseTextualProcessing().simplify_tag(t)) for (w, t) in sent] for sent in tsents if
                   sent]
-        train = tsents[100:]
-        test = tsents[:100]
+        train = tsents[600:]
+        test = tsents[:400]
 
         t0 = nltk.DefaultTagger('NN')
         t1 = nltk.UnigramTagger(train, backoff=t0)
         t2 = nltk.BigramTagger(test, backoff=t1)
+        print(t0.evaluate(test))
+        print(t1.evaluate(test))
         print(t2.evaluate(test))
-        FileUtil().write_pickle_file('pttag.pkl', t2)
+        FileUtil.write_pickle_file('pttag.pkl', t2)
         return t2
 
     @staticmethod
