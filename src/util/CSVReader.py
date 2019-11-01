@@ -11,10 +11,10 @@ class CSVReader:
         pass
 
     @staticmethod
-    def write_files(folder_path, files, file_contents):
+    def write_files(folder_path, files, file_name, file_contents):
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
-        with open(folder_path + 'data.csv', 'w', encoding="utf-8") as csvfile:
+        with open(folder_path + file_name, 'w', encoding="utf-8") as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(['Text', 'Author'])
             for idx, content in enumerate(file_contents):

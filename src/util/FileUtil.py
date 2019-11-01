@@ -44,7 +44,7 @@ class FileUtil:
     def extract_file_content(file_paths):
         result = []
         for path in file_paths:
-            with open(path, 'r') as file:
+            with open(path, 'r', encoding='utf-8', errors='ignore') as file:
                 result.append(file.read().upper())
         return result
 
@@ -66,4 +66,4 @@ class FileUtil:
         if ';' not in name:
             return ''.join([name[0] for name in name.split(" ")[::-1]])
         else:
-            return ''.join([name[0] for name in name.split(";")[::-1]])
+            return ''.join([name[0:3] for name in name.split(";")])
