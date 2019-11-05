@@ -28,6 +28,9 @@ class StudentConstant:
         'Dinabel',
         'VILAS-BOAS'
         'CURSO DE CIÊNCIAS BIOLÓGICAS',
-        'METODOLOGIA DO ENSINO DE CIÊNCIAS E BIOLOGIA']
+        'METODOLOGIA DO ENSINO DE CIÊNCIAS E BIOLOGIA',
+        'AV. CONDE DA BOA VISTA, 921 - BOA VISTA, - PE, 50060-002',
+        'Biologia da conservação'
+        ]
 
 

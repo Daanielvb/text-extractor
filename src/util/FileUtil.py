@@ -44,7 +44,7 @@ class FileUtil:
     def extract_file_content(file_paths):
         result = []
         for path in file_paths:
-            with open(path, 'r', encoding='utf-8', errors='ignore') as file:
+            with open(path, 'r', errors='ignore') as file:
                 result.append(file.read().upper())
         return result
 

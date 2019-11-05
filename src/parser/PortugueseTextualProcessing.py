@@ -41,7 +41,7 @@ class PortugueseTextualProcessing:
         train = tsents[600:]
         test = tsents[:400]
 
-        t0 = nltk.DefaultTagger('NN')
+        t0 = nltk.DefaultTagger('n')
         t1 = nltk.UnigramTagger(train, backoff=t0)
         t2 = nltk.BigramTagger(test, backoff=t1)
         print(t0.evaluate(test))

@@ -18,7 +18,7 @@ class StyloDocument(object):
         self.sentence_word_length = [len(sent.split()) for sent in self.sentences]
         self.paragraphs = [p for p in self.file_content.split("\n\n") if len(p) > 0 and not p.isspace()]
         self.paragraph_word_length = [len(p.split()) for p in self.paragraphs]
-        self.collocations = self.text.collocations()
+        self.collocations = self.text.collocation_list()
         self.punctuation = [".", ",", ";", "-", ":"]
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
@@ -68,8 +68,17 @@ class StyloDocument(object):
     def document_len(self):
         return sum(self.sentence_chars)
 
+    @classmethod
+    def csv_header(cls):
+        return (
+            ['Author', 'LexicalDiversity', 'MeanWordLen', 'MeanSentenceLen', 'StdevSentenceLen', 'MeanParagraphLen','DocumentLen'
+             ,'Commas', 'Semicolons', 'Quotes', 'Exclamations', 'Colons', 'Dashes', 'Mdashes', 'Ands',
+             'Buts', 'Howevers', 'Ifs', 'Thats', 'Mores', 'Musts', 'Mights', 'This', 'Verys']
+        )
+
     def csv_output(self):
-        return '"%s","%s",%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g' % (
+        # TODO: Add features not being used yet (tags, tagfDist, collocations)
+        return '%s,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g' % (
             self.author,
             self.type_token_ratio(),
             self.mean_word_len(),
@@ -86,16 +95,16 @@ class StyloDocument(object):
             self.term_per_hundred('-'),
             self.term_per_hundred('--'),
 
-            self.term_per_hundred('and'),
-            self.term_per_hundred('but'),
-            self.term_per_hundred('however'),
-            self.term_per_hundred('if'),
-            self.term_per_hundred('that'),
-            self.term_per_hundred('more'),
-            self.term_per_hundred('must'),
-            self.term_per_hundred('might'),
-            self.term_per_hundred('this'),
-            self.term_per_hundred('very')
+            self.term_per_hundred('e'),
+            self.term_per_hundred('mas'),
+            self.term_per_hundred('porém'),
+            self.term_per_hundred('se'),
+            self.term_per_hundred('isto'),
+            self.term_per_hundred('mais'),
+            self.term_per_hundred('precisa'),
+            self.term_per_hundred('pode'),
+            self.term_per_hundred('esse'),
+            self.term_per_hundred('muito')
         )
 
     def text_output(self):
@@ -114,7 +123,7 @@ class StyloDocument(object):
         print("Document Length          :", self.document_len())
         print("\n")
 
-        print(">>> Punctuation Analysis (per 100 tokens) <<<\n")
+        print(">>> Analise de pontuacoes (per 100 tokens) <<<\n")
         print('Commas                   :', self.term_per_hundred(','))
         print('Semicolons               :', self.term_per_hundred(';'))
         print('Quotations               :', self.term_per_hundred('\"'))
@@ -123,7 +132,7 @@ class StyloDocument(object):
         print('Hyphens                  :', self.term_per_hundred('-'))  # m-dash or n-dash?
         print('Double Hyphens           :', self.term_per_hundred('--'))  # m-dash or n-dash?
 
-        print(">>> Lexical Usage Analysis (per 100 tokens) <<<\n")
+        print(">>> Analise lexica (per 100 tokens) <<<\n")
         print('e                      :', self.term_per_hundred('e'))
         print('mas                      :', self.term_per_hundred('mas'))
         print('porém                  :', self.term_per_hundred('porém'))
