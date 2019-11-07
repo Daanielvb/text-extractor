@@ -75,7 +75,7 @@ class StyloDocument(object):
         return sum(self.sentence_chars)
 
     def csv_output(self):
-        return '"%s","%s",%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g' % (
+        "'{}',{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
             self.author, 
             self.file_name, 
             self.type_token_ratio(), 

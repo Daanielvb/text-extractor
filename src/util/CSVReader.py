@@ -28,7 +28,8 @@ class CSVReader:
             filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(StyloDocument.csv_header())
             for stylo_obj in stylo_objects:
-                filewriter.writerow([stylo_obj.csv_output()])
+                row = stylo_obj.csv_output().split(",")
+                filewriter.writerow(row)
 
     @staticmethod
     def read_csv(file):

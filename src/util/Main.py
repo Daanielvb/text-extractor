@@ -36,21 +36,22 @@ def remove_group_works(dataframe):
 
 def remove_single_class_entries(dataframe):
     #TODO: Check some NaNs
-    return dataframe.groupby('Author').filter(lambda x: len(x) > 1)
+    return dataframe.groupby('Autor').filter(lambda x: len(x) > 1)
 
 
 if __name__ == '__main__':
+    #df = pd.read_csv('../../data/parsed-data/stylo.csv')
+    #df = remove_single_class_entries(df)
     # TODO: Finish the text-to-features conversion
     # TODO: Start using simple SVMdf = df.groupby('Author').filter(lambda x: len(x) > 1)
-    # convert_data('../../data/students_exercises/')
-    # df = pd.read_csv('../../data/parsed-data/data2.csv', encoding='utf-8')
-    # df = remove_group_works(df)
-    # df = remove_single_class_entries(df)
-    # prepare_train_data(df)
-
+    #convert_data('../../data/students_exercises/')
+    #df = pd.read_csv('../../data/parsed-data/data2.csv', encoding='utf-8')
     stylo_objs = CSVReader.read_csv('../../data/parsed-data/data2.csv')
-    print(stylo_objs[0].csv_output())
-    CSVReader.write_stylo_features('../../data/parsed-data/', 'stylo.csv', stylo_objs)
+    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', stylo_objs)
+    df = pd.read_csv('../../data/parsed-data/stylo.csv')
+    df = remove_single_class_entries(df)
+    prepare_train_data(df)
+
 
 
 

@@ -71,14 +71,14 @@ class StyloDocument(object):
     @classmethod
     def csv_header(cls):
         return (
-            ['Author', 'LexicalDiversity', 'MeanWordLen', 'MeanSentenceLen', 'StdevSentenceLen', 'MeanParagraphLen','DocumentLen'
-             ,'Commas', 'Semicolons', 'Quotes', 'Exclamations', 'Colons', 'Dashes', 'Mdashes', 'Ands',
-             'Buts', 'Howevers', 'Ifs', 'Thats', 'Mores', 'Musts', 'Mights', 'This', 'Verys']
+            ['Autor', 'DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos','TamanhoDocumento'
+             ,'Virgulas', 'PontoEVirgula', 'Aspas', 'Exclamaoes', 'DoisPontos', 'Travessao', 'Es',
+             'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito']
         )
 
     def csv_output(self):
         # TODO: Add features not being used yet (tags, tagfDist, collocations)
-        return '%s,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g' % (
+        return "'{}',{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
             self.author,
             self.type_token_ratio(),
             self.mean_word_len(),
@@ -86,15 +86,12 @@ class StyloDocument(object):
             self.std_sentence_len(),
             self.mean_paragraph_len(),
             self.document_len(),
-
             self.term_per_hundred(','),
             self.term_per_hundred(';'),
             self.term_per_hundred('"'),
             self.term_per_hundred('!'),
             self.term_per_hundred(':'),
             self.term_per_hundred('-'),
-            self.term_per_hundred('--'),
-
             self.term_per_hundred('e'),
             self.term_per_hundred('mas'),
             self.term_per_hundred('porém'),
