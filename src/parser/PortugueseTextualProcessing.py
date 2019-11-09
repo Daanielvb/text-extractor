@@ -8,7 +8,7 @@ from src.util.FileUtil import *
 
 class PortugueseTextualProcessing:
     STOPWORDS = set(nltk.corpus.stopwords.words('portuguese'))
-    TAGGER = load(open('t2.pkl', 'rb'))
+    TAGGER = load(open('pttag.pkl', 'rb'))
 
     def __init__(self):
         pass
@@ -38,10 +38,12 @@ class PortugueseTextualProcessing:
         tsents = floresta.tagged_sents()
         tsents = [[(w.lower(), PortugueseTextualProcessing().simplify_tag(t)) for (w, t) in sent] for sent in tsents if
                   sent]
-        train = tsents[600:]
-        test = tsents[:400]
+        train = tsents[:6000]
+        test = tsents[6000:]
 
-        t0 = nltk.DefaultTagger('n')
+        print(len(train))
+        print(len(test))
+        t0 = nltk.DefaultTagger('notfound')
         t1 = nltk.UnigramTagger(train, backoff=t0)
         t2 = nltk.BigramTagger(test, backoff=t1)
         print(t0.evaluate(test))

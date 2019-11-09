@@ -4,6 +4,8 @@ from src.util.CSVReader import *
 import pandas as pd
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def convert_data(base_path):
@@ -36,21 +38,29 @@ def remove_group_works(dataframe):
 
 def remove_single_class_entries(dataframe):
     #TODO: Check some NaNs
-    return dataframe.groupby('Autor').filter(lambda x: len(x) > 1)
+    return dataframe.groupby('Classe(Autor)').filter(lambda x: len(x) > 1)
+
+
+def save_plot(plot, plot_name):
+    plot.savefig(plot_name)
+
+def show_column_distribution(dataframe, class_name):
+    dataframe[class_name].value_counts().plot(kind='barh')
+    plt.show()
 
 
 if __name__ == '__main__':
-    #df = pd.read_csv('../../data/parsed-data/stylo.csv')
-    #df = remove_single_class_entries(df)
-    # TODO: Finish the text-to-features conversion
     # TODO: Start using simple SVMdf = df.groupby('Author').filter(lambda x: len(x) > 1)
     #convert_data('../../data/students_exercises/')
     #df = pd.read_csv('../../data/parsed-data/data2.csv', encoding='utf-8')
-    #stylo_objs = CSVReader.read_csv('../../data/parsed-data/data2.csv')
-    #CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', stylo_objs)
+    stylo_objs = CSVReader.read_csv('../../data/parsed-data/data2.csv')
+    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', stylo_objs)
     df = pd.read_csv('../../data/parsed-data/stylo.csv')
     df = remove_single_class_entries(df)
-    prepare_train_data(df)
+    CSVReader().export_dataframe(df, 'stylo2.csv')
+
+    #show_column_distribution('Classe(Autor)')
+    #prepare_train_data(df)
 
 
 

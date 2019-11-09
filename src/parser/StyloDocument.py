@@ -23,6 +23,16 @@ class StyloDocument(object):
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
 
+    def get_class_frequency(self, tag_start):
+        count = 0
+        for tag in self.tagfdist.keys():
+            if tag[0] == tag_start:
+                count += self.tagfdist[tag]
+        return count/self.tagfdist.N()
+
+    def tag_frequency(self, tag):
+        return self.tagfdist.freq(tag)
+
     def term_per_thousand(self, term):
         """
         term       X
@@ -71,15 +81,14 @@ class StyloDocument(object):
     @classmethod
     def csv_header(cls):
         return (
-            ['Autor', 'DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos','TamanhoDocumento'
-             ,'Virgulas', 'PontoEVirgula', 'Aspas', 'Exclamaoes', 'DoisPontos', 'Travessao', 'Es',
-             'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito']
+            ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos','TamanhoDocumento'
+             ,'Virgulas', 'PontoEVirgula', 'Aspas', 'Exclamacoes', 'DoisPontos', 'Travessao', 'E',
+             'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
+             'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados', 'Classe(Autor)']
         )
 
     def csv_output(self):
-        # TODO: Add features not being used yet (tags, tagfDist, collocations)
-        return "'{}',{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
-            self.author,
+        return "'{}',{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
             self.type_token_ratio(),
             self.mean_word_len(),
             self.mean_sentence_len(),
@@ -101,7 +110,17 @@ class StyloDocument(object):
             self.term_per_hundred('precisa'),
             self.term_per_hundred('pode'),
             self.term_per_hundred('esse'),
-            self.term_per_hundred('muito')
+            self.term_per_hundred('muito'),
+            self.tag_frequency('adj'),
+            self.tag_frequency('adv'),
+            self.tag_frequency('art'),
+            self.tag_frequency('n'),
+            self.tag_frequency('prp'),
+            self.get_class_frequency('v'),
+            self.get_class_frequency('conj'),
+            self.get_class_frequency('pron'),
+            self.tag_frequency('notfound'),
+            self.author,
         )
 
     def text_output(self):

@@ -47,3 +47,7 @@ class CSVReader:
                         print('Line count:' + str(line_count) + ' Text content:' + row[0])
                         line_count += 1
         return results
+
+    @staticmethod
+    def export_dataframe(dataframe, file_name):
+        dataframe.to_csv(file_name, index=None, header=True)
