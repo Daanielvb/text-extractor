@@ -23,12 +23,13 @@ class StyloDocument(object):
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
 
-    def get_class_frequency(self, tag_start):
+    def get_class_frequency_by_start(self, tag_start):
         count = 0
         for tag in self.tagfdist.keys():
-            if tag[0] == tag_start:
+            if tag.startswith(tag_start):
                 count += self.tagfdist[tag]
         return count/self.tagfdist.N()
+
 
     def tag_frequency(self, tag):
         return self.tagfdist.freq(tag)
@@ -82,13 +83,13 @@ class StyloDocument(object):
     def csv_header(cls):
         return (
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos','TamanhoDocumento'
-             ,'Virgulas', 'PontoEVirgula', 'Aspas', 'Exclamacoes', 'DoisPontos', 'Travessao', 'E',
+             ,'Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
              'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados', 'Classe(Autor)']
         )
 
     def csv_output(self):
-        return "'{}',{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
             self.type_token_ratio(),
             self.mean_word_len(),
             self.mean_sentence_len(),
@@ -97,7 +98,6 @@ class StyloDocument(object):
             self.document_len(),
             self.term_per_hundred(','),
             self.term_per_hundred(';'),
-            self.term_per_hundred('"'),
             self.term_per_hundred('!'),
             self.term_per_hundred(':'),
             self.term_per_hundred('-'),
@@ -116,9 +116,9 @@ class StyloDocument(object):
             self.tag_frequency('art'),
             self.tag_frequency('n'),
             self.tag_frequency('prp'),
-            self.get_class_frequency('v'),
-            self.get_class_frequency('conj'),
-            self.get_class_frequency('pron'),
+            self.get_class_frequency_by_start('v'),
+            self.get_class_frequency_by_start('conj'),
+            self.get_class_frequency_by_start('pron'),
             self.tag_frequency('notfound'),
             self.author,
         )

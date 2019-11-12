@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-import seaborn as sns
+from sklearn import preprocessing
 
 
 def convert_data(base_path):
@@ -48,16 +48,27 @@ def show_column_distribution(dataframe, class_name):
     dataframe[class_name].value_counts().plot(kind='barh')
     plt.show()
 
+def save_converted_stylo_data():
+    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', CSVReader.read_csv('../../data/parsed-data/data2.csv'))
+
+def normalize_data(data, norm='l2'):
+    """ normalizes input data
+    https://scikit-learn.org/stable/modules/preprocessing.html#normalization"""
+    return preprocessing.normalize(data, norm)
 
 if __name__ == '__main__':
     # TODO: Start using simple SVMdf = df.groupby('Author').filter(lambda x: len(x) > 1)
     #convert_data('../../data/students_exercises/')
-    #df = pd.read_csv('../../data/parsed-data/data2.csv', encoding='utf-8')
-    stylo_objs = CSVReader.read_csv('../../data/parsed-data/data2.csv')
-    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', stylo_objs)
+    save_converted_stylo_data()
+
     df = pd.read_csv('../../data/parsed-data/stylo.csv')
     df = remove_single_class_entries(df)
-    CSVReader().export_dataframe(df, 'stylo2.csv')
+    authors = df.pop('Classe(Autor)')
+    df_norm = (df - df.mean()) / (df.max() - df.min())
+    df_norm['Classe(Autor)'] = authors
+
+    CSVReader().export_dataframe(df_norm, 'stylo2.csv')
+
 
     #show_column_distribution('Classe(Autor)')
     #prepare_train_data(df)

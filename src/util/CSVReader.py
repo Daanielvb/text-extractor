@@ -18,7 +18,7 @@ class CSVReader:
             filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(['Text', 'Author'])
             for idx, content in enumerate(file_contents):
-                filewriter.writerow([content[0], FileUtil.convert_author_name(files[idx].upper())])
+                filewriter.writerow([content, FileUtil.convert_author_name(files[idx].upper())])
 
     @staticmethod
     def write_stylo_features(folder_path, file_name, stylo_objects):
