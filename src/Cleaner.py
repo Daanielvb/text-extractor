@@ -29,11 +29,12 @@ class Cleaner:
     def remove_headers(text_list):
         result = []
         for text in text_list:
+
             # text = re.sub(Cleaner.STUDENT_PATTERN, '', text, flags=re.IGNORECASE)
             # text = re.sub(Cleaner.TEACHER_PATTERN,  '', text, flags=re.IGNORECASE)
             # text = re.sub(Cleaner.COURSE_PATTERN, '', text, flags=re.IGNORECASE)
             text = Cleaner().remove_student_names(text)[0]
-
+            text = text.replace('"', "'")
             text = re.sub(Cleaner.INSTITUTION_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.PERIOD_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.DATE_PATTERN, '', text, flags=re.IGNORECASE)
