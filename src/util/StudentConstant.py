@@ -53,7 +53,9 @@ class StudentConstant:
         'CURSO DE CIENCIAS BIOLOGICAS',
         'ALUNA:',
         'ALUNO:',
-
+        'MARINA MILENA LIMA',
+        'FONE: (81) 2122-3500',
+        'FAX: (81)3423-3066',
         'DEPARTAMENTO DE CIÊNCIAS BIOLÓGICAS',
         'AV. CONDE DA BOA VISTA, 921 - BOA VISTA, - PE, 50060-002',
         '50060-002',
