@@ -71,19 +71,23 @@ if __name__ == '__main__':
     #print(embedding_matrix)
     # TODO: Start using simple SVMdf = df.groupby('Author').filter(lambda x: len(x) > 1)
     # convert_data('../../data/students_exercises/')
-    df = pd.read_csv('../../data/parsed-data/student_data2.csv')
+    df = pd.read_csv('../../data/parsed-data/data2.csv')
     result = []
+    embbedings = PortugueseTextualProcessing().load_vector_2()
     for text in df['Text']:
         print(text)
-        embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix({}, [text])
+        embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix(embbedings, [text])
         print(embedding_matrix)
         result.append(embedding_matrix)
 
+    output = []
     for idx, text in enumerate(result):
-        result.append(df['Author'][idx])
+        print(idx)
+        print(df['Author'][idx])
+        output.append([result[idx], df['Author'][idx]])
 
     #TODO: Convert array into csv file
-    print(result)
+    print(output)
 
 
     # df = remove_single_class_entries(df, 'Author')

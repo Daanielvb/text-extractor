@@ -119,5 +119,5 @@ class PortugueseTextualProcessing:
             embedding_vector = word_embedding.get(word)
             if embedding_vector is not None:
                 # words not found in embedding index will be all-zeros.
-                embedding_matrix[i] = embedding_vector
+                embedding_matrix[i] = embedding_vector[:PortugueseTextualProcessing.EMBEDDING_DIM]
         return embedding_matrix
