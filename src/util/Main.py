@@ -72,22 +72,30 @@ if __name__ == '__main__':
     # TODO: Start using simple SVMdf = df.groupby('Author').filter(lambda x: len(x) > 1)
     # convert_data('../../data/students_exercises/')
     df = pd.read_csv('../../data/parsed-data/data2.csv')
+    y = df.pop('Author')
     result = []
-    embbedings = PortugueseTextualProcessing().load_vector_2()
-    for text in df['Text']:
-        print(text)
-        embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix(embbedings, [text])
-        print(embedding_matrix)
-        result.append(embedding_matrix)
+    embeddings = PortugueseTextualProcessing().load_vector_2()
 
-    output = []
-    for idx, text in enumerate(result):
-        print(idx)
-        print(df['Author'][idx])
-        output.append([result[idx], df['Author'][idx]])
+    tokenizer, padded_sentences, vocab_length = PortugueseTextualProcessing().convert_corpus_to_number(df)
+    embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix_2(embeddings, tokenizer, vocab_length)
 
-    #TODO: Convert array into csv file
-    print(output)
+    # TODO: Create CSV file
+
+    # embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix_2(embeddings, df)
+    # for text in df['Text']:
+    #     print(text)
+    #     embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix(embeddings, [text])
+    #     print(embedding_matrix)
+    #     result.append(embedding_matrix)
+    #
+    # output = []
+    # for idx, text in enumerate(result):
+    #     print(idx)
+    #     print(df['Author'][idx])
+    #     output.append([result[idx], df['Author'][idx]])
+    #
+    # #TODO: Convert array into csv file
+    # print(output)
 
 
     # df = remove_single_class_entries(df, 'Author')

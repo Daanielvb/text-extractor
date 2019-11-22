@@ -90,7 +90,7 @@ class PortugueseTextualProcessing:
     @staticmethod
     def load_vector_2():
         word_embedding = {}
-        with open("glove_s100.txt", 'r') as f:
+        with open("glove_s100.txt", 'r', encoding='utf-8') as f:
             for line in f:
                 word, coefs = line.split(maxsplit=1)
                 coefs = np.fromstring(coefs, 'f', sep=' ')
@@ -102,6 +102,35 @@ class PortugueseTextualProcessing:
     def find_closest_embeddings(embedding):
         return sorted(PortugueseTextualProcessing.WORD_EMBEDDINGS.keys(),
                       key=lambda word: spatial.distance.euclidean(PortugueseTextualProcessing.WORD_EMBEDDINGS[word], embedding))
+
+    @staticmethod
+    def convert_corpus_to_number(dataframe):
+        """:param dataframe Dataframe()"""
+        corpus = dataframe['Text']
+        tokenizer = Tokenizer(num_words=PortugueseTextualProcessing.MAX_NUM_WORDS)
+        tokenizer.fit_on_texts(corpus)
+        vocab_length = len(tokenizer.word_index) + 1
+
+        print('vocab len:' + str(vocab_length))
+        embedded_sentences = tokenizer.texts_to_sequences(corpus)
+        print(embedded_sentences)
+
+        longest_sentence = max(corpus, key=lambda sentence: len(nltk.word_tokenize(sentence, language='portuguese')))
+        length_long_sentence = len(nltk.word_tokenize(longest_sentence, language='portuguese'))
+
+        padded_sentences = pad_sequences(embedded_sentences, length_long_sentence, padding='post')
+
+        print(padded_sentences)
+        return tokenizer, padded_sentences, vocab_length
+
+    @staticmethod
+    def build_embedding_matrix_2(word_embedding_dict, vocab_length, tokenizer):
+        embedding_matrix = np.zeros((vocab_length, 100))
+        for word, index in tokenizer.word_index.items():
+            embedding_vector = word_embedding_dict.get(word)
+            if embedding_vector is not None:
+                embedding_matrix[index] = embedding_vector
+        return embedding_matrix
 
     @staticmethod
     def build_embedding_matrix(word_embedding, input_text):
