@@ -2,11 +2,14 @@ from src.util.PDFReader import *
 from src.util.DOCReader import *
 from src.util.CSVReader import *
 import pandas as pd
-import json
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Flatten
+from keras.layers.embeddings import Embedding
 
 
 def convert_data(base_path):
@@ -76,8 +79,28 @@ if __name__ == '__main__':
     result = []
     embeddings = PortugueseTextualProcessing().load_vector_2()
 
-    tokenizer, padded_sentences, vocab_length = PortugueseTextualProcessing().convert_corpus_to_number(df)
-    embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix_2(embeddings, tokenizer, vocab_length)
+    tokenizer, padded_sentences, vocab_length, length_long_sentence \
+        = PortugueseTextualProcessing().convert_corpus_to_number(df)
+    embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix_2(embeddings, vocab_length, tokenizer)
+
+    print(embedding_matrix)
+    print(padded_sentences)
+
+    model = Sequential()
+    embedding_layer = Embedding(vocab_length, 100, weights=[embedding_matrix], input_length=length_long_sentence,
+                                trainable=False)
+    model.add(embedding_layer)
+    model.add(Flatten())
+    model.add(Dense(1, activation='relu'))
+
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
+    print(model.summary())
+
+
+    # TODO: Fix ValueError: could not convert string to float: 'SDFI'
+    model.fit(padded_sentences, y, epochs=100, verbose=1)
+    loss, accuracy = model.evaluate(padded_sentences, y, verbose=0)
+    print('Accuracy: %f' % (accuracy * 100))
 
     # TODO: Create CSV file
 

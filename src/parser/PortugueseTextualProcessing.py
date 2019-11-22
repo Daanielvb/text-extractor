@@ -121,7 +121,7 @@ class PortugueseTextualProcessing:
         padded_sentences = pad_sequences(embedded_sentences, length_long_sentence, padding='post')
 
         print(padded_sentences)
-        return tokenizer, padded_sentences, vocab_length
+        return tokenizer, padded_sentences, vocab_length, length_long_sentence
 
     @staticmethod
     def build_embedding_matrix_2(word_embedding_dict, vocab_length, tokenizer):
@@ -129,7 +129,7 @@ class PortugueseTextualProcessing:
         for word, index in tokenizer.word_index.items():
             embedding_vector = word_embedding_dict.get(word)
             if embedding_vector is not None:
-                embedding_matrix[index] = embedding_vector
+                embedding_matrix[index] = embedding_vector[:100]
         return embedding_matrix
 
     @staticmethod
