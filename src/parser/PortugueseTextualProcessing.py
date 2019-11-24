@@ -105,48 +105,26 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def convert_corpus_to_number(dataframe):
-        """:param dataframe Dataframe()"""
+        """:param dataframe pandas.Dataframe"""
         corpus = dataframe['Text']
         tokenizer = Tokenizer(num_words=PortugueseTextualProcessing.MAX_NUM_WORDS)
         tokenizer.fit_on_texts(corpus)
-        vocab_length = len(tokenizer.word_index) + 1
 
-        print('vocab len:' + str(vocab_length))
         embedded_sentences = tokenizer.texts_to_sequences(corpus)
         print(embedded_sentences)
 
         longest_sentence = max(corpus, key=lambda sentence: len(nltk.word_tokenize(sentence, language='portuguese')))
-        length_long_sentence = len(nltk.word_tokenize(longest_sentence, language='portuguese'))
+        max_sentence_len = len(nltk.word_tokenize(longest_sentence, language='portuguese'))
 
-        padded_sentences = pad_sequences(embedded_sentences, length_long_sentence, padding='post')
+        padded_sentences = pad_sequences(embedded_sentences, max_sentence_len, padding='post')
 
-        print(padded_sentences)
-        return tokenizer, padded_sentences, vocab_length, length_long_sentence
+        return tokenizer, padded_sentences, max_sentence_len
 
     @staticmethod
-    def build_embedding_matrix_2(word_embedding_dict, vocab_length, tokenizer):
+    def build_embedding_matrix(word_embedding_dict, vocab_length, tokenizer):
         embedding_matrix = np.zeros((vocab_length, 100))
         for word, index in tokenizer.word_index.items():
             embedding_vector = word_embedding_dict.get(word)
             if embedding_vector is not None:
                 embedding_matrix[index] = embedding_vector[:100]
-        return embedding_matrix
-
-    @staticmethod
-    def build_embedding_matrix(word_embedding, input_text):
-        tokenizer = Tokenizer(num_words=PortugueseTextualProcessing.MAX_NUM_WORDS)
-        tokenizer.fit_on_texts(input_text)
-        # sequences = tokenizer.texts_to_sequences(input_text)
-        word_index = tokenizer.word_index
-        print('Found %s unique tokens.' % len(word_index))
-
-        num_words = min(PortugueseTextualProcessing.MAX_NUM_WORDS, len(word_index) + 1)
-        embedding_matrix = np.zeros((num_words, PortugueseTextualProcessing.EMBEDDING_DIM))
-        for word, i in word_index.items():
-            if i >= PortugueseTextualProcessing.MAX_NUM_WORDS:
-                continue
-            embedding_vector = word_embedding.get(word)
-            if embedding_vector is not None:
-                # words not found in embedding index will be all-zeros.
-                embedding_matrix[i] = embedding_vector[:PortugueseTextualProcessing.EMBEDDING_DIM]
         return embedding_matrix

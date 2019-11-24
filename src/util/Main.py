@@ -6,10 +6,10 @@ from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import Flatten
-from keras.layers.embeddings import Embedding
+from sklearn.preprocessing import LabelEncoder
+from keras.utils import np_utils
+from sklearn.model_selection import StratifiedKFold
+from src.classifiers.NeuralNetwork import *
 
 
 def convert_data(base_path):
@@ -66,79 +66,71 @@ def normalize_data(data, norm='l2'):
     return preprocessing.normalize(data, norm)
 
 
+def decode_labels(label_encoder, encoded_array):
+    return label_encoder.inverse_transform(np.argmax(encoded_array, axis=1, out=None))
+
+
+def decode_class(label_encoder, class_value):
+    label_encoder.inverse_transform([class_value])
+
+
 if __name__ == '__main__':
 
-    #word_embedding = PortugueseTextualProcessing().load_vector_2()
-
-    #embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix(word_embedding, ['apenas um teste, daniel é o meu nome atual cara loko'])
-    #print(embedding_matrix)
-    # TODO: Start using simple SVMdf = df.groupby('Author').filter(lambda x: len(x) > 1)
-    # convert_data('../../data/students_exercises/')
     df = pd.read_csv('../../data/parsed-data/data2.csv')
+
+    df = remove_single_class_entries(df, 'Author')
     y = df.pop('Author')
+
+    le = LabelEncoder()
+    le.fit(y)
+    encoded_Y = le.transform(y)
+
+    # decode: le.inverse_transform(encoded_Y)
+    # convert integers to dummy variables (i.e. one hot encoded)
+    dummy_y = np_utils.to_categorical(encoded_Y)
+
     result = []
-    embeddings = PortugueseTextualProcessing().load_vector_2()
+    glove_embedding = PortugueseTextualProcessing().load_vector_2()
 
-    tokenizer, padded_sentences, vocab_length, length_long_sentence \
+    tokenizer, padded_sentences, max_sentence_len \
         = PortugueseTextualProcessing().convert_corpus_to_number(df)
-    embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix_2(embeddings, vocab_length, tokenizer)
 
-    print(embedding_matrix)
-    print(padded_sentences)
+    vocab_len = len(tokenizer.word_index) + 1
 
-    model = Sequential()
-    embedding_layer = Embedding(vocab_length, 100, weights=[embedding_matrix], input_length=length_long_sentence,
-                                trainable=False)
-    model.add(embedding_layer)
-    model.add(Flatten())
-    model.add(Dense(1, activation='relu'))
+    embedded_matrix = PortugueseTextualProcessing().build_embedding_matrix(glove_embedding, vocab_len, tokenizer)
 
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
-    print(model.summary())
+    # TODO: Iterate over params to check best configs
+    init = ['glorot_uniform', 'normal', 'uniform']
+    optimizers = ['rmsprop', 'adam']
+    epochs = [50, 100, 150]
+    batches = [5, 10, 20]
+    param_network = dict(optimizer=optimizers, epochs=epochs, batch_size=batches, init=init)
 
+    # TODO: Check results with normalization (df_norm = (df - df.mean()) / (df.max() - df.min()))
 
-    # TODO: Fix ValueError: could not convert string to float: 'SDFI'
-    model.fit(padded_sentences, y, epochs=100, verbose=1)
-    loss, accuracy = model.evaluate(padded_sentences, y, verbose=0)
-    print('Accuracy: %f' % (accuracy * 100))
+    cv_scores = []
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
+    models = []
+    for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
+        dummy_y = np_utils.to_categorical(encoded_Y)
+        print("TRAIN:", train_index, "TEST:", test_index)
+        X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
+        y_train, y_test = dummy_y[train_index], dummy_y[test_index]
 
-    # TODO: Create CSV file
+        nn = NeuralNetwork()
+        model = nn.baseline_model(embedded_matrix, max_sentence_len, vocab_len)
 
-    # embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix_2(embeddings, df)
-    # for text in df['Text']:
-    #     print(text)
-    #     embedding_matrix = PortugueseTextualProcessing().build_embedding_matrix(embeddings, [text])
-    #     print(embedding_matrix)
-    #     result.append(embedding_matrix)
-    #
-    # output = []
-    # for idx, text in enumerate(result):
-    #     print(idx)
-    #     print(df['Author'][idx])
-    #     output.append([result[idx], df['Author'][idx]])
-    #
-    # #TODO: Convert array into csv file
-    # print(output)
+        nn.train(X_train, y_train, 100)
+
+        scores = nn.evaluate_model(X_test, y_test)
+        cv_scores.append(scores[1] * 100)
+        models.append(nn)
+
+    print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
+    models[cv_scores.index(max(cv_scores))].save_model()
 
 
-    # df = remove_single_class_entries(df, 'Author')
-    # CSVReader().export_dataframe(df, '../../student_data2.csv')
-    #
-    # save_converted_stylo_data()
-    #
-    #
-    #
-    # df = pd.read_csv('../../data/parsed-data/stylo.csv')
-    # df = remove_single_class_entries(df, 'Classe(Autor)')
-    # authors = df.pop('Classe(Autor)')
-    # df_norm = (df - df.mean()) / (df.max() - df.min())
-    # df_norm['Classe(Autor)'] = authors
-    #
-    # CSVReader().export_dataframe(df_norm, 'stylo2.csv')
 
-
-    #show_column_distribution('Classe(Autor)')
-    #prepare_train_data(df)
 
 
 

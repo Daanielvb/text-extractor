@@ -11,3 +11,4 @@ sklearn
 spatial
 keras
 tensorflow
+h5py
