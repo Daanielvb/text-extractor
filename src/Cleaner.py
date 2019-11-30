@@ -38,6 +38,7 @@ class Cleaner:
             text = re.sub(Cleaner.INSTITUTION_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.PERIOD_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.DATE_PATTERN, '', text, flags=re.IGNORECASE)
+            # TODO: Verify if results are better using PortugueseTextualProcessing().remove_stopwords()
             result.append(Cleaner().format(text))
         return result
 
