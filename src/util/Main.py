@@ -108,6 +108,8 @@ if __name__ == '__main__':
 
     # TODO: Check results with normalization (df_norm = (df - df.mean()) / (df.max() - df.min()))
 
+    number_of_classes = len(np_utils.to_categorical(encoded_Y)[0])
+
     cv_scores = []
     kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
     models = []
@@ -118,7 +120,7 @@ if __name__ == '__main__':
         y_train, y_test = dummy_y[train_index], dummy_y[test_index]
 
         nn = NeuralNetwork()
-        model = nn.baseline_model(embedded_matrix, max_sentence_len, vocab_len)
+        model = nn.baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(encoded_Y[0]))
 
         nn.train(X_train, y_train, 100)
 

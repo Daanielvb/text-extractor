@@ -14,14 +14,15 @@ class NeuralNetwork:
     def train(self, X_train, y_train, epochs=150):
         self.model.fit(X_train, y_train, epochs=epochs, verbose=1)
 
-    def baseline_model(self, emd_matrix, long_sent_size, vocab_len):
+    def baseline_model(self, emd_matrix, long_sent_size, vocab_len, number_of_classes):
         self.model = Sequential()
         embedding_layer = Embedding(vocab_len, 100, weights=[emd_matrix], input_length=long_sent_size,
                                         trainable=False)
         self.model.add(embedding_layer)
         self.model.add(Flatten())
+
         # softmax performing better than relu
-        self.model.add(Dense(20, activation='softmax'))
+        self.model.add(Dense(number_of_classes, activation='softmax'))
 
         self.model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
         return self.model
