@@ -13,6 +13,7 @@ from src.classifiers.NeuralNetwork import *
 
 
 def convert_data(base_path):
+    # TODO: Re-add lygya maria souza and maria milena dos santos at MECB/A3
     clean_txt_content, txt_file_names = FileUtil.convert_files(base_path)
     clean_doc_content, doc_file_names = DOCReader().convert_docs(base_path)
     clean_pdf_content, pdf_file_names = PDFReader().convert_pdfs(base_path)
@@ -75,61 +76,61 @@ def decode_class(label_encoder, class_value):
 
 
 if __name__ == '__main__':
-
-    df = pd.read_csv('../../data/parsed-data/data2.csv')
-
-    df = remove_single_class_entries(df, 'Author')
-    y = df.pop('Author')
-
-    le = LabelEncoder()
-    le.fit(y)
-    encoded_Y = le.transform(y)
-
-    # decode: le.inverse_transform(encoded_Y)
-    # convert integers to dummy variables (i.e. one hot encoded)
-    dummy_y = np_utils.to_categorical(encoded_Y)
-
-    result = []
-    glove_embedding = PortugueseTextualProcessing().load_vector_2()
-
-    tokenizer, padded_sentences, max_sentence_len \
-        = PortugueseTextualProcessing().convert_corpus_to_number(df)
-
-    vocab_len = len(tokenizer.word_index) + 1
-
-    embedded_matrix = PortugueseTextualProcessing().build_embedding_matrix(glove_embedding, vocab_len, tokenizer)
-
-    # TODO: Iterate over params to check best configs
-    init = ['glorot_uniform', 'normal', 'uniform']
-    optimizers = ['rmsprop', 'adam']
-    epochs = [50, 100, 150]
-    batches = [5, 10, 20]
-    param_network = dict(optimizer=optimizers, epochs=epochs, batch_size=batches, init=init)
-
-    # TODO: Check results with normalization (df_norm = (df - df.mean()) / (df.max() - df.min()))
-
-    number_of_classes = len(np_utils.to_categorical(encoded_Y)[0])
-
-    cv_scores = []
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
-    models = []
-    for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
-        dummy_y = np_utils.to_categorical(encoded_Y)
-        print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
-        y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-
-        nn = NeuralNetwork()
-        model = nn.baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(encoded_Y[0]))
-
-        nn.train(X_train, y_train, 100)
-
-        scores = nn.evaluate_model(X_test, y_test)
-        cv_scores.append(scores[1] * 100)
-        models.append(nn)
-
-    print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-    models[cv_scores.index(max(cv_scores))].save_model()
+    convert_data('../../data/students_exercises/')
+    # df = pd.read_csv('../../data/parsed-data/data2.csv')
+    #
+    # df = remove_single_class_entries(df, 'Author')
+    # y = df.pop('Author')
+    #
+    # le = LabelEncoder()
+    # le.fit(y)
+    # encoded_Y = le.transform(y)
+    #
+    # # decode: le.inverse_transform(encoded_Y)
+    # # convert integers to dummy variables (i.e. one hot encoded)
+    # dummy_y = np_utils.to_categorical(encoded_Y)
+    #
+    # result = []
+    # glove_embedding = PortugueseTextualProcessing().load_vector_2()
+    #
+    # tokenizer, padded_sentences, max_sentence_len \
+    #     = PortugueseTextualProcessing().convert_corpus_to_number(df)
+    #
+    # vocab_len = len(tokenizer.word_index) + 1
+    #
+    # embedded_matrix = PortugueseTextualProcessing().build_embedding_matrix(glove_embedding, vocab_len, tokenizer)
+    #
+    # # TODO: Iterate over params to check best configs
+    # init = ['glorot_uniform', 'normal', 'uniform']
+    # optimizers = ['rmsprop', 'adam']
+    # epochs = [50, 100, 150]
+    # batches = [5, 10, 20]
+    # param_network = dict(optimizer=optimizers, epochs=epochs, batch_size=batches, init=init)
+    #
+    # # TODO: Check results with normalization (df_norm = (df - df.mean()) / (df.max() - df.min()))
+    #
+    # number_of_classes = len(np_utils.to_categorical(encoded_Y)[0])
+    #
+    # cv_scores = []
+    # kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
+    # models = []
+    # for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
+    #     dummy_y = np_utils.to_categorical(encoded_Y)
+    #     print("TRAIN:", train_index, "TEST:", test_index)
+    #     X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
+    #     y_train, y_test = dummy_y[train_index], dummy_y[test_index]
+    #
+    #     nn = NeuralNetwork()
+    #     model = nn.baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(encoded_Y[0]))
+    #
+    #     nn.train(X_train, y_train, 100)
+    #
+    #     scores = nn.evaluate_model(X_test, y_test)
+    #     cv_scores.append(scores[1] * 100)
+    #     models.append(nn)
+    #
+    # print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
+    # models[cv_scores.index(max(cv_scores))].save_model()
 
 
 
