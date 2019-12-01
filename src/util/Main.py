@@ -12,8 +12,8 @@ from sklearn.model_selection import StratifiedKFold
 from src.classifiers.NeuralNetwork import *
 import pickle
 
+
 def convert_data(base_path):
-    # TODO: Re-add lygya maria souza and maria milena dos santos at MECB/A3
     clean_txt_content, txt_file_names = FileUtil.convert_files(base_path)
     clean_doc_content, doc_file_names = DOCReader().convert_docs(base_path)
     clean_pdf_content, pdf_file_names = PDFReader().convert_pdfs(base_path)
@@ -52,8 +52,8 @@ def remove_entries_based_on_threshold(dataframe, class_name, threshold):
     return dataframe.groupby(class_name).filter(lambda x: len(x) > threshold)
 
 
-def save_plot(plot, plot_name):
-    plot.savefig(plot_name)
+def save_plot(plot_name):
+    plt.savefig(plot_name)
 
 
 def show_column_distribution(dataframe, class_name):
@@ -112,9 +112,13 @@ def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
 
 
 def run_complete_pipeline():
+    convert_data('../../data/students_exercises')
     df = pd.read_csv('../../data/parsed-data/data2.csv')
 
     df = remove_entries_based_on_threshold(df, 'Author', 1)
+
+    show_column_distribution(df, 'Author')
+
     y = df.pop('Author')
 
     le = LabelEncoder()
@@ -126,7 +130,7 @@ def run_complete_pipeline():
     tokenizer, padded_sentences, max_sentence_len \
         = PortugueseTextualProcessing().convert_corpus_to_number(df)
 
-    # save_tokenizer(tokenizer)
+    save_tokenizer(tokenizer)
     vocab_len = len(tokenizer.word_index) + 1
 
     glove_embedding = PortugueseTextualProcessing().load_vector_2(tokenizer)
@@ -168,24 +172,27 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('../../data/parsed-data/data2.csv')
+    #df = pd.read_csv('../../data/parsed-data/data2.csv')
 
-    from random import randint
-
-    correct = 0
-    df = remove_entries_based_on_threshold(df, 'Author', 1)
-    nn = NeuralNetwork()
-    nn.load_model()
-    encoder = load_encoder()
-    tokenizer = load_tokenizer()
-    for i in range(100):
-        idx = randint(0, len(df.Author) - 1)
-        print('idx:' + str(idx))
-        half_size = int(len(df.Text.iloc[idx])/2)
-        half_text = df.Text.iloc[idx][half_size:]
-        pred_result = run_compiled_model(nn, tokenizer, encoder, half_text, df.Author.iloc[idx])
-        if pred_result:
-            correct += 1
-
-    print('total correct = ' + str(correct))
-    print('accuracy % = ' + str((correct/100) * 100))
+    run_complete_pipeline()
+    # from random import randint
+    #
+    # correct = 0
+    # df = remove_entries_based_on_threshold(df, 'Author', 1)
+    # nn = NeuralNetwork()
+    # nn.load_model()
+    # encoder = load_encoder()
+    # tokenizer = load_tokenizer()
+    # run_compiled_model(nn, tokenizer, encoder, '1 - Competição entre membros de espécies diferentes que usam os mesmos recursos limitados. Os recursos costumam ser limitados em um habitat e muitas espécies podem competir para consegui-los. O efeito geral da competição interespecífica é negativo para as duas espécies participantes, ou seja, cada espécie estaria melhor se a outra espécie não estivesse presente. Com tudo referente à complementaridade de nicho O princípio exclusão competitiva diz que duas espécies competidoras podem concorrer em determinado local, mas para isso elas precisam possuir nichos realizados diferentes. 2 Em referente ao primeiro estudo de caso (Asterionella formosa/ Synedra ulna) a ocorrência competitiva devido ao mesmo recurso (silicato) apresenta princípio da exclusão competitivas onde ambas ocupando o mesmo nicho em que a capacidade suporte influencia na exclusão de uma espécie. No segundo caso a relação de coexistência da diversidade de espécie de peixe-palhaço esta relacionada com a quantidade de anêmonas onde o seu principal recursos esta no abrigo possibilitando a produtividade e perpetuação da espécie de peixe, além disso, devido a população desse peixe esta ligado ao recurso limitante por anêmona criando uma diversidade que utiliza diferentes nichos devido ao distanciamento de cada anêmona do estudo. 3 - O princípio da exclusão competitiva ou, como também é chamado, Lei de Gause, é uma proposição que afirma que, em um ambiente estável no qual os indivíduos se distribuem de forma homogênea, duas espécies com nichos ecológicos parecidos não podem coexistir, devido a pressão evolutiva exercida pela competição. De acordo com esse princípio, um dos competidores terminará por sobrepujar ao outro, o que pode acarretar mudanças morfológicas, comportamentais, deslocamento de nicho ecológico ou até mesmo a extinção da espécie em desvantagem. Em suma, o que esse conceito quer dizer é que competidores completos não podem coexistir. ', 'test')
+    #
+    # # for i in range(100):
+    # #     idx = randint(0, len(df.Author) - 1)
+    # #     print('idx:' + str(idx))
+    # #     half_size = int(len(df.Text.iloc[idx])/2)
+    # #     half_text = df.Text.iloc[idx][:half_size]
+    # #     pred_result = run_compiled_model(nn, tokenizer, encoder, half_text, df.Author.iloc[idx])
+    # #     if pred_result:
+    # #         correct += 1
+    #
+    # print('total correct = ' + str(correct))
+    # print('accuracy % = ' + str((correct/100) * 100))
