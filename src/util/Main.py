@@ -10,7 +10,7 @@ from sklearn.preprocessing import LabelEncoder
 from keras.utils import np_utils
 from sklearn.model_selection import StratifiedKFold
 from src.classifiers.NeuralNetwork import *
-
+import pickle
 
 def convert_data(base_path):
     # TODO: Re-add lygya maria souza and maria milena dos santos at MECB/A3
@@ -43,9 +43,13 @@ def remove_group_works(dataframe):
     return dataframe.loc[mask]
 
 
-def remove_single_class_entries(dataframe, class_name):
+def remove_entries_based_on_threshold(dataframe, class_name, threshold):
+    """Remove classes from a dataframe based on threshold, eg: If threshold = 1,
+        only instances with 2 or more examples contained in the `class_name` column
+        will remain on the dataframe
+    """
     #TODO: Check some NaNs
-    return dataframe.groupby(class_name).filter(lambda x: len(x) > 1)
+    return dataframe.groupby(class_name).filter(lambda x: len(x) > threshold)
 
 
 def save_plot(plot, plot_name):
@@ -75,66 +79,99 @@ def decode_class(label_encoder, class_value):
     label_encoder.inverse_transform([class_value])
 
 
+def save_encoder(label_encoder, encoder_file_name='label_encoder_classes.npy'):
+    np.save(encoder_file_name,label_encoder)
+
+
+def load_encoder(encoder_file_name='label_encoder_classes.npy'):
+    encoder = LabelEncoder()
+    encoder.classes_ = np.load(encoder_file_name, allow_pickle=True)
+    return encoder
+
+
+def save_tokenizer(tokenizer, tokenizer_file='tokenizer.pickle'):
+    with open(tokenizer_file, 'wb') as handle:
+        pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def load_tokenizer(tokenizer_file='tokenizer.pickle'):
+    with open(tokenizer_file, 'rb') as handle:
+        tokenizer = pickle.load(handle)
+    return tokenizer
+
+
+def run_compiled_model(X_predict, y_expected):
+    nn = NeuralNetwork()
+    nn.load_model()
+    encoder = load_encoder()
+    tokenizer = load_tokenizer()
+
+    # TODO: Entry is not on the appropriate shape to be used by the model
+    embedded_sentence = tokenizer.texts_to_sequences(X_predict)
+    padded_sentences = pad_sequences(embedded_sentence, 6658, padding='post')
+
+    pred = nn.predict_entry(padded_sentences)
+    print (pred + '' + y_expected)
+
+
+def run_complete_pipeline():
+    df = pd.read_csv('../../data/parsed-data/data2.csv')
+
+    df = remove_entries_based_on_threshold(df, 'Author', 1)
+    y = df.pop('Author')
+
+    le = LabelEncoder()
+    le.fit(y)
+    encoded_Y = le.transform(y)
+    save_encoder(le)
+    # decode: le.inverse_transform(encoded_Y)
+
+    tokenizer, padded_sentences, max_sentence_len \
+        = PortugueseTextualProcessing().convert_corpus_to_number(df)
+
+    # save_tokenizer(tokenizer)
+    vocab_len = len(tokenizer.word_index) + 1
+
+    glove_embedding = PortugueseTextualProcessing().load_vector_2(tokenizer)
+
+    embedded_matrix = PortugueseTextualProcessing().build_embedding_matrix(glove_embedding, vocab_len, tokenizer)
+
+    # TODO: Iterate over params to check best configs
+    init = ['glorot_uniform', 'normal', 'uniform']
+    optimizers = ['rmsprop', 'adam']
+    epochs = [50, 100, 150]
+    batches = [5, 10, 20]
+    param_network = dict(optimizer=optimizers, epochs=epochs, batch_size=batches, init=init)
+
+    # TODO: Check results with normalization (df_norm = (df - df.mean()) / (df.max() - df.min()))
+    cv_scores = []
+    kfold = StratifiedKFold(n_splits=4, shuffle=True, random_state=7)
+    models = []
+
+    # Separate some validation samples
+
+    for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
+        # convert integers to dummy variables (i.e. one hot encoded)
+        dummy_y = np_utils.to_categorical(encoded_Y)
+        print("TRAIN:", train_index, "TEST:", test_index)
+        X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
+        y_train, y_test = dummy_y[train_index], dummy_y[test_index]
+
+        nn = NeuralNetwork()
+        nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(dummy_y[0]))
+
+        nn.train(X_train, y_train, 100)
+
+        scores = nn.evaluate_model(X_test, y_test)
+        cv_scores.append(scores[1] * 100)
+        models.append(nn)
+
+    print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
+    models[cv_scores.index(max(cv_scores))].save_model()
+
+
 if __name__ == '__main__':
-    convert_data('../../data/students_exercises/')
-    # df = pd.read_csv('../../data/parsed-data/data2.csv')
-    #
-    # df = remove_single_class_entries(df, 'Author')
-    # y = df.pop('Author')
-    #
-    # le = LabelEncoder()
-    # le.fit(y)
-    # encoded_Y = le.transform(y)
-    #
-    # # decode: le.inverse_transform(encoded_Y)
-    # # convert integers to dummy variables (i.e. one hot encoded)
-    # dummy_y = np_utils.to_categorical(encoded_Y)
-    #
-    # result = []
-    # glove_embedding = PortugueseTextualProcessing().load_vector_2()
-    #
-    # tokenizer, padded_sentences, max_sentence_len \
-    #     = PortugueseTextualProcessing().convert_corpus_to_number(df)
-    #
-    # vocab_len = len(tokenizer.word_index) + 1
-    #
-    # embedded_matrix = PortugueseTextualProcessing().build_embedding_matrix(glove_embedding, vocab_len, tokenizer)
-    #
-    # # TODO: Iterate over params to check best configs
-    # init = ['glorot_uniform', 'normal', 'uniform']
-    # optimizers = ['rmsprop', 'adam']
-    # epochs = [50, 100, 150]
-    # batches = [5, 10, 20]
-    # param_network = dict(optimizer=optimizers, epochs=epochs, batch_size=batches, init=init)
-    #
-    # # TODO: Check results with normalization (df_norm = (df - df.mean()) / (df.max() - df.min()))
-    #
-    # number_of_classes = len(np_utils.to_categorical(encoded_Y)[0])
-    #
-    # cv_scores = []
-    # kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
-    # models = []
-    # for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
-    #     dummy_y = np_utils.to_categorical(encoded_Y)
-    #     print("TRAIN:", train_index, "TEST:", test_index)
-    #     X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
-    #     y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-    #
-    #     nn = NeuralNetwork()
-    #     model = nn.baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(encoded_Y[0]))
-    #
-    #     nn.train(X_train, y_train, 100)
-    #
-    #     scores = nn.evaluate_model(X_test, y_test)
-    #     cv_scores.append(scores[1] * 100)
-    #     models.append(nn)
-    #
-    # print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-    # models[cv_scores.index(max(cv_scores))].save_model()
-
-
-
-
-
-
+    df = pd.read_csv('../../data/parsed-data/data2.csv')
+    df = remove_entries_based_on_threshold(df, 'Author', 1)
+    run_compiled_model(df.Text.iloc[0], df.Author.iloc[0])
 

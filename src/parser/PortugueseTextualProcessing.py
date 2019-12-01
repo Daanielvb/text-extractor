@@ -76,25 +76,15 @@ class PortugueseTextualProcessing:
                 print(f"{left[-context:]} '{word}' {right[:context]}")
 
     @staticmethod
-    def load_vector():
+    def load_vector_2(vocabulary_tokenizer):
         word_embedding = {}
-        with open("glove_s100.txt", 'r') as f:
-            for line in f:
-                values = line.split()
-                word = values[0]
-                vector = np.asarray(values[1:], "float32")
-                word_embedding[word] = vector
-        print('Found %s word vectors.' % len(word_embedding))
-        return word_embedding
-
-    @staticmethod
-    def load_vector_2():
-        word_embedding = {}
+        vocabulary_tokenizer
         with open("glove_s100.txt", 'r', encoding='utf-8') as f:
             for line in f:
                 word, coefs = line.split(maxsplit=1)
-                coefs = np.fromstring(coefs, 'f', sep=' ')
-                word_embedding[word] = coefs
+                if word in vocabulary_tokenizer.word_index:
+                    coefs = np.fromstring(coefs, 'f', sep=' ')
+                    word_embedding[word] = coefs
         print('Found %s word vectors.' % len(word_embedding))
         return word_embedding
 
