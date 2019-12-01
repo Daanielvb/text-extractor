@@ -172,27 +172,33 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    #df = pd.read_csv('../../data/parsed-data/data2.csv')
 
-    run_complete_pipeline()
-    # from random import randint
-    #
-    # correct = 0
-    # df = remove_entries_based_on_threshold(df, 'Author', 1)
-    # nn = NeuralNetwork()
-    # nn.load_model()
-    # encoder = load_encoder()
-    # tokenizer = load_tokenizer()
-    # run_compiled_model(nn, tokenizer, encoder, '1 - Competição entre membros de espécies diferentes que usam os mesmos recursos limitados. Os recursos costumam ser limitados em um habitat e muitas espécies podem competir para consegui-los. O efeito geral da competição interespecífica é negativo para as duas espécies participantes, ou seja, cada espécie estaria melhor se a outra espécie não estivesse presente. Com tudo referente à complementaridade de nicho O princípio exclusão competitiva diz que duas espécies competidoras podem concorrer em determinado local, mas para isso elas precisam possuir nichos realizados diferentes. 2 Em referente ao primeiro estudo de caso (Asterionella formosa/ Synedra ulna) a ocorrência competitiva devido ao mesmo recurso (silicato) apresenta princípio da exclusão competitivas onde ambas ocupando o mesmo nicho em que a capacidade suporte influencia na exclusão de uma espécie. No segundo caso a relação de coexistência da diversidade de espécie de peixe-palhaço esta relacionada com a quantidade de anêmonas onde o seu principal recursos esta no abrigo possibilitando a produtividade e perpetuação da espécie de peixe, além disso, devido a população desse peixe esta ligado ao recurso limitante por anêmona criando uma diversidade que utiliza diferentes nichos devido ao distanciamento de cada anêmona do estudo. 3 - O princípio da exclusão competitiva ou, como também é chamado, Lei de Gause, é uma proposição que afirma que, em um ambiente estável no qual os indivíduos se distribuem de forma homogênea, duas espécies com nichos ecológicos parecidos não podem coexistir, devido a pressão evolutiva exercida pela competição. De acordo com esse princípio, um dos competidores terminará por sobrepujar ao outro, o que pode acarretar mudanças morfológicas, comportamentais, deslocamento de nicho ecológico ou até mesmo a extinção da espécie em desvantagem. Em suma, o que esse conceito quer dizer é que competidores completos não podem coexistir. ', 'test')
-    #
-    # # for i in range(100):
-    # #     idx = randint(0, len(df.Author) - 1)
-    # #     print('idx:' + str(idx))
-    # #     half_size = int(len(df.Text.iloc[idx])/2)
-    # #     half_text = df.Text.iloc[idx][:half_size]
-    # #     pred_result = run_compiled_model(nn, tokenizer, encoder, half_text, df.Author.iloc[idx])
-    # #     if pred_result:
-    # #         correct += 1
-    #
-    # print('total correct = ' + str(correct))
-    # print('accuracy % = ' + str((correct/100) * 100))
+    # run_complete_pipeline()
+
+    df = pd.read_csv('../../data/parsed-data/data2.csv')
+
+
+    from random import randint
+    # TODO: Check if null tokens is a good approach for unseen content
+    # TODO: Perform validation with unseen data
+    # TODO: See if its possible to use Random Forest with our embedding matrix
+    # TODO: Think about the group works problem
+    correct = 0
+    df = remove_entries_based_on_threshold(df, 'Author', 1)
+    nn = NeuralNetwork()
+    nn.load_model()
+    encoder = load_encoder()
+    tokenizer = load_tokenizer()
+    run_compiled_model(nn, tokenizer, encoder, '1 - Competição entre membros de espécies diferentes que usam os mesmos recursos limitados. Os recursos costumam ser limitados em um habitat e muitas espécies podem competir para consegui-los. O efeito geral da competição interespecífica é negativo para as duas espécies participantes, ou seja, cada espécie estaria melhor se a outra espécie não estivesse presente. Com tudo referente à complementaridade de nicho O princípio exclusão competitiva diz que duas espécies competidoras podem concorrer em determinado local, mas para isso elas precisam possuir nichos realizados diferentes. 2 Em referente ao primeiro estudo de caso (Asterionella formosa/ Synedra ulna) a ocorrência competitiva devido ao mesmo recurso (silicato) apresenta princípio da exclusão competitivas onde ambas ocupando o mesmo nicho em que a capacidade suporte influencia na exclusão de uma espécie. No segundo caso a relação de coexistência da diversidade de espécie de peixe-palhaço esta relacionada com a quantidade de anêmonas onde o seu principal recursos esta no abrigo possibilitando a produtividade e perpetuação da espécie de peixe, além disso, devido a população desse peixe esta ligado ao recurso limitante por anêmona criando uma diversidade que utiliza diferentes nichos devido ao distanciamento de cada anêmona do estudo. 3 - O princípio da exclusão competitiva ou, como também é chamado, Lei de Gause, é uma proposição que afirma que, em um ambiente estável no qual os indivíduos se distribuem de forma homogênea, duas espécies com nichos ecológicos parecidos não podem coexistir, devido a pressão evolutiva exercida pela competição. De acordo com esse princípio, um dos competidores terminará por sobrepujar ao outro, o que pode acarretar mudanças morfológicas, comportamentais, deslocamento de nicho ecológico ou até mesmo a extinção da espécie em desvantagem. Em suma, o que esse conceito quer dizer é que competidores completos não podem coexistir. ', 'test')
+
+    for i in range(100):
+        idx = randint(0, len(df.Author) - 1)
+        print('idx:' + str(idx))
+        half_size = int(len(df.Text.iloc[idx])/2)
+        half_text = df.Text.iloc[idx][:half_size]
+        pred_result = run_compiled_model(nn, tokenizer, encoder, half_text, df.Author.iloc[idx])
+        if pred_result:
+            correct += 1
+
+    print('total correct = ' + str(correct))
+    print('accuracy % = ' + str((correct/100) * 100))
