@@ -55,5 +55,8 @@ class NeuralNetwork:
         self.model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
         print("Loaded model from disk")
 
-    def predict_entry(self, entry):
-        return self.model.evaluate(entry)
+    def predict_entries(self, entry):
+        predictons = self.model.predict_classes(entry)
+        # show the inputs and predicted outputs
+        print("X=%s, Predicted=%s" % (entry, predictons[0]))
+        return predictons

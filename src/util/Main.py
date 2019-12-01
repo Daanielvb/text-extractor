@@ -76,11 +76,11 @@ def decode_labels(label_encoder, encoded_array):
 
 
 def decode_class(label_encoder, class_value):
-    label_encoder.inverse_transform([class_value])
+    return label_encoder.inverse_transform([class_value])
 
 
 def save_encoder(label_encoder, encoder_file_name='label_encoder_classes.npy'):
-    np.save(encoder_file_name,label_encoder)
+    np.save(encoder_file_name, label_encoder.classes_)
 
 
 def load_encoder(encoder_file_name='label_encoder_classes.npy'):
@@ -100,18 +100,15 @@ def load_tokenizer(tokenizer_file='tokenizer.pickle'):
     return tokenizer
 
 
-def run_compiled_model(X_predict, y_expected):
-    nn = NeuralNetwork()
-    nn.load_model()
-    encoder = load_encoder()
-    tokenizer = load_tokenizer()
-
-    # TODO: Entry is not on the appropriate shape to be used by the model
-    embedded_sentence = tokenizer.texts_to_sequences(X_predict)
+def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
+    embedded_sentence = tokenizer.texts_to_sequences([X_predict])
     padded_sentences = pad_sequences(embedded_sentence, 6658, padding='post')
 
-    pred = nn.predict_entry(padded_sentences)
-    print (pred + '' + y_expected)
+    pred = model.predict_entries(padded_sentences)
+
+    decoded_pred = decode_class(encoder, pred[0])
+    print('predicted:' + decoded_pred + ' expected:' + y_expected)
+    return decoded_pred == y_expected
 
 
 def run_complete_pipeline():
@@ -172,6 +169,23 @@ def run_complete_pipeline():
 
 if __name__ == '__main__':
     df = pd.read_csv('../../data/parsed-data/data2.csv')
-    df = remove_entries_based_on_threshold(df, 'Author', 1)
-    run_compiled_model(df.Text.iloc[0], df.Author.iloc[0])
 
+    from random import randint
+
+    correct = 0
+    df = remove_entries_based_on_threshold(df, 'Author', 1)
+    nn = NeuralNetwork()
+    nn.load_model()
+    encoder = load_encoder()
+    tokenizer = load_tokenizer()
+    for i in range(100):
+        idx = randint(0, len(df.Author) - 1)
+        print('idx:' + str(idx))
+        half_size = int(len(df.Text.iloc[idx])/2)
+        half_text = df.Text.iloc[idx][half_size:]
+        pred_result = run_compiled_model(nn, tokenizer, encoder, half_text, df.Author.iloc[idx])
+        if pred_result:
+            correct += 1
+
+    print('total correct = ' + str(correct))
+    print('accuracy % = ' + str((correct/100) * 100))
