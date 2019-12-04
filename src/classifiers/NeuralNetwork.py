@@ -1,6 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import Flatten
+from keras.layers import Dense, Flatten, Dropout
 from keras.layers.embeddings import Embedding
 from keras.models import model_from_json
 
@@ -19,6 +18,7 @@ class NeuralNetwork:
         embedding_layer = Embedding(vocab_len, 100, weights=[emd_matrix], input_length=long_sent_size,
                                         trainable=False)
         self.model.add(embedding_layer)
+        self.model.add(Dropout(0.2))
         self.model.add(Flatten())
 
         # softmax performing better than relu

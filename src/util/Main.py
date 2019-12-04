@@ -117,7 +117,7 @@ def run_complete_pipeline():
 
     df = remove_entries_based_on_threshold(df, 'Author', 1)
 
-    show_column_distribution(df, 'Author')
+    #show_column_distribution(df, 'Author')
 
     y = df.pop('Author')
 
@@ -151,16 +151,15 @@ def run_complete_pipeline():
 
     # Separate some validation samples
 
+    nn = NeuralNetwork()
+    nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
+
     for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
         # convert integers to dummy variables (i.e. one hot encoded)
         dummy_y = np_utils.to_categorical(encoded_Y)
         print("TRAIN:", train_index, "TEST:", test_index)
         X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
         y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-
-        nn = NeuralNetwork()
-        nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(dummy_y[0]))
-
         nn.train(X_train, y_train, 100)
 
         scores = nn.evaluate_model(X_test, y_test)
@@ -173,7 +172,7 @@ def run_complete_pipeline():
 
 if __name__ == '__main__':
 
-    # run_complete_pipeline()
+    run_complete_pipeline()
 
     df = pd.read_csv('../../data/parsed-data/data2.csv')
 
