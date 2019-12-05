@@ -83,6 +83,13 @@ class StyloDocument(object):
     def count_characters(self, character_list):
         return len([word for word in self.file_content if word in character_list])
 
+    #TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
+    def local_hapax_legommena_frequency(self):
+        return (len(self.fdist.hapaxes()))/len(self.text.tokens)
+
+    def collocations_frequency(self):
+        return (len(self.collocations))/len(self.text.tokens)
+
     @classmethod
     def csv_header(cls):
         return (
@@ -90,12 +97,13 @@ class StyloDocument(object):
              'Ponto','Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
              'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados',
-             'Vogais', 'LetrasA', 'LetrasE', 'LetrasI', 'LetrasO', 'LetrasU', 'Classe(Autor)']
+             'Vogais', 'LetrasA', 'LetrasE', 'LetrasI', 'LetrasO', 'LetrasU', 'FrequenciaDeHapaxLegomenaLocal',
+             'CollocationsFrequency', 'Classe(Autor)']
         )
 
     def csv_output(self):
-        # 37 {} + class {}
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
+        # 39 {} + class {}
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'{}'".format(
             self.type_token_ratio(),
             self.mean_word_len(),
             self.mean_sentence_len(),
@@ -133,6 +141,8 @@ class StyloDocument(object):
             self.count_characters(['i']),
             self.count_characters(['o']),
             self.count_characters(['u']),
+            self.local_hapax_legommena_frequency(),
+            self.collocations_frequency(),
             self.author,
         )
 
