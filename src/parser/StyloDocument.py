@@ -1,11 +1,11 @@
-DEFAULT_AUTHOR = "Unknown"
 from nltk import sent_tokenize, word_tokenize, Text
 from nltk.probability import FreqDist
-import numpy as np
 from src.parser.PortugueseTextualProcessing import *
 
 
 class StyloDocument(object):
+
+    DEFAULT_AUTHOR = "Unknown"
 
     def __init__(self, file_content, author=DEFAULT_AUTHOR):
         self.author = author
@@ -83,12 +83,19 @@ class StyloDocument(object):
     def count_characters(self, character_list):
         return len([word for word in self.file_content if word in character_list])
 
-    #TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     def local_hapax_legommena_frequency(self):
         return (len(self.fdist.hapaxes()))/len(self.text.tokens)
 
     def collocations_frequency(self):
         return (len(self.collocations))/len(self.text.tokens)
+
+    def most_frequent_word_size(self):
+        return FreqDist(len(w) for w in self.text).max()
+
+    def most_frequent_word_size(self):
+        return FreqDist(len(w) for w in self.text).most_common(3)
+
+    # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
 
     @classmethod
     def csv_header(cls):
@@ -98,12 +105,12 @@ class StyloDocument(object):
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
              'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados',
              'Vogais', 'LetrasA', 'LetrasE', 'LetrasI', 'LetrasO', 'LetrasU', 'FrequenciaDeHapaxLegomenaLocal',
-             'CollocationsFrequency', 'Classe(Autor)']
+             'FrequenciaDeCollocations', 'TamanhoDePalavraMaisComum', 'Classe(Autor)']
         )
 
     def csv_output(self):
-        # 39 {} + class {}
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'{}'".format(
+        # 40 {} + class {}
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'{}'".format(
             self.type_token_ratio(),
             self.mean_word_len(),
             self.mean_sentence_len(),
@@ -143,6 +150,7 @@ class StyloDocument(object):
             self.count_characters(['u']),
             self.local_hapax_legommena_frequency(),
             self.collocations_frequency(),
+            self.most_frequent_word_size(),
             self.author,
         )
 
