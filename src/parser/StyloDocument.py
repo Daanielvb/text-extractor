@@ -16,10 +16,12 @@ class StyloDocument(object):
         self.sentences = sent_tokenize(self.file_content, language='portuguese')
         self.sentence_chars = [len(sent) for sent in self.sentences]
         self.sentence_word_length = [len(sent.split()) for sent in self.sentences]
+        # TODO: Fix paragraphs, all records are being set to 1, might be related to \n replacing at data extraction
         self.paragraphs = [p for p in self.file_content.split("\n\n") if len(p) > 0 and not p.isspace()]
         self.paragraph_word_length = [len(p.split()) for p in self.paragraphs]
         self.collocations = self.text.collocation_list()
         self.punctuation = [".", ",", ";", "-", ":"]
+        self.white_spaces = len(self.file_content.split(' '))
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
 
@@ -29,7 +31,6 @@ class StyloDocument(object):
             if tag.startswith(tag_start):
                 count += self.tagfdist[tag]
         return count/self.tagfdist.N()
-
 
     def tag_frequency(self, tag):
         return self.tagfdist.freq(tag)
@@ -79,23 +80,29 @@ class StyloDocument(object):
     def document_len(self):
         return sum(self.sentence_chars)
 
+    def count_characters(self, character_list):
+        return len([word for word in self.file_content if word in character_list])
+
     @classmethod
     def csv_header(cls):
         return (
-            ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos','TamanhoDocumento'
-             ,'Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
+            ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos','TamanhoDocumento',
+             'Ponto','Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
-             'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados', 'Classe(Autor)']
+             'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados',
+             'Vogais', 'LetrasA', 'LetrasE', 'LetrasI', 'LetrasO', 'LetrasU', 'Classe(Autor)']
         )
 
     def csv_output(self):
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
+        # 37 {} + class {}
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
             self.type_token_ratio(),
             self.mean_word_len(),
             self.mean_sentence_len(),
             self.std_sentence_len(),
             self.mean_paragraph_len(),
             self.document_len(),
+            self.term_per_hundred('.'),
             self.term_per_hundred(','),
             self.term_per_hundred(';'),
             self.term_per_hundred('!'),
@@ -120,6 +127,12 @@ class StyloDocument(object):
             self.get_class_frequency_by_start('conj'),
             self.get_class_frequency_by_start('pron'),
             self.tag_frequency('notfound'),
+            self.count_characters(['a', 'e', 'i', 'o', 'u']),
+            self.count_characters(['a']),
+            self.count_characters(['e']),
+            self.count_characters(['i']),
+            self.count_characters(['o']),
+            self.count_characters(['u']),
             self.author,
         )
 
