@@ -96,6 +96,8 @@ class StyloDocument(object):
         return FreqDist(len(w) for w in self.text).most_common(3)
 
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
+    # TODO: Number of long words
+    # TODO: Longest word size
 
     @classmethod
     def csv_header(cls):
