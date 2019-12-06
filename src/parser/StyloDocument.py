@@ -1,5 +1,6 @@
 from nltk import sent_tokenize, word_tokenize, Text
 from nltk.probability import FreqDist
+import math
 from src.parser.PortugueseTextualProcessing import *
 
 
@@ -71,6 +72,10 @@ class StyloDocument(object):
         word_chars = [len(word) for word in words]
         return sum(word_chars) / float(len(word_chars))
 
+    def max_word_len(self):
+        words = set(word_tokenize(self.file_content, language='portuguese'))
+        return max([len(word) for word in words])
+
     def type_token_ratio(self):
         return (len(set(self.text)) / len(self.text)) * 100
 
@@ -95,10 +100,38 @@ class StyloDocument(object):
     def most_frequent_word_size(self):
         return FreqDist(len(w) for w in self.text).most_common(3)
 
+    def guiraud_R_measure(self):
+        return (len(set(self.text)))/math.sqrt(len(self.text))
+
+    def herdan_C_measure(self):
+        # log V(N)/log N
+        return (math.log2(len(set(self.text))))/math.log2(len(self.text))
+
+    def herdan_V_measure(self):
+        # N ^ C
+        return math.pow(len(self.text), self.herdan_C_measure())
+
+    def K_measure(self):
+        # log V(N)/log(log(N))
+        return (math.log2(len(set(self.text)))) / math.log2(math.log2(len(self.text)))
+
+    def dugast_U_measure(self):
+        # log ^ 2 N/log(N) - log V(N)
+        return (math.pow(math.log2(len(self.text),2))) / (math.log2(len(self.text)) - math.log2(len(set(self.text))))
+
+    def maas_A_measure(self):
+        #a ^ 2 = logN - logV(N)/log ^ 2 N
+        return math.sqrt((math.log2(len(self.text)) - math.log2(len(set(self.text))))
+                          / math.pow(math.log2(len(self.text), 2)))
+
+    def LN_measure(self):
+        # 1 - V(N) ^ 2/ V(N) ^ 2 log N
+        return (1 - math.pow(len(set(self.text)),2)) / (math.pow(len(set(self.text)), 2) * math.log2(len(self.text)))
+
+
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
     # TODO: Longest word size
-
     @classmethod
     def csv_header(cls):
         return (
@@ -107,13 +140,14 @@ class StyloDocument(object):
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
              'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados',
              'Vogais', 'LetrasA', 'LetrasE', 'LetrasI', 'LetrasO', 'LetrasU', 'FrequenciaDeHapaxLegomenaLocal',
-             'FrequenciaDeCollocations', 'TamanhoDePalavraMaisComum', 'Classe(Autor)']
+             'FrequenciaDeCollocations', 'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra', 'Classe(Autor)']
         )
 
     def csv_output(self):
-        # 40 {} + class {}
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'{}'".format(
+        # 41 {} + class {}
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'{}'".format(
             self.type_token_ratio(),
+            self.guiraud_R_measure(),
             self.mean_word_len(),
             self.mean_sentence_len(),
             self.std_sentence_len(),
@@ -153,6 +187,7 @@ class StyloDocument(object):
             self.local_hapax_legommena_frequency(),
             self.collocations_frequency(),
             self.most_frequent_word_size(),
+            self.max_word_len(),
             self.author,
         )
 
