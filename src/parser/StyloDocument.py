@@ -97,8 +97,8 @@ class StyloDocument(object):
     def most_frequent_word_size(self):
         return FreqDist(len(w) for w in self.text).max()
 
-    def most_frequent_word_size(self):
-        return FreqDist(len(w) for w in self.text).most_common(3)
+    def mean_frequent_word_size(self):
+        return FreqDist(len(w) for w in self.text).most_common(3)[1][0]
 
     def guiraud_R_measure(self):
         return (len(set(self.text)))/math.sqrt(len(self.text))
@@ -117,19 +117,19 @@ class StyloDocument(object):
 
     def dugast_U_measure(self):
         # log ^ 2 N/log(N) - log V(N)
-        return (math.pow(math.log2(len(self.text),2))) / (math.log2(len(self.text)) - math.log2(len(set(self.text))))
+        return (math.pow(math.log2(len(self.text)), 2)) / (math.log2(len(self.text)) - math.log2(len(set(self.text))))
 
     def maas_A_measure(self):
         #a ^ 2 = logN - logV(N)/log ^ 2 N
         return math.sqrt((math.log2(len(self.text)) - math.log2(len(set(self.text))))
-                          / math.pow(math.log2(len(self.text), 2)))
+                          / math.pow(math.log2(len(self.text)), 2))
 
     def LN_measure(self):
         # 1 - V(N) ^ 2/ V(N) ^ 2 log N
         return (1 - math.pow(len(set(self.text)),2)) / (math.pow(len(set(self.text)), 2) * math.log2(len(self.text)))
 
     def honores_H_measure(self):
-        len(self.fdist.hapaxes())/len(set(self.text))
+        return (len(self.fdist.hapaxes()))/len(set(self.text))
 
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
@@ -148,10 +148,9 @@ class StyloDocument(object):
 
     def csv_output(self):
         # 41 {} + class {}
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'{}'".format(
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
             self.type_token_ratio(),
-            self.guiraud_R_measure(),
             self.mean_word_len(),
             self.mean_sentence_len(),
             self.std_sentence_len(),
@@ -190,16 +189,16 @@ class StyloDocument(object):
             self.count_characters(['u']),
             self.local_hapax_legommena_frequency(),
             self.collocations_frequency(),
-            self.most_frequent_word_size(),
+            self.mean_frequent_word_size(),
             self.max_word_len(),
-            self.guiraud_R_measure(),
-            self.herdan_C_measure(),
-            self.herdan_V_measure(),
-            self.K_measure(),
-            self.dugast_U_measure(),
-            self.maas_A_measure(),
-            self.LN_measure(),
-            self.honores_H_measure(),
+            round(self.guiraud_R_measure(), 5),
+            round(self.herdan_C_measure(), 5),
+            round(self.herdan_V_measure(), 5),
+            round(self.K_measure(), 5),
+            round(self.dugast_U_measure(), 5),
+            round(self.maas_A_measure(), 5),
+            round(self.LN_measure(), 5),
+            round(self.honores_H_measure(), 5),
             self.author,
         )
 
