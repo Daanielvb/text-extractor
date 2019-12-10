@@ -128,6 +128,8 @@ class StyloDocument(object):
         # 1 - V(N) ^ 2/ V(N) ^ 2 log N
         return (1 - math.pow(len(set(self.text)),2)) / (math.pow(len(set(self.text)), 2) * math.log2(len(self.text)))
 
+    def honores_H_measure(self):
+        len(self.fdist.hapaxes())/len(set(self.text))
 
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
@@ -140,12 +142,14 @@ class StyloDocument(object):
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
              'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados',
              'Vogais', 'LetrasA', 'LetrasE', 'LetrasI', 'LetrasO', 'LetrasU', 'FrequenciaDeHapaxLegomenaLocal',
-             'FrequenciaDeCollocations', 'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra', 'Classe(Autor)']
+             'FrequenciaDeCollocations', 'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra', 'GuiraudR', 'HerdanC',
+             'HerdanV', 'MedidaK', 'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'Classe(Autor)']
         )
 
     def csv_output(self):
         # 41 {} + class {}
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'{}'".format(
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'{}'".format(
             self.type_token_ratio(),
             self.guiraud_R_measure(),
             self.mean_word_len(),
@@ -188,6 +192,14 @@ class StyloDocument(object):
             self.collocations_frequency(),
             self.most_frequent_word_size(),
             self.max_word_len(),
+            self.guiraud_R_measure(),
+            self.herdan_C_measure(),
+            self.herdan_V_measure(),
+            self.K_measure(),
+            self.dugast_U_measure(),
+            self.maas_A_measure(),
+            self.LN_measure(),
+            self.honores_H_measure(),
             self.author,
         )
 
