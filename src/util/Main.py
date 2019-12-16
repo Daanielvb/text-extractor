@@ -140,7 +140,6 @@ def run_compiled_pipeline():
     print('total correct = ' + str(correct))
     print('accuracy % = ' + str((correct / 100) * 100))
 
-
 def run_complete_pipeline():
     convert_data('../../data/students_exercises')
     df = pd.read_csv('../../data/parsed-data/data2.csv')
@@ -201,5 +200,9 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    CSVReader().read_csv('../../data/parsed-data/data2.csv')
-    save_converted_stylo_data()
+    #CSVReader().read_csv('../../data/parsed-data/data2.csv')
+    #save_converted_stylo_data()
+    df = pd.read_csv('../../data/parsed-data/stylo2.csv')
+
+    df.to_csv('../../data/parsed-data/stylo2.csv')
+    #TODO : Create random forest class and move utility methods to other places outside main
