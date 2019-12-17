@@ -12,4 +12,4 @@ spatial
 keras
 tensorflow
 h5py
-imblearn
+imbalanced-learn
