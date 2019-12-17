@@ -1,6 +1,7 @@
 from src.util.PDFReader import *
 from src.util.DOCReader import *
 from src.util.CSVReader import *
+from src.util.ModelUtil import *
 import pandas as pd
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
@@ -70,43 +71,13 @@ def normalize_data(data, norm='l2'):
     https://scikit-learn.org/stable/modules/preprocessing.html#normalization"""
     return preprocessing.normalize(data, norm)
 
-
-def decode_labels(label_encoder, encoded_array):
-    return label_encoder.inverse_transform(np.argmax(encoded_array, axis=1, out=None))
-
-
-def decode_class(label_encoder, class_value):
-    return label_encoder.inverse_transform([class_value])
-
-
-def save_encoder(label_encoder, encoder_file_name='label_encoder_classes.npy'):
-    np.save(encoder_file_name, label_encoder.classes_)
-
-
-def load_encoder(encoder_file_name='label_encoder_classes.npy'):
-    encoder = LabelEncoder()
-    encoder.classes_ = np.load(encoder_file_name, allow_pickle=True)
-    return encoder
-
-
-def save_tokenizer(tokenizer, tokenizer_file='tokenizer.pickle'):
-    with open(tokenizer_file, 'wb') as handle:
-        pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def load_tokenizer(tokenizer_file='tokenizer.pickle'):
-    with open(tokenizer_file, 'rb') as handle:
-        tokenizer = pickle.load(handle)
-    return tokenizer
-
-
 def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
     embedded_sentence = tokenizer.texts_to_sequences([X_predict])
     padded_sentences = pad_sequences(embedded_sentence, 6658, padding='post')
 
     pred = model.predict_entries(padded_sentences)
 
-    decoded_pred = decode_class(encoder, pred[0])
+    decoded_pred = ModelUtil.decode_class(encoder, pred[0])
     print('predicted:' + decoded_pred + ' expected:' + y_expected)
     return decoded_pred == y_expected
 
@@ -122,8 +93,8 @@ def run_compiled_pipeline():
     df = remove_entries_based_on_threshold(df, 'Author', 1)
     nn = NeuralNetwork()
     nn.load_model()
-    encoder = load_encoder()
-    tokenizer = load_tokenizer()
+    encoder = ModelUtil().load_encoder()
+    tokenizer = ModelUtil().load_tokenizer()
     run_compiled_model(nn, tokenizer, encoder,
                        '1 - Competição entre membros de espécies diferentes que usam os mesmos recursos limitados. Os recursos costumam ser limitados em um habitat e muitas espécies podem competir para consegui-los. O efeito geral da competição interespecífica é negativo para as duas espécies participantes, ou seja, cada espécie estaria melhor se a outra espécie não estivesse presente. Com tudo referente à complementaridade de nicho O princípio exclusão competitiva diz que duas espécies competidoras podem concorrer em determinado local, mas para isso elas precisam possuir nichos realizados diferentes. 2 Em referente ao primeiro estudo de caso (Asterionella formosa/ Synedra ulna) a ocorrência competitiva devido ao mesmo recurso (silicato) apresenta princípio da exclusão competitivas onde ambas ocupando o mesmo nicho em que a capacidade suporte influencia na exclusão de uma espécie. No segundo caso a relação de coexistência da diversidade de espécie de peixe-palhaço esta relacionada com a quantidade de anêmonas onde o seu principal recursos esta no abrigo possibilitando a produtividade e perpetuação da espécie de peixe, além disso, devido a população desse peixe esta ligado ao recurso limitante por anêmona criando uma diversidade que utiliza diferentes nichos devido ao distanciamento de cada anêmona do estudo. 3 - O princípio da exclusão competitiva ou, como também é chamado, Lei de Gause, é uma proposição que afirma que, em um ambiente estável no qual os indivíduos se distribuem de forma homogênea, duas espécies com nichos ecológicos parecidos não podem coexistir, devido a pressão evolutiva exercida pela competição. De acordo com esse princípio, um dos competidores terminará por sobrepujar ao outro, o que pode acarretar mudanças morfológicas, comportamentais, deslocamento de nicho ecológico ou até mesmo a extinção da espécie em desvantagem. Em suma, o que esse conceito quer dizer é que competidores completos não podem coexistir. ',
                        'test')
@@ -140,6 +111,7 @@ def run_compiled_pipeline():
     print('total correct = ' + str(correct))
     print('accuracy % = ' + str((correct / 100) * 100))
 
+
 def run_complete_pipeline():
     convert_data('../../data/students_exercises')
     df = pd.read_csv('../../data/parsed-data/data2.csv')
@@ -153,13 +125,13 @@ def run_complete_pipeline():
     le = LabelEncoder()
     le.fit(y)
     encoded_Y = le.transform(y)
-    save_encoder(le)
+    ModelUtil().save_encoder(le)
     # decode: le.inverse_transform(encoded_Y)
 
     tokenizer, padded_sentences, max_sentence_len \
         = PortugueseTextualProcessing().convert_corpus_to_number(df)
 
-    save_tokenizer(tokenizer)
+    ModelUtil().save_tokenizer(tokenizer)
     vocab_len = len(tokenizer.word_index) + 1
 
     glove_embedding = PortugueseTextualProcessing().load_vector_2(tokenizer)
