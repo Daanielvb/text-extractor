@@ -146,14 +146,14 @@ class StyloDocument(object):
         )
 
     def csv_output(self):
-        # 41 {} + class {}
+        # 49 {} + class {} (50)
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
-            self.type_token_ratio(),
-            self.mean_word_len(),
-            self.mean_sentence_len(),
-            self.std_sentence_len(),
-            self.mean_paragraph_len(),
+            round(self.type_token_ratio(),5),
+            round(self.mean_word_len(),5),
+            round(self.mean_sentence_len(),5),
+            round(self.std_sentence_len(), 5),
+            round(self.mean_paragraph_len(),5),
             self.document_len(),
             self.term_per_hundred('.'),
             self.term_per_hundred(','),

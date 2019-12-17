@@ -1,6 +1,7 @@
 import numpy as np
 import pickle
 from sklearn.preprocessing import LabelEncoder
+from sklearn import preprocessing
 
 
 class ModelUtil:
@@ -36,3 +37,9 @@ class ModelUtil:
         with open(tokenizer_file, 'rb') as handle:
             tokenizer = pickle.load(handle)
         return tokenizer
+
+    @staticmethod
+    def normalize_data(data, norm='l2'):
+        """ normalizes input data
+        https://scikit-learn.org/stable/modules/preprocessing.html#normalization"""
+        return preprocessing.normalize(data, norm)

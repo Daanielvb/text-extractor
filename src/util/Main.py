@@ -6,7 +6,6 @@ import pandas as pd
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-from sklearn import preprocessing
 from sklearn.preprocessing import LabelEncoder
 from keras.utils import np_utils
 from sklearn.model_selection import StratifiedKFold
@@ -65,11 +64,6 @@ def show_column_distribution(dataframe, class_name):
 def save_converted_stylo_data():
     CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', CSVReader.read_csv('../../data/parsed-data/data2.csv'))
 
-
-def normalize_data(data, norm='l2'):
-    """ normalizes input data
-    https://scikit-learn.org/stable/modules/preprocessing.html#normalization"""
-    return preprocessing.normalize(data, norm)
 
 def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
     embedded_sentence = tokenizer.texts_to_sequences([X_predict])
@@ -172,9 +166,6 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    #CSVReader().read_csv('../../data/parsed-data/data2.csv')
-    #save_converted_stylo_data()
     df = pd.read_csv('../../data/parsed-data/stylo2.csv')
-
     df.to_csv('../../data/parsed-data/stylo2.csv')
     #TODO : Create random forest class and move utility methods to other places outside main
