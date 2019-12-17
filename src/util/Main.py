@@ -166,6 +166,8 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('../../data/parsed-data/stylo2.csv')
-    df.to_csv('../../data/parsed-data/stylo2.csv')
+    # TODO: Re-run text extraction to grab paragraphs original content and perform more tests
+    df = pd.read_csv('../../data/parsed-data/stylol2.csv')
+    df = remove_entries_based_on_threshold(df, 'Classe(Autor)', 2)
+    CSVReader.export_dataframe(df, '../../data/parsed-data/stylol2.csv')
     #TODO : Create random forest class and move utility methods to other places outside main

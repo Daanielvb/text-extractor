@@ -29,7 +29,6 @@ class Cleaner:
     def remove_headers(text_list):
         result = []
         for text in text_list:
-
             # text = re.sub(Cleaner.STUDENT_PATTERN, '', text, flags=re.IGNORECASE)
             # text = re.sub(Cleaner.TEACHER_PATTERN,  '', text, flags=re.IGNORECASE)
             # text = re.sub(Cleaner.COURSE_PATTERN, '', text, flags=re.IGNORECASE)
@@ -44,6 +43,6 @@ class Cleaner:
 
     @staticmethod
     def format(text):
-        text = re.sub('\n', ' ', text)
-        text = re.sub('\n{2,}', '', text)
+        #text = re.sub('\n', ' ', text)
+        text = re.sub('\n{3,}', '\n\n', text)
         return text.strip()

@@ -85,8 +85,12 @@ class StyloDocument(object):
     def document_len(self):
         return sum(self.sentence_chars)
 
-    def count_characters(self, character_list):
-        return len([word for word in self.file_content if word in character_list])
+    def count_characters_frequency(self, character_list):
+        return (len([word for word in self.file_content if word in character_list])) / len(self.text)
+
+    def count_consonant_frequency(self):
+        character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'y', 'x', 'z']
+        return (len([word for word in self.file_content if word in character_list])) / len(self.text)
 
     def local_hapax_legommena_frequency(self):
         return (len(self.fdist.hapaxes()))/len(self.text.tokens)
@@ -136,25 +140,26 @@ class StyloDocument(object):
     @classmethod
     def csv_header(cls):
         return (
-            ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos','TamanhoDocumento',
+            ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
+             #'TamanhoDocumento',
              'Ponto','Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
              'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados',
-             'Vogais', 'LetrasA', 'LetrasE', 'LetrasI', 'LetrasO', 'LetrasU', 'FrequenciaDeHapaxLegomenaLocal',
-             'FrequenciaDeCollocations', 'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra', 'GuiraudR', 'HerdanC',
-             'HerdanV', 'MedidaK', 'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'Classe(Autor)']
+             'FreqVogais', 'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU', 'FrequenciaConsoantes',
+             'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeCollocations', 'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra',
+             'GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK', 'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'Classe(Autor)']
         )
 
     def csv_output(self):
         # 49 {} + class {} (50)
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
-            round(self.type_token_ratio(),5),
-            round(self.mean_word_len(),5),
-            round(self.mean_sentence_len(),5),
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
+            round(self.type_token_ratio(), 5),
+            round(self.mean_word_len(), 5),
+            round(self.mean_sentence_len(), 5),
             round(self.std_sentence_len(), 5),
-            round(self.mean_paragraph_len(),5),
-            self.document_len(),
+            round(self.mean_paragraph_len(), 5),
+            # self.document_len(),
             self.term_per_hundred('.'),
             self.term_per_hundred(','),
             self.term_per_hundred(';'),
@@ -180,13 +185,14 @@ class StyloDocument(object):
             self.get_class_frequency_by_start('conj'),
             self.get_class_frequency_by_start('pron'),
             self.tag_frequency('notfound'),
-            self.count_characters(['a', 'e', 'i', 'o', 'u']),
-            self.count_characters(['a']),
-            self.count_characters(['e']),
-            self.count_characters(['i']),
-            self.count_characters(['o']),
-            self.count_characters(['u']),
-            self.local_hapax_legommena_frequency(),
+            self.count_characters_frequency(['a', 'e', 'i', 'o', 'u']),
+            self.count_characters_frequency(['a']),
+            self.count_characters_frequency(['e']),
+            self.count_characters_frequency(['i']),
+            self.count_characters_frequency(['o']),
+            self.count_characters_frequency(['u']),
+            self.count_consonant_frequency(),
+            round(self.local_hapax_legommena_frequency(), 5),
             self.collocations_frequency(),
             self.mean_frequent_word_size(),
             self.max_word_len(),
