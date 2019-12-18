@@ -2,6 +2,7 @@ from nltk import sent_tokenize, word_tokenize, Text
 from nltk.probability import FreqDist
 import math
 from src.parser.PortugueseTextualProcessing import *
+from spellchecker import SpellChecker
 
 
 class StyloDocument(object):
@@ -20,11 +21,11 @@ class StyloDocument(object):
         # TODO: Fix paragraphs, all records are being set to 1, might be related to \n replacing at data extraction
         self.paragraphs = [p for p in self.file_content.split("\n\n") if len(p) > 0 and not p.isspace()]
         self.paragraph_word_length = [len(p.split()) for p in self.paragraphs]
-        self.collocations = self.text.collocation_list()
         self.punctuation = [".", ",", ";", "-", ":"]
         self.white_spaces = len(self.file_content.split(' '))
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
+        self.spell = SpellChecker(language='pt')
 
     def get_class_frequency_by_start(self, tag_start):
         count = 0
@@ -95,8 +96,8 @@ class StyloDocument(object):
     def local_hapax_legommena_frequency(self):
         return (len(self.fdist.hapaxes()))/len(self.text.tokens)
 
-    def collocations_frequency(self):
-        return (len(self.collocations))/len(self.text.tokens)
+    def collocations_frequency(self, size):
+        return (len(self.text.collocation_list(window_size=size)))/len(self.text.tokens)
 
     def most_frequent_word_size(self):
         return FreqDist(len(w) for w in self.text).max()
@@ -135,6 +136,9 @@ class StyloDocument(object):
     def honores_H_measure(self):
         return (len(self.fdist.hapaxes()))/len(set(self.text))
 
+    def spell_miss_check_frequency(self):
+        return (len(self.spell.unknown(self.text))) / len(self.text)
+
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
     @classmethod
@@ -144,16 +148,17 @@ class StyloDocument(object):
              #'TamanhoDocumento',
              'Ponto','Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
-             'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'TermosNaoTageados',
+             'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'FreqTermosNaoTageados', 'FreqPalavrasErradas',
              'FreqVogais', 'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU', 'FrequenciaConsoantes',
-             'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeCollocations', 'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra',
-             'GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK', 'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'Classe(Autor)']
+             'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams', 'FrequenciaDeQuadrigrams',
+             'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK',
+             'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'Classe(Autor)']
         )
 
     def csv_output(self):
-        # 49 {} + class {} (50)
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
+        # 52 {} + class {} (T53)
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
             round(self.type_token_ratio(), 5),
             round(self.mean_word_len(), 5),
             round(self.mean_sentence_len(), 5),
@@ -185,6 +190,7 @@ class StyloDocument(object):
             self.get_class_frequency_by_start('conj'),
             self.get_class_frequency_by_start('pron'),
             self.tag_frequency('notfound'),
+            self.spell_miss_check_frequency(),
             self.count_characters_frequency(['a', 'e', 'i', 'o', 'u']),
             self.count_characters_frequency(['a']),
             self.count_characters_frequency(['e']),
@@ -193,7 +199,9 @@ class StyloDocument(object):
             self.count_characters_frequency(['u']),
             self.count_consonant_frequency(),
             round(self.local_hapax_legommena_frequency(), 5),
-            self.collocations_frequency(),
+            self.collocations_frequency(2),
+            self.collocations_frequency(3),
+            self.collocations_frequency(4),
             self.mean_frequent_word_size(),
             self.max_word_len(),
             round(self.guiraud_R_measure(), 5),

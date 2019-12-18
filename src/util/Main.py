@@ -10,7 +10,6 @@ from sklearn.preprocessing import LabelEncoder
 from keras.utils import np_utils
 from sklearn.model_selection import StratifiedKFold
 from src.classifiers.NeuralNetwork import *
-import pickle
 
 
 def convert_data(base_path):
@@ -166,8 +165,13 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    # TODO: Re-run text extraction to grab paragraphs original content and perform more tests
-    df = pd.read_csv('../../data/parsed-data/stylol2.csv')
+    df = pd.read_csv('../../data/parsed-data/stylo.csv')
     df = remove_entries_based_on_threshold(df, 'Classe(Autor)', 2)
+    columns = df.columns
+    y = df.pop('Classe(Autor)')
+    df = ModelUtil.normalize_data(df)
+
+    # TODO: Fix this line below that is not working anymore
+    df['Classe(Autor)'] = y
     CSVReader.export_dataframe(df, '../../data/parsed-data/stylol2.csv')
     #TODO : Create random forest class and move utility methods to other places outside main

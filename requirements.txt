@@ -13,3 +13,4 @@ keras
 tensorflow
 h5py
 imbalanced-learn
+pyspellchecker
