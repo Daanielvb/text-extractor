@@ -42,15 +42,6 @@ def remove_group_works(dataframe):
     return dataframe.loc[mask]
 
 
-def remove_entries_based_on_threshold(dataframe, class_name, threshold):
-    """Remove classes from a dataframe based on threshold, eg: If threshold = 1,
-        only instances with 2 or more examples contained in the `class_name` column
-        will remain on the dataframe
-    """
-    #TODO: Check some NaNs
-    return dataframe.groupby(class_name).filter(lambda x: len(x) > threshold)
-
-
 def save_plot(plot_name):
     plt.savefig(plot_name)
 
@@ -165,13 +156,6 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('../../data/parsed-data/stylo.csv')
-    df = remove_entries_based_on_threshold(df, 'Classe(Autor)', 2)
-    columns = df.columns
-    y = df.pop('Classe(Autor)')
-    df = ModelUtil.normalize_data(df)
-
-    # TODO: Fix this line below that is not working anymore
-    df['Classe(Autor)'] = y
+    #TODO: Investigate why there are some 1-class only cases
+    df = ModelUtil().normalize_dataframe()
     CSVReader.export_dataframe(df, '../../data/parsed-data/stylol2.csv')
-    #TODO : Create random forest class and move utility methods to other places outside main

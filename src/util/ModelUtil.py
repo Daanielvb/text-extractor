@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pickle
 from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing
@@ -43,3 +44,23 @@ class ModelUtil:
         """ normalizes input data
         https://scikit-learn.org/stable/modules/preprocessing.html#normalization"""
         return preprocessing.normalize(data, norm)
+
+    @staticmethod
+    def remove_entries_based_on_threshold(dataframe, class_name, threshold):
+        """Remove classes from a dataframe based on threshold, eg: If threshold = 1,
+            only instances with 2 or more examples contained in the `class_name` column
+            will remain on the dataframe
+        """
+        # TODO: Check some NaNs
+        return dataframe.groupby(class_name).filter(lambda x: len(x) > threshold)
+
+    @staticmethod
+    def normalize_dataframe(csv_file='../../data/parsed-data/stylo.csv', class_name='Classe(Autor)', threshold=2):
+        df = pd.read_csv(csv_file)
+        df = ModelUtil().remove_entries_based_on_threshold(df, 'Classe(Autor)', threshold)
+        y = df.pop(class_name)
+        columns = df.columns
+        normalized_data = ModelUtil.normalize_data(df)
+        df = pd.DataFrame(columns=columns, data=normalized_data)
+        df[class_name] = y
+        return df

@@ -90,7 +90,7 @@ class StyloDocument(object):
         return (len([word for word in self.file_content if word in character_list])) / len(self.text)
 
     def count_consonant_frequency(self):
-        character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'y', 'x', 'z']
+        character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'y','x', 'z']
         return (len([word for word in self.file_content if word in character_list])) / len(self.text)
 
     def local_hapax_legommena_frequency(self):
