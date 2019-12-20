@@ -12,14 +12,14 @@ from sklearn.model_selection import StratifiedKFold
 from src.classifiers.NeuralNetwork import *
 
 
-def convert_data(base_path):
+def convert_text_to_stylometric(base_path='../../data/students_exercises'):
     clean_txt_content, txt_file_names = FileUtil.convert_files(base_path)
     clean_doc_content, doc_file_names = DOCReader().convert_docs(base_path)
     clean_pdf_content, pdf_file_names = PDFReader().convert_pdfs(base_path)
 
     files_content = FileUtil.merge_contents(clean_txt_content, clean_doc_content, clean_pdf_content)
     file_paths = FileUtil.merge_contents(txt_file_names, doc_file_names, pdf_file_names)
-    CSVReader.write_files('../../data/parsed-data/', file_paths, 'data2.csv', files_content)
+    CSVReader.write_files('../../data/parsed-data/', file_paths, 'data.csv', files_content)
 
 
 def prepare_train_data(dataframe):
@@ -52,7 +52,8 @@ def show_column_distribution(dataframe, class_name):
 
 
 def save_converted_stylo_data():
-    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', CSVReader.read_csv('../../data/parsed-data/data2.csv'))
+    convert_text_to_stylometric()
+    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', CSVReader.read_csv('../../data/parsed-data/data.csv'))
 
 
 def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
@@ -74,7 +75,7 @@ def run_compiled_pipeline():
     # TODO: See if its possible to use Random Forest with our embedding matrix
     # TODO: Think about the group works problem
     correct = 0
-    df = remove_entries_based_on_threshold(df, 'Author', 1)
+    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 1)
     nn = NeuralNetwork()
     nn.load_model()
     encoder = ModelUtil().load_encoder()
@@ -97,10 +98,10 @@ def run_compiled_pipeline():
 
 
 def run_complete_pipeline():
-    convert_data('../../data/students_exercises')
+    save_converted_stylo_data()
     df = pd.read_csv('../../data/parsed-data/data2.csv')
 
-    df = remove_entries_based_on_threshold(df, 'Author', 1)
+    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 1)
 
     #show_column_distribution(df, 'Author')
 
@@ -157,5 +158,6 @@ def run_complete_pipeline():
 
 if __name__ == '__main__':
     #TODO: Investigate why there are some 1-class only cases
+    save_converted_stylo_data()
     df = ModelUtil().normalize_dataframe()
     CSVReader.export_dataframe(df, '../../data/parsed-data/stylol2.csv')

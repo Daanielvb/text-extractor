@@ -57,10 +57,12 @@ class ModelUtil:
     @staticmethod
     def normalize_dataframe(csv_file='../../data/parsed-data/stylo.csv', class_name='Classe(Autor)', threshold=2):
         df = pd.read_csv(csv_file)
-        df = ModelUtil().remove_entries_based_on_threshold(df, 'Classe(Autor)', threshold)
+        df = ModelUtil().remove_entries_based_on_threshold(df, class_name, threshold)
         y = df.pop(class_name)
         columns = df.columns
-        normalized_data = ModelUtil.normalize_data(df)
+        normalized_data = ModelUtil.normalize_data(df.values)
         df = pd.DataFrame(columns=columns, data=normalized_data)
-        df[class_name] = y
+        y = y.reset_index()
+        df[class_name] = y['Classe(Autor)']
         return df
+
