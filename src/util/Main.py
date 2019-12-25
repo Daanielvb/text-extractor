@@ -11,6 +11,7 @@ from keras.utils import np_utils
 from sklearn.model_selection import StratifiedKFold
 from src.classifiers.NeuralNetwork import *
 from src.classifiers.RFClassifier import *
+from src.classifiers.SimpleNeuralNetwork import *
 
 
 def convert_text_to_stylometric(base_path='../../data/students_exercises'):
@@ -159,5 +160,5 @@ def run_complete_pipeline():
 
 if __name__ == '__main__':
     df = pd.read_csv('../../data/parsed-data/stylol2.csv')
-    rfc = RFClassifier(df)
-    rfc.split_and_train()
+    nn = SimpleNeuralNetwork(df)
+    nn.split_and_train()

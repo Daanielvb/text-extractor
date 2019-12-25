@@ -50,8 +50,9 @@ class RFClassifier:
 
         print(scores)
 
-    def build_classifier(self):
-        clf = RandomForestClassifier(
+    @classmethod
+    def build_classifier(cls):
+        return RandomForestClassifier(
             n_estimators=50,
             criterion='gini',
             min_samples_split=2,
@@ -69,4 +70,3 @@ class RFClassifier:
             warm_start=False,
             class_weight='balanced'
         )
-        return clf
