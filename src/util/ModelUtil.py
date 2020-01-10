@@ -66,3 +66,37 @@ class ModelUtil:
         df[class_name] = y['Classe(Autor)']
         return df
 
+    @staticmethod
+    def extract_validation_data_from_frame(X, Y):
+        # Get one example of each class for validation:
+        validation_data = {}
+        indexes = []
+        for idx, author in enumerate(Y):
+            if author not in validation_data.keys():
+                print(author)
+                validation_data[author] = X.iloc[idx]
+                indexes.append(idx)
+
+        bias = 0
+        for idx in indexes:
+            Y.drop(Y.index[idx + bias], inplace=True)
+            X.drop(X.index[idx + bias], inplace=True)
+            bias -= 1
+        return validation_data, X, Y
+
+    @staticmethod
+    def extract_validation_data(X, Y):
+        # Get one example of each class for validation:
+        validation_data = {}
+        indexes = []
+        for idx, author in enumerate(Y):
+            if author not in validation_data.keys():
+                print(author)
+                validation_data[author] = X[idx]
+                indexes.append(idx)
+
+        for idx in reversed(indexes):
+            Y = np.delete(Y, idx)
+            X = np.delete(X, idx, axis=0)
+
+        return validation_data, X, Y

@@ -8,6 +8,7 @@ from keras.utils import np_utils
 
 
 class SimpleNeuralNetwork:
+    """Neural network used for stylometric features with some improvements after the original NeuralNetwork"""
 
     def __init__(self, df):
         self.X = None
@@ -46,7 +47,7 @@ class SimpleNeuralNetwork:
             models.append(self.model)
 
         print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-        #models[cv_scores.index(max(cv_scores))].save_model()
+        models[cv_scores.index(max(cv_scores))].save_model()
 
     def build_classifier(self, number_of_features=52, number_of_classes=11):
         self.model = Sequential()

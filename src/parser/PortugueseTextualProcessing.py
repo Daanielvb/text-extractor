@@ -76,7 +76,7 @@ class PortugueseTextualProcessing:
                 print(f"{left[-context:]} '{word}' {right[:context]}")
 
     @staticmethod
-    def load_vector_2(vocabulary_tokenizer):
+    def load_vector(vocabulary_tokenizer):
         word_embedding = {}
         vocabulary_tokenizer
         with open("glove_s100.txt", 'r', encoding='utf-8') as f:

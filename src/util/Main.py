@@ -104,7 +104,7 @@ def run_complete_pipeline():
 
     df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 2)
 
-    show_column_distribution(df, 'Author')
+    #show_column_distribution(df, 'Author')
 
     y = df.pop('Author')
 
@@ -120,7 +120,7 @@ def run_complete_pipeline():
     ModelUtil().save_tokenizer(tokenizer)
     vocab_len = len(tokenizer.word_index) + 1
 
-    glove_embedding = PortugueseTextualProcessing().load_vector_2(tokenizer)
+    glove_embedding = PortugueseTextualProcessing().load_vector(tokenizer)
 
     embedded_matrix = PortugueseTextualProcessing().build_embedding_matrix(glove_embedding, vocab_len, tokenizer)
 
@@ -131,7 +131,6 @@ def run_complete_pipeline():
     batches = [5, 10, 20]
     param_network = dict(optimizer=optimizers, epochs=epochs, batch_size=batches, init=init)
 
-    # TODO: Check results with normalization (df_norm = (df - df.mean()) / (df.max() - df.min()))
     cv_scores = []
     kfold = StratifiedKFold(n_splits=4, shuffle=True, random_state=7)
     models = []
@@ -140,12 +139,14 @@ def run_complete_pipeline():
 
     nn = NeuralNetwork()
     nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
-    # TODO: Remove part of the data for validation purposes
-    for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
+
+    val_data, X, Y = ModelUtil().extract_validation_data(padded_sentences, encoded_Y)
+
+    for train_index, test_index in kfold.split(X, Y):
         # convert integers to dummy variables (i.e. one hot encoded)
-        dummy_y = np_utils.to_categorical(encoded_Y)
+        dummy_y = np_utils.to_categorical(Y)
         print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
+        X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = dummy_y[train_index], dummy_y[test_index]
         nn.train(X_train, y_train, 100)
 
@@ -154,13 +155,14 @@ def run_complete_pipeline():
         models.append(nn)
 
     print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-    models[cv_scores.index(max(cv_scores))].save_model()
+    best_model = models[cv_scores.index(max(cv_scores))]
+    best_model.save_model()
+
+    # TODO: Fix prediction that is failing here
+    # for key, val in val_data.items():
+    #     print('key:' + str(key))
+    #     best_model.predict_entries(val)
 
 
 if __name__ == '__main__':
     run_complete_pipeline()
-    #save_converted_stylo_data()
-    #df = pd.read_csv('../../data/parsed-data/stylol2.csv')
-    #nn = SimpleNeuralNetwork(df)
-    #nn.split_and_train()
-    #TODO: Verify the one-vs-all approach to create N classifiers

@@ -56,7 +56,7 @@ class NeuralNetwork:
         print("Loaded model from disk")
 
     def predict_entries(self, entry):
-        predictons = self.model.predict_classes(entry)
+        predictions = self.model.predict_classes(entry)
         # show the inputs and predicted outputs
-        print("X=%s, Predicted=%s" % (entry, predictons[0]))
-        return predictons
+        print("X=%s, Predicted=%s" % (entry, predictions[0]))
+        return predictions
