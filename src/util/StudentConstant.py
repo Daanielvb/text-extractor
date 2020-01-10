@@ -38,6 +38,8 @@ class StudentConstant:
         'CONGREGAÇÃO DE SANTA DOROTEIA DO BRASIL',
         'ISAILDA FERREIRA DA SILVA',
         'DINABEL',
+        'ALVES',
+        'CIRNE',
         'VILAS-BOAS',
         'VILAS BOAS',
         'CURSO DE CIÊNCIAS BIOLÓGICAS',

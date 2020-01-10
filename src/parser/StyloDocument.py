@@ -18,7 +18,6 @@ class StyloDocument(object):
         self.sentences = sent_tokenize(self.file_content, language='portuguese')
         self.sentence_chars = [len(sent) for sent in self.sentences]
         self.sentence_word_length = [len(sent.split()) for sent in self.sentences]
-        # TODO: Fix paragraphs, all records are being set to 1, might be related to \n replacing at data extraction
         self.paragraphs = [p for p in self.file_content.split("\n\n") if len(p) > 0 and not p.isspace()]
         self.paragraph_word_length = [len(p.split()) for p in self.paragraphs]
         self.punctuation = [".", ",", ";", "-", ":"]

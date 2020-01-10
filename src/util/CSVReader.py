@@ -1,6 +1,4 @@
 import csv
-import os
-
 from src.parser.StyloDocument import *
 from src.util.FileUtil import *
 

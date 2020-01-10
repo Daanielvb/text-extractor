@@ -100,12 +100,11 @@ def run_compiled_pipeline():
 
 
 def run_complete_pipeline():
-    save_converted_stylo_data()
-    df = pd.read_csv('../../data/parsed-data/data2.csv')
+    df = pd.read_csv('../../data/parsed-data/data.csv')
 
-    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 1)
+    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 2)
 
-    #show_column_distribution(df, 'Author')
+    show_column_distribution(df, 'Author')
 
     y = df.pop('Author')
 
@@ -141,7 +140,7 @@ def run_complete_pipeline():
 
     nn = NeuralNetwork()
     nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
-
+    # TODO: Remove part of the data for validation purposes
     for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
         # convert integers to dummy variables (i.e. one hot encoded)
         dummy_y = np_utils.to_categorical(encoded_Y)
@@ -159,6 +158,9 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('../../data/parsed-data/stylol2.csv')
-    nn = SimpleNeuralNetwork(df)
-    nn.split_and_train()
+    run_complete_pipeline()
+    #save_converted_stylo_data()
+    #df = pd.read_csv('../../data/parsed-data/stylol2.csv')
+    #nn = SimpleNeuralNetwork(df)
+    #nn.split_and_train()
+    #TODO: Verify the one-vs-all approach to create N classifiers
