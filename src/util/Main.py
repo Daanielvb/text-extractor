@@ -159,9 +159,9 @@ def run_complete_pipeline():
     best_model.save_model()
 
     # TODO: Fix prediction that is failing here
-    # for key, val in val_data.items():
-    #     print('key:' + str(key))
-    #     best_model.predict_entries(val)
+    for key, val in val_data.items():
+         print('key:' + str(key))
+         best_model.predict_entries(val.reshape(1, 2139))
 
 
 if __name__ == '__main__':
