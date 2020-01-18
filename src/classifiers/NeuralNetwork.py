@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, Dropout
+from keras.layers import Dense, Flatten, Dropout, LSTM, SpatialDropout1D
 from keras.layers.embeddings import Embedding
 from keras.models import model_from_json
 
@@ -12,6 +12,17 @@ class NeuralNetwork:
 
     def train(self, X_train, y_train, epochs=150):
         self.model.fit(X_train, y_train, epochs=epochs, verbose=1)
+
+    def build_LSTM_model(self, emd_matrix, long_sent_size, vocab_len, number_of_classes):
+        self.model = Sequential()
+        embedding_layer = Embedding(vocab_len, 100, weights=[emd_matrix], input_length=long_sent_size,
+                                    trainable=False)
+        self.model.add(embedding_layer)
+        self.model.add(SpatialDropout1D(0.2))
+        self.model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
+        self.model.add(Dense(number_of_classes, activation='softmax'))
+        self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        return self.model
 
     def build_baseline_model(self, emd_matrix, long_sent_size, vocab_len, number_of_classes):
         self.model = Sequential()
