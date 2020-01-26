@@ -1,8 +1,11 @@
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, Dropout, LSTM, SpatialDropout1D
+from keras.layers import Dense, Flatten, Dropout, LSTM, SpatialDropout1D, Conv1D, MaxPool1D
 from keras.layers.embeddings import Embedding
 from keras.models import model_from_json
-
+import numpy as np
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils import to_categorical
 
 class NeuralNetwork:
 
@@ -13,23 +16,57 @@ class NeuralNetwork:
     def train(self, X_train, y_train, epochs=150):
         self.model.fit(X_train, y_train, epochs=epochs, verbose=1)
 
+    def cnn_w2v(self, x_train, x_test):
+        #TODO: Make this work and check results
+        tokenizer = Tokenizer()
+        tokenizer.fit_on_texts(list(x_train) + list(x_test))
+        x_train_seqs = tokenizer.texts_to_sequences(list(x_train))
+
+        word2idx = tokenizer.word_index
+
+        for word, idx in word2idx.items():
+            if word in wv.vocab:
+                embeddings[idx] = wv.get_vector(word)
+
+        # Every sequence has the same size. Assigns zero for those who do not arrive at maxlen
+        x_train_paded = pad_sequences(x_train_seqs, maxlen=52)
+        y_train_onehot = to_categorical(y_train)
+
+        embeddings = np.zeros((len(word2idx) + 1, 100))
+        # Approach with word2vec
+        cnn_model = Sequential()
+
+        cnn_model.add(Embedding(embeddings.shape[0],
+                                embeddings.shape[1],
+                                weights=[embeddings],
+                                trainable=False, input_length=52))
+        # Prevents overfitting
+        cnn_model.add(Dropout(0.5))
+        cnn_model.add(Conv1D(64, 5, activation='relu'))
+        # Get the most relevant features
+        cnn_model.add(MaxPool1D(2, strides=2))
+        # Transforms the input data to calculate the density
+        cnn_model.add(Flatten())
+        cnn_model.add(Dense(5, activation='softmax'))
+        return cnn_model
+
     def build_LSTM_model(self, emd_matrix, long_sent_size, vocab_len, number_of_classes):
         self.model = Sequential()
         embedding_layer = Embedding(vocab_len, 100, weights=[emd_matrix], input_length=long_sent_size,
-                                    trainable=False)
+                                    trainable=True)
         self.model.add(embedding_layer)
-        self.model.add(SpatialDropout1D(0.2))
+        self.model.add(SpatialDropout1D(0.3))
         self.model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
         self.model.add(Dense(number_of_classes, activation='softmax'))
-        self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         return self.model
 
     def build_baseline_model(self, emd_matrix, long_sent_size, vocab_len, number_of_classes):
         self.model = Sequential()
         embedding_layer = Embedding(vocab_len, 100, weights=[emd_matrix], input_length=long_sent_size,
-                                        trainable=False)
+                                        trainable=True)
         self.model.add(embedding_layer)
-        self.model.add(Dropout(0.2))
+        self.model.add(Dropout(0.3))
         self.model.add(Flatten())
 
         # softmax performing better than relu
