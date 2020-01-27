@@ -139,16 +139,18 @@ def run_complete_pipeline():
 
     nn = NeuralNetwork()
     nnlstm = NeuralNetwork()
+    conv2d = NeuralNetwork()
+
     nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
-
     nnlstm.build_LSTM_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
-    #val_data, X, Y = ModelUtil().extract_validation_data(padded_sentences, encoded_Y)
-
-    for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
+    conv2d.build_CNN_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
+    val_data, X, Y = ModelUtil().extract_validation_data(padded_sentences, encoded_Y)
+    saved_models = []
+    for train_index, test_index in kfold.split(X, Y):
         # convert integers to dummy variables (i.e. one hot encoded)
-        dummy_y = np_utils.to_categorical(encoded_Y)
+        dummy_y = np_utils.to_categorical(Y)
         print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
+        X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = dummy_y[train_index], dummy_y[test_index]
         nn.train(X_train, y_train, 100)
 
@@ -159,15 +161,16 @@ def run_complete_pipeline():
     print("NN accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
     best_model = models[cv_scores.index(max(cv_scores))]
     best_model.save_model(model_name='nn.json', weights_name='nn.h5')
+    saved_models.append(best_model)
 
     cv_scores = []
     models = []
 
-    for train_index, test_index in kfold.split(padded_sentences, encoded_Y):
+    for train_index, test_index in kfold.split(X, Y):
         # convert integers to dummy variables (i.e. one hot encoded)
-        dummy_y = np_utils.to_categorical(encoded_Y)
+        dummy_y = np_utils.to_categorical(Y)
         print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = padded_sentences[train_index], padded_sentences[test_index]
+        X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = dummy_y[train_index], dummy_y[test_index]
         nnlstm.train(X_train, y_train, 20)
 
@@ -178,11 +181,32 @@ def run_complete_pipeline():
     print("LSTM Accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
     best_model = models[cv_scores.index(max(cv_scores))]
     best_model.save_model(model_name='lstm.json', weights_name='lstm.h5')
+    saved_models.append(best_model)
 
-    # # TODO: Fix prediction that is failing here
-    # for key, val in val_data.items():
-    #      print('key:' + str(key))
-    #      best_model.predict_entries(val.reshape(1, 2139))
+    cv_scores = []
+    models = []
+
+    for train_index, test_index in kfold.split(X, Y):
+        # convert integers to dummy variables (i.e. one hot encoded)
+        dummy_y = np_utils.to_categorical(Y)
+        print("TRAIN:", train_index, "TEST:", test_index)
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = dummy_y[train_index], dummy_y[test_index]
+        conv2d.train(X_train, y_train, 50)
+
+        scores = conv2d.evaluate_model(X_test, y_test)
+        cv_scores.append(scores[1] * 100)
+        models.append(conv2d)
+
+    print("CNN Accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
+    best_model = models[cv_scores.index(max(cv_scores))]
+    best_model.save_model(model_name='cnn.json', weights_name='cnn.h5')
+    saved_models.append(best_model)
+
+    for key, val in val_data.items():
+         print('key:' + str(key))
+         for model in saved_models:
+            model.predict_entries(val.reshape(1, 2139))
 
 
 if __name__ == '__main__':

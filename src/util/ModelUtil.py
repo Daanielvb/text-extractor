@@ -89,7 +89,7 @@ class ModelUtil:
         # Get one example of each class for validation:
         validation_data = {}
         indexes = []
-        for idx, author in enumerate(Y):
+        for idx, author in enumerate(reversed(Y)):
             if author not in validation_data.keys():
                 print(author)
                 validation_data[author] = X[idx]

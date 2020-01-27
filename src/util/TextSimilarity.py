@@ -35,12 +35,8 @@ class TextSimilarity:
         vectorizer = CountVectorizer(compare_texts)
         vectorizer.fit(compare_texts)
         vectors = [t for t in TextSimilarity().get_vectors(compare_texts, vectorizer)]
-
         input_vector = vectors.pop(0)
-        best_cos = 0
-        result = ''
         distances = [1 - spatial.distance.cosine(input_vector, vect) for vect in vectors]
-
         return distances.index(max(distances))
 
 
