@@ -45,4 +45,5 @@ class Cleaner:
     def format(text):
         #text = re.sub('\n', ' ', text)
         text = re.sub('\n{3,}', '\n\n', text)
+        text = re.sub(r"[\t]*", "", text)
         return text.strip()

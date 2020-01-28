@@ -24,6 +24,8 @@ class StudentConstant:
         'GILSON', 'LISBOA', 'FERREIRA',
         'ISAÍLDA', 'ISAILDA',
         'JULIA', 'MARLEY',
+        'THIPHANNY BARROS',
+        'THIPHANNY', 'BARROS',
         'LAIS', 'ROSILENE', 'FREITAS',
         'JOSIANE', 'MARIA', 'SANTANA',
         'LEANDRO', 'LEMOS',

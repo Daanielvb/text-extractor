@@ -55,7 +55,7 @@ def show_column_distribution(dataframe, class_name):
 
 def save_converted_stylo_data():
     convert_text_to_stylometric()
-    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo.csv', CSVReader.read_csv('../../data/parsed-data/data.csv'))
+    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo-data.csv', CSVReader.read_csv('../../data/parsed-data/data.csv'))
 
 
 def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
@@ -210,4 +210,4 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    run_complete_pipeline()
+    convert_text_to_stylometric()
