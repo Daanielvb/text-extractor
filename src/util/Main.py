@@ -124,18 +124,9 @@ def run_complete_pipeline():
 
     embedded_matrix = PortugueseTextualProcessing().build_embedding_matrix(glove_embedding, vocab_len, tokenizer)
 
-    # TODO: Iterate over params to check best configs
-    init = ['glorot_uniform', 'normal', 'uniform']
-    optimizers = ['rmsprop', 'adam']
-    epochs = [50, 100, 150]
-    batches = [5, 10, 20]
-    param_network = dict(optimizer=optimizers, epochs=epochs, batch_size=batches, init=init)
-
     cv_scores = []
     kfold = StratifiedKFold(n_splits=4, shuffle=True, random_state=7)
     models = []
-
-    # Separate some validation samples
 
     nn = NeuralNetwork()
     nnlstm = NeuralNetwork()
@@ -144,7 +135,10 @@ def run_complete_pipeline():
     nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
     nnlstm.build_LSTM_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
     conv2d.build_CNN_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
+
+    # Separate some validation samples
     val_data, X, Y = ModelUtil().extract_validation_data(padded_sentences, encoded_Y)
+
     saved_models = []
     for train_index, test_index in kfold.split(X, Y):
         # convert integers to dummy variables (i.e. one hot encoded)
@@ -203,11 +197,11 @@ def run_complete_pipeline():
     best_model.save_model(model_name='cnn.json', weights_name='cnn.h5')
     saved_models.append(best_model)
 
-    for key, val in val_data.items():
-         print('key:' + str(key))
-         for model in saved_models:
-            model.predict_entries(val.reshape(1, 2139))
+    # for key, val in val_data.items():
+    #      print('key:' + str(key))
+    #      for model in saved_models:
+    #         model.predict_entries(val.reshape(1, 2139))
 
 
 if __name__ == '__main__':
-    convert_text_to_stylometric()
+    run_complete_pipeline()

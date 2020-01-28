@@ -1,7 +1,8 @@
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, Dropout, LSTM, SpatialDropout1D, Conv1D, MaxPool1D
+from keras.layers import Dense, Flatten, Dropout, LSTM, SpatialDropout1D, Conv1D, MaxPool1D, GRU, Input, Concatenate, GlobalMaxPooling1D
 from keras.layers.embeddings import Embedding
-from keras.models import model_from_json
+from keras.models import model_from_json, Model
+
 
 class NeuralNetwork:
 
@@ -42,6 +43,42 @@ class NeuralNetwork:
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         return self.model
 
+    def build_cnn_gru_model(self, emd_matrix, long_sent_size, vocab_len, number_of_classes):
+        inputs = Input(shape=(long_sent_size,), name='input')
+
+        embedding = Embedding(vocab_len, 100, weights=[emd_matrix], trainable=True, input_length=long_sent_size)(inputs)
+
+        # CNN uni,bi e tri grama
+        conv1 = Conv1D(100, 1, activation='relu')(embedding)
+        conv2 = Conv1D(100, 3, activation='relu')(embedding)
+        conv3 = Conv1D(100, 2, activation='relu')(embedding)
+
+        conv1 = GlobalMaxPooling1D()(conv1)
+        conv2 = GlobalMaxPooling1D()(conv2)
+        conv3 = GlobalMaxPooling1D()(conv3)
+
+        # Concatenate CNNs results
+        concatenate = Concatenate()([conv1, conv2, conv3])
+
+        dense1 = Dense(100, activation='tanh')(concatenate)
+        dense1 = Dropout(0.2)(dense1)
+
+        # GRU model
+        gru = GRU(100, dropout=0.2, recurrent_dropout=0.2)(embedding)
+
+        # Concatenate GRU and CNNs
+        merge = Concatenate()([dense1, gru])
+
+        out1 = Dense(128, activation='tanh')(merge)
+        out = Dense(number_of_classes, activation='softmax')(out1)
+
+        self.model = Model(inputs=inputs, outputs=out)
+
+        self.model.summary()
+
+        self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        return self.model
+
     def build_baseline_model(self, emd_matrix, long_sent_size, vocab_len, number_of_classes):
         self.model = Sequential()
         embedding_layer = Embedding(vocab_len, 100, weights=[emd_matrix], input_length=long_sent_size,
@@ -55,9 +92,6 @@ class NeuralNetwork:
 
         self.model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
         return self.model
-
-    def compile_model(self, optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy']):
-        self.model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
     def evaluate_model(self, X_test, y_test):
         scores = self.model.evaluate(X_test, y_test, verbose=1)
