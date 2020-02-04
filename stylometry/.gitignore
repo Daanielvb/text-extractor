@@ -1,5 +1,0 @@
-
-/build
-# leave data out
-data/*/*.txt
-*.pyc

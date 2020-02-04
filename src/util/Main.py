@@ -14,7 +14,7 @@ from src.classifiers.RFClassifier import *
 from src.classifiers.SimpleNeuralNetwork import *
 
 
-def convert_text_to_stylometric(base_path='../../data/students_exercises'):
+def extract_text_from_original_works(base_path='../../data/students_exercises'):
     clean_txt_content, txt_file_names = FileUtil.convert_files(base_path)
     clean_doc_content, doc_file_names = DOCReader().convert_docs(base_path)
     clean_pdf_content, pdf_file_names = PDFReader().convert_pdfs(base_path)
@@ -54,8 +54,8 @@ def show_column_distribution(dataframe, class_name):
 
 
 def save_converted_stylo_data():
-    convert_text_to_stylometric()
-    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo-data.csv', CSVReader.read_csv('../../data/parsed-data/data.csv'))
+    #extract_text_from_original_works()
+    CSVReader().write_stylo_features('../../data/parsed-data/', 'selected-stylo-data.csv', CSVReader.read_csv('../../data/parsed-data/selected-data.csv'))
 
 
 def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
@@ -102,7 +102,9 @@ def run_compiled_pipeline():
 def run_complete_pipeline():
     df = pd.read_csv('../../data/parsed-data/data.csv')
 
-    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
+    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 2)
+    show_column_distribution(df, 'Author')
+    CSVReader().export_dataframe(df, 'selected-data.csv')
 
     #show_column_distribution(df, 'Author')
 
@@ -204,4 +206,4 @@ def run_complete_pipeline():
 
 
 if __name__ == '__main__':
-    run_complete_pipeline()
+    save_converted_stylo_data()
