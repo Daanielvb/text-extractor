@@ -99,13 +99,10 @@ def run_compiled_pipeline():
     print('accuracy % = ' + str((correct / 100) * 100))
 
 
-def run_complete_pipeline():
-    df = pd.read_csv('../../data/parsed-data/data.csv')
+def run_complete_pipeline(dataset='../../data/parsed-data/selected-data.csv'):
+    df = pd.read_csv(dataset)
 
-    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 2)
-    show_column_distribution(df, 'Author')
-    CSVReader().export_dataframe(df, 'selected-data.csv')
-
+    #df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 2)
     #show_column_distribution(df, 'Author')
 
     y = df.pop('Author')
@@ -131,79 +128,84 @@ def run_complete_pipeline():
     models = []
 
     nn = NeuralNetwork()
-    nnlstm = NeuralNetwork()
+    #TODO: Check this model
+    cnnGRU = NeuralNetwork()
     conv2d = NeuralNetwork()
 
     nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
-    nnlstm.build_LSTM_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
+    cnnGRU.build_cnn_gru_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
     conv2d.build_CNN_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
 
     # Separate some validation samples
+    # TODO: Check an alternative for this validation strategy
     val_data, X, Y = ModelUtil().extract_validation_data(padded_sentences, encoded_Y)
 
     saved_models = []
+    # for train_index, test_index in kfold.split(X, Y):
+    #     # convert integers to dummy variables (i.e. one hot encoded)
+    #     dummy_y = np_utils.to_categorical(Y)
+    #     print("TRAIN:", train_index, "TEST:", test_index)
+    #     X_train, X_test = X[train_index], X[test_index]
+    #     y_train, y_test = dummy_y[train_index], dummy_y[test_index]
+    #     nn.train(X_train, y_train, 100)
+    #
+    #     scores = nn.evaluate_model(X_test, y_test)
+    #     cv_scores.append(scores[1] * 100)
+    #     models.append(nn)
+    #
+    # print("NN accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
+    # best_model = models[cv_scores.index(max(cv_scores))]
+    # best_model.save_model(model_name='nn.json', weights_name='nn.h5')
+    # saved_models.append(best_model)
+    #
+    # cv_scores = []
+    # models = []
+
     for train_index, test_index in kfold.split(X, Y):
         # convert integers to dummy variables (i.e. one hot encoded)
         dummy_y = np_utils.to_categorical(Y)
         print("TRAIN:", train_index, "TEST:", test_index)
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-        nn.train(X_train, y_train, 100)
+        cnnGRU.train(X_train, y_train, 20)
 
-        scores = nn.evaluate_model(X_test, y_test)
+        scores = cnnGRU.evaluate_model(X_test, y_test)
         cv_scores.append(scores[1] * 100)
-        models.append(nn)
+        models.append(cnnGRU)
 
-    print("NN accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-    best_model = models[cv_scores.index(max(cv_scores))]
-    best_model.save_model(model_name='nn.json', weights_name='nn.h5')
-    saved_models.append(best_model)
-
-    cv_scores = []
-    models = []
-
-    for train_index, test_index in kfold.split(X, Y):
-        # convert integers to dummy variables (i.e. one hot encoded)
-        dummy_y = np_utils.to_categorical(Y)
-        print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = X[train_index], X[test_index]
-        y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-        nnlstm.train(X_train, y_train, 20)
-
-        scores = nnlstm.evaluate_model(X_test, y_test)
-        cv_scores.append(scores[1] * 100)
-        models.append(nnlstm)
-
-    print("LSTM Accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
+    print("CNN GRU Accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
     best_model = models[cv_scores.index(max(cv_scores))]
     best_model.save_model(model_name='lstm.json', weights_name='lstm.h5')
     saved_models.append(best_model)
 
-    cv_scores = []
-    models = []
+    # cv_scores = []
+    # models = []
+    #
+    # for train_index, test_index in kfold.split(X, Y):
+    #     # convert integers to dummy variables (i.e. one hot encoded)
+    #     dummy_y = np_utils.to_categorical(Y)
+    #     print("TRAIN:", train_index, "TEST:", test_index)
+    #     X_train, X_test = X[train_index], X[test_index]
+    #     y_train, y_test = dummy_y[train_index], dummy_y[test_index]
+    #     conv2d.train(X_train, y_train, 50)
+    #
+    #     scores = conv2d.evaluate_model(X_test, y_test)
+    #     cv_scores.append(scores[1] * 100)
+    #     models.append(conv2d)
+    #
+    # print("CNN Accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
+    # best_model = models[cv_scores.index(max(cv_scores))]
+    # best_model.save_model(model_name='cnn.json', weights_name='cnn.h5')
+    # saved_models.append(best_model)
 
-    for train_index, test_index in kfold.split(X, Y):
-        # convert integers to dummy variables (i.e. one hot encoded)
-        dummy_y = np_utils.to_categorical(Y)
-        print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = X[train_index], X[test_index]
-        y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-        conv2d.train(X_train, y_train, 50)
-
-        scores = conv2d.evaluate_model(X_test, y_test)
-        cv_scores.append(scores[1] * 100)
-        models.append(conv2d)
-
-    print("CNN Accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-    best_model = models[cv_scores.index(max(cv_scores))]
-    best_model.save_model(model_name='cnn.json', weights_name='cnn.h5')
-    saved_models.append(best_model)
-
-    # for key, val in val_data.items():
-    #      print('key:' + str(key))
-    #      for model in saved_models:
-    #         model.predict_entries(val.reshape(1, 2139))
+    for key, val in val_data.items():
+        print('key:' + str(key))
+        for model in saved_models:
+            # TODO: This is throwing errors in some cases: Evaluate
+            model.predict_entries(val.reshape(1, 2139))
 
 
 if __name__ == '__main__':
+    # TODO: Check current accuracy using neural networks versus stylometric data
+    # TODO: Check the usage of other pre-trained embeddings that were already downloaded
     save_converted_stylo_data()

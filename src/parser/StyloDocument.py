@@ -144,7 +144,7 @@ class StyloDocument(object):
     def csv_header(cls):
         return (
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
-             #'TamanhoDocumento',
+             'StdevTamParagrafos',
              'Ponto','Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
              'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'FreqTermosNaoTageados', 'FreqPalavrasErradas',
@@ -155,14 +155,15 @@ class StyloDocument(object):
         )
 
     def csv_output(self):
-        # 52 {} + class {} (T53)
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+        # 53 {} + class {} (T53)
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
-            round(self.type_token_ratio(), 5),
-            round(self.mean_word_len(), 5),
-            round(self.mean_sentence_len(), 5),
-            round(self.std_sentence_len(), 5),
-            round(self.mean_paragraph_len(), 5),
+            round(self.type_token_ratio(), 8),
+            round(self.mean_word_len(), 8),
+            round(self.mean_sentence_len(), 8),
+            round(self.std_sentence_len(), 8),
+            round(self.mean_paragraph_len(), 8),
+            round(self.std_paragraph_len(), 8),
             # self.document_len(),
             self.term_per_hundred('.'),
             self.term_per_hundred(','),
@@ -197,20 +198,20 @@ class StyloDocument(object):
             self.count_characters_frequency(['o']),
             self.count_characters_frequency(['u']),
             self.count_consonant_frequency(),
-            round(self.local_hapax_legommena_frequency(), 5),
+            round(self.local_hapax_legommena_frequency(), 8),
             self.collocations_frequency(2),
             self.collocations_frequency(3),
             self.collocations_frequency(4),
             self.mean_frequent_word_size(),
             self.max_word_len(),
-            round(self.guiraud_R_measure(), 5),
-            round(self.herdan_C_measure(), 5),
-            round(self.herdan_V_measure(), 5),
-            round(self.K_measure(), 5),
-            round(self.dugast_U_measure(), 5),
-            round(self.maas_A_measure(), 5),
-            round(self.LN_measure(), 5),
-            round(self.honores_H_measure(), 5),
+            round(self.guiraud_R_measure(), 8),
+            round(self.herdan_C_measure(), 8),
+            round(self.herdan_V_measure(), 8),
+            round(self.K_measure(), 8),
+            round(self.dugast_U_measure(), 8),
+            round(self.maas_A_measure(), 8),
+            round(self.LN_measure(), 8),
+            round(self.honores_H_measure(), 8),
             self.author,
         )
 
