@@ -3,6 +3,8 @@ import pandas as pd
 import pickle
 from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import NearMiss
 
 
 class ModelUtil:
@@ -100,3 +102,18 @@ class ModelUtil:
             X = np.delete(X, idx, axis=0)
 
         return validation_data, X, Y
+
+    @staticmethod
+    def reduce_majority_class_samples(X, Y):
+        nr = NearMiss()
+        X, y = nr.fit(X, Y)
+        return X, y
+
+    @staticmethod
+    def increase_minority_class_samples(X, Y):
+        """Synthetic minority over-sampling technique"""
+        smt = SMOTE()
+        X, Y = smt.fit(X, Y)
+        return X, Y
+
+
