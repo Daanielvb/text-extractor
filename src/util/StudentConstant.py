@@ -101,7 +101,8 @@ class StudentConstant:
         '2018',
         '2018.1',
         '2018.2',
-        '2019.2'
+        '2019.2',
+        'KYLZIA', 'ANDREA', 'AZEVEDO', 'PEREIRA'
         ]
 
 
