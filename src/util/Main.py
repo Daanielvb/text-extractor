@@ -5,7 +5,7 @@ from src.util.ModelUtil import *
 import pandas as pd
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
+import matplotlib
 from sklearn.preprocessing import LabelEncoder
 from keras.utils import np_utils
 from sklearn.model_selection import StratifiedKFold
@@ -55,7 +55,7 @@ def show_column_distribution(dataframe, class_name):
 
 def save_converted_stylo_data():
     #extract_text_from_original_works()
-    CSVReader().write_stylo_features('../../data/parsed-data/', 'selected-stylo-data.csv', CSVReader.read_csv('../../data/parsed-data/selected-data.csv'))
+    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo-data.csv', CSVReader.read_csv('../../data/parsed-data/data.csv'))
 
 
 def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
@@ -99,10 +99,10 @@ def run_compiled_pipeline():
     print('accuracy % = ' + str((correct / 100) * 100))
 
 
-def run_complete_pipeline(dataset='../../data/parsed-data/selected-data.csv'):
+def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
     df = pd.read_csv(dataset)
 
-    #df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 2)
+    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
     #show_column_distribution(df, 'Author')
 
     y = df.pop('Author')
@@ -128,84 +128,65 @@ def run_complete_pipeline(dataset='../../data/parsed-data/selected-data.csv'):
     models = []
 
     nn = NeuralNetwork()
-    #TODO: Check this model
-    cnnGRU = NeuralNetwork()
-    conv2d = NeuralNetwork()
+    #conv2d = NeuralNetwork()
 
     nn.build_baseline_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
-    cnnGRU.build_cnn_gru_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
-    conv2d.build_CNN_model(embedded_matrix, max_sentence_len, vocab_len, len(np_utils.to_categorical(encoded_Y)[0]))
 
-    # Separate some validation samples
     # TODO: Check an alternative for this validation strategy
-    val_data, X, Y = ModelUtil().extract_validation_data(padded_sentences, encoded_Y)
+    #val_data, X, Y = ModelUtil().extract_validation_data(padded_sentences, encoded_Y)
+    y = np_utils.to_categorical(encoded_Y)
+    history = nn.model.fit(
+        padded_sentences, y,
+        validation_split=0.2,
+        epochs=250,
+        batch_size=512)
 
-    saved_models = []
-    # for train_index, test_index in kfold.split(X, Y):
-    #     # convert integers to dummy variables (i.e. one hot encoded)
-    #     dummy_y = np_utils.to_categorical(Y)
-    #     print("TRAIN:", train_index, "TEST:", test_index)
-    #     X_train, X_test = X[train_index], X[test_index]
-    #     y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-    #     nn.train(X_train, y_train, 100)
+    # loss = history.history['loss']
+    # val_loss = history.history['val_loss']
+    # epochs = range(1, len(loss) + 1)
+    # matplotlib.pyplot.plot(epochs, loss, 'g', label='Training loss')
+    # matplotlib.pyplot.plot(epochs, val_loss, 'y', label='Validation loss')
+    # plt.title('Training and validation loss')
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Loss')
+    # plt.legend()
+    # plt.show()
     #
-    #     scores = nn.evaluate_model(X_test, y_test)
-    #     cv_scores.append(scores[1] * 100)
-    #     models.append(nn)
-    #
-    # print("NN accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-    # best_model = models[cv_scores.index(max(cv_scores))]
-    # best_model.save_model(model_name='nn.json', weights_name='nn.h5')
-    # saved_models.append(best_model)
-    #
-    # cv_scores = []
-    # models = []
-
+    # plt.clf()
+    # acc = history.history['acc']
+    # val_acc = history.history['val_acc']
+    # plt.plot(epochs, acc, 'g', label='Training acc')
+    # plt.plot(epochs, val_acc, 'y', label='Validation acc')
+    # plt.title('Training and validation accuracy')
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Accuracy')
+    # plt.legend()
+    # plt.show()
+    # saved_models = []
     for train_index, test_index in kfold.split(X, Y):
         # convert integers to dummy variables (i.e. one hot encoded)
         dummy_y = np_utils.to_categorical(Y)
         print("TRAIN:", train_index, "TEST:", test_index)
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-        cnnGRU.train(X_train, y_train, 20)
+        nn.train(X_train, y_train, 100)
 
-        scores = cnnGRU.evaluate_model(X_test, y_test)
+        scores = nn.evaluate_model(X_test, y_test)
         cv_scores.append(scores[1] * 100)
-        models.append(cnnGRU)
-
-    print("CNN GRU Accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-    best_model = models[cv_scores.index(max(cv_scores))]
-    best_model.save_model(model_name='lstm.json', weights_name='lstm.h5')
-    saved_models.append(best_model)
-
-    # cv_scores = []
-    # models = []
-    #
-    # for train_index, test_index in kfold.split(X, Y):
-    #     # convert integers to dummy variables (i.e. one hot encoded)
-    #     dummy_y = np_utils.to_categorical(Y)
-    #     print("TRAIN:", train_index, "TEST:", test_index)
-    #     X_train, X_test = X[train_index], X[test_index]
-    #     y_train, y_test = dummy_y[train_index], dummy_y[test_index]
-    #     conv2d.train(X_train, y_train, 50)
-    #
-    #     scores = conv2d.evaluate_model(X_test, y_test)
-    #     cv_scores.append(scores[1] * 100)
-    #     models.append(conv2d)
-    #
-    # print("CNN Accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
+        models.append(nn)
+    # print("NN accuracy %.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
     # best_model = models[cv_scores.index(max(cv_scores))]
-    # best_model.save_model(model_name='cnn.json', weights_name='cnn.h5')
+    # #best_model.save_model(model_name='nn.json', weights_name='nn.h5')
     # saved_models.append(best_model)
 
-    for key, val in val_data.items():
-        print('key:' + str(key))
-        for model in saved_models:
-            # TODO: This is throwing errors in some cases: Evaluate
-            model.predict_entries(val.reshape(1, 2139))
+    # for key, val in val_data.items():
+    #     print('key:' + str(key))
+    #     for model in saved_models:
+    #         # TODO: This is throwing errors in some cases: Evaluate
+    #         model.predict_entries(val.reshape(1, 2139))
 
 
 if __name__ == '__main__':
     # TODO: Check current accuracy using neural networks versus stylometric data
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
-    save_converted_stylo_data()
+    run_complete_pipeline()

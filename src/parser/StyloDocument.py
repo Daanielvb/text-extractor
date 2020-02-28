@@ -151,7 +151,7 @@ class StyloDocument(object):
              'FreqVogais', 'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU', 'FrequenciaConsoantes',
              'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams', 'FrequenciaDeQuadrigrams',
              'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK',
-             'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'Classe(Autor)']
+             'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'Author']
         )
 
     def csv_output(self):

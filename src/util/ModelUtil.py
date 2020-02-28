@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pickle
+import matplotlib as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing
 from imblearn.over_sampling import SMOTE
@@ -112,8 +113,36 @@ class ModelUtil:
     @staticmethod
     def increase_minority_class_samples(X, Y):
         """Synthetic minority over-sampling technique"""
-        smt = SMOTE()
-        X, Y = smt.fit(X, Y)
+        smt = SMOTE(k_neighbors=2)
+        X, Y = smt.fit_resample(X, Y)
         return X, Y
+
+    # TODO: Fix the current plt error
+    @staticmethod
+    def plot_training_validation_loss(history):
+        plt.clf()
+        loss = history.history['loss']
+        val_loss = history.history['val_loss']
+        epochs = range(1, len(loss) + 1)
+        plt.plot(epochs, loss, 'g', label='Training loss')
+        plt.plot(epochs, val_loss, 'y', label='Validation loss')
+        plt.title('Training and validation loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.show()
+
+    @staticmethod
+    def plot_training_val_accuracy(history, epochs):
+        plt.clf()
+        acc = history.history['acc']
+        val_acc = history.history['val_acc']
+        plt.plot(epochs, acc, 'g', label='Training acc')
+        plt.plot(epochs, val_acc, 'y', label='Validation acc')
+        plt.title('Training and validation accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+        plt.show()
 
 

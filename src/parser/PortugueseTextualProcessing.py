@@ -76,10 +76,10 @@ class PortugueseTextualProcessing:
                 print(f"{left[-context:]} '{word}' {right[:context]}")
 
     @staticmethod
-    def load_vector(vocabulary_tokenizer):
+    def load_vector(vocabulary_tokenizer, embedding_file='glove_s100.txt'):
         word_embedding = {}
         vocabulary_tokenizer
-        with open("glove_s100.txt", 'r', encoding='utf-8') as f:
+        with open(embedding_file, 'r', encoding='utf-8') as f:
             for line in f:
                 word, coefs = line.split(maxsplit=1)
                 if word in vocabulary_tokenizer.word_index:
@@ -111,10 +111,10 @@ class PortugueseTextualProcessing:
         return tokenizer, padded_sentences, max_sentence_len
 
     @staticmethod
-    def build_embedding_matrix(word_embedding_dict, vocab_length, tokenizer):
-        embedding_matrix = np.zeros((vocab_length, 100))
+    def build_embedding_matrix(word_embedding_dict, vocab_length, tokenizer, size=100):
+        embedding_matrix = np.zeros((vocab_length, size))
         for word, index in tokenizer.word_index.items():
             embedding_vector = word_embedding_dict.get(word)
             if embedding_vector is not None:
-                embedding_matrix[index] = embedding_vector[:100]
+                embedding_matrix[index] = embedding_vector[:size]
         return embedding_matrix
