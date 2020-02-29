@@ -58,7 +58,7 @@ class ModelUtil:
         return dataframe.groupby(class_name).filter(lambda x: len(x) > threshold)
 
     @staticmethod
-    def normalize_dataframe(csv_file='../../data/parsed-data/stylo.csv', class_name='Classe(Autor)', threshold=2):
+    def normalize_dataframe(csv_file='../../data/parsed-data/stylo.csv', class_name='Author', threshold=2):
         df = pd.read_csv(csv_file)
         df = ModelUtil().remove_entries_based_on_threshold(df, class_name, threshold)
         y = df.pop(class_name)

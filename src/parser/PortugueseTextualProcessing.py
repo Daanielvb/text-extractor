@@ -1,13 +1,14 @@
 import nltk
-from nltk import tokenize
+from nltk import tokenize, ne_chunk
 from nltk.stem import RSLPStemmer
-from nltk.corpus import floresta
+from nltk.corpus import floresta, genesis, machado, mac_morpho
 from pickle import load
 from src.util.FileUtil import *
 import numpy as np
 import spatial
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
+from nltk import RegexpParser, Tree
 
 
 class PortugueseTextualProcessing:
@@ -33,16 +34,44 @@ class PortugueseTextualProcessing:
         return [w for w in tokenized_text if w not in PortugueseTextualProcessing().STOPWORDS]
 
     @staticmethod
-    def postag(tokenized_text):
+    def postag(tokenized_text, as_list=True):
         result = []
         for token in tokenized_text:
-            result.append(PortugueseTextualProcessing().TAGGER.tag([token.lower()]))
+            if as_list:
+                result.append(PortugueseTextualProcessing().TAGGER.tag([token.lower()]))
+            else:
+                result.append(PortugueseTextualProcessing().TAGGER.tag([token.lower()])[0])
         return result
 
     @staticmethod
+    def get_continuous_chunks(tokenized_text, chunk_func=ne_chunk):
+        # Defining a grammar & Parser
+        NP = "NP: {(<(v-fin|v-inf|v-pcp|v-ger)\w+>|<n\w?>)+.*<n\w?>}"
+        chunker = RegexpParser(NP)
+        tagged = PortugueseTextualProcessing.postag(tokenized_text, as_list=False)
+        cs = chunker.parse(tagged)
+        continuous_chunk = []
+        current_chunk = []
+
+        for subtree in cs:
+            if type(subtree) == Tree:
+                current_chunk.append(" ".join([token for token, pos in subtree.leaves()]))
+            elif current_chunk:
+                named_entity = " ".join(current_chunk)
+                if named_entity not in continuous_chunk:
+                    continuous_chunk.append(named_entity)
+                    current_chunk = []
+            else:
+                continue
+
+        return continuous_chunk
+
+    @staticmethod
     def build_tagger():
-        tsents = floresta.tagged_sents()
-        tsents = [[(w.lower(), PortugueseTextualProcessing().simplify_tag(t)) for (w, t) in sent] for sent in tsents if
+        tsents = []
+        tsents.extend(floresta.tagged_sents())
+        tsents.extend(mac_morpho.tagged_sents())
+        tsents = [[(w.lower(), PortugueseTextualProcessing().simplify_tag(nltk.pos_tag(t))) for (w, t) in sent] for sent in tsents if
                   sent]
         train = tsents[:6000]
         test = tsents[6000:]
@@ -52,11 +81,13 @@ class PortugueseTextualProcessing:
         t0 = nltk.DefaultTagger('notfound')
         t1 = nltk.UnigramTagger(train, backoff=t0)
         t2 = nltk.BigramTagger(test, backoff=t1)
+        t3 = nltk.TrigramTagger(test, backoff=t2)
         print(t0.evaluate(test))
         print(t1.evaluate(test))
         print(t2.evaluate(test))
-        FileUtil.write_pickle_file('pttag.pkl', t2)
-        return t2
+        print(t3.evaluate(test))
+        FileUtil.write_pickle_file('pttag.pkl', t3)
+        return t3
 
     @staticmethod
     def simplify_tag(t):

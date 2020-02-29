@@ -99,6 +99,15 @@ def run_compiled_pipeline():
     print('accuracy % = ' + str((correct / 100) * 100))
 
 
+def run_stylometric_pipeline(dataset='../../data/parsed-data/stylo-data.csv'):
+    df = pd.read_csv(dataset)
+    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
+    nn = SimpleNeuralNetwork(df)
+    accs = []
+    for i in range(0, 100):
+        accs.append(nn.split_and_train())
+    print (np.mean(accs))
+
 def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
     df = pd.read_csv(dataset)
 
@@ -116,7 +125,7 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
     tokenizer, padded_sentences, max_sentence_len \
         = PortugueseTextualProcessing().convert_corpus_to_number(df)
 
-    ModelUtil().save_tokenizer(tokenizer)
+    #ModelUtil().save_tokenizer(tokenizer)
     vocab_len = len(tokenizer.word_index) + 1
 
     glove_embedding = PortugueseTextualProcessing().load_vector(tokenizer)
@@ -189,4 +198,5 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
 if __name__ == '__main__':
     # TODO: Check current accuracy using neural networks versus stylometric data
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
-    run_complete_pipeline()
+    #save_converted_stylo_data()
+    PortugueseTextualProcessing().build_tagger()

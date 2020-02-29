@@ -24,6 +24,7 @@ class StyloDocument(object):
         self.white_spaces = len(self.file_content.split(' '))
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
+        self.test = PortugueseTextualProcessing().get_continuous_chunks(self.tokens)
         self.spell = SpellChecker(language='pt')
 
     def get_class_frequency_by_start(self, tag_start):
@@ -50,6 +51,8 @@ class StyloDocument(object):
         -----  = ------
           N       100
         """
+        # TODO: test the similar function instead of the exact term
+        print(self.text.similar(term))
         return (self.fdist[term] * 100) / self.fdist.N()
 
     def mean_sentence_len(self):
@@ -85,11 +88,15 @@ class StyloDocument(object):
     def document_len(self):
         return sum(self.sentence_chars)
 
+    def get_phrases(self):
+        return [i for i in self.file_content.split('.') if i != '']
+
     def count_characters_frequency(self, character_list):
         return (len([word for word in self.file_content if word in character_list])) / len(self.text)
 
     def count_consonant_frequency(self):
-        character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'y','x', 'z']
+        character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w',
+                          'y', 'x', 'z']
         return (len([word for word in self.file_content if word in character_list])) / len(self.text)
 
     def local_hapax_legommena_frequency(self):
