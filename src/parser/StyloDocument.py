@@ -24,7 +24,6 @@ class StyloDocument(object):
         self.white_spaces = len(self.file_content.split(' '))
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
-        self.test = PortugueseTextualProcessing().get_continuous_chunks(self.tokens)
         self.spell = SpellChecker(language='pt')
 
     def get_class_frequency_by_start(self, tag_start):
@@ -51,8 +50,6 @@ class StyloDocument(object):
         -----  = ------
           N       100
         """
-        # TODO: test the similar function instead of the exact term
-        print(self.text.similar(term))
         return (self.fdist[term] * 100) / self.fdist.N()
 
     def mean_sentence_len(self):
@@ -145,6 +142,9 @@ class StyloDocument(object):
     def spell_miss_check_frequency(self):
         return (len(self.spell.unknown(self.text))) / len(self.text)
 
+    def noun_phrases(self):
+        return PortugueseTextualProcessing().get_number_of_noun_phrases(self.tokens) / len(self.text)
+
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
     @classmethod
@@ -154,17 +154,17 @@ class StyloDocument(object):
              'StdevTamParagrafos',
              'Ponto','Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
              'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
-             'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerbos', 'FreqConj', 'FreqPronomes', 'FreqTermosNaoTageados', 'FreqPalavrasErradas',
-             'FreqVogais', 'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU', 'FrequenciaConsoantes',
-             'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams', 'FrequenciaDeQuadrigrams',
-             'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK',
-             'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'Author']
+             'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj', 'FreqPronomes', 'FreqTermosNaoTageados',
+             'FreqPalavrasErradas','FreqVogais', 'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU',
+             'FrequenciaConsoantes','FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams',
+             'FrequenciaDeQuadrigrams','TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC',
+             'HerdanV', 'MedidaK','DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'FrequenciaFrasesNominais', 'Author']
         )
 
     def csv_output(self):
-        # 53 {} + class {} (T53)
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
+        # 55 {} + class {} (T56)
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
             round(self.type_token_ratio(), 8),
             round(self.mean_word_len(), 8),
             round(self.mean_sentence_len(), 8),
@@ -188,14 +188,15 @@ class StyloDocument(object):
             self.term_per_hundred('pode'),
             self.term_per_hundred('esse'),
             self.term_per_hundred('muito'),
-            self.tag_frequency('adj'),
-            self.tag_frequency('adv'),
-            self.tag_frequency('art'),
-            self.tag_frequency('n'),
-            self.tag_frequency('prp'),
-            self.get_class_frequency_by_start('v'),
-            self.get_class_frequency_by_start('conj'),
-            self.get_class_frequency_by_start('pron'),
+            self.tag_frequency('ADJ'),
+            self.tag_frequency('ADV'),
+            self.tag_frequency('ART'),
+            self.tag_frequency('N'),
+            self.tag_frequency('PREP'),
+            self.tag_frequency('PCP'),  # verbo no participio
+            self.get_class_frequency_by_start('V'),
+            self.get_class_frequency_by_start('K'),
+            self.get_class_frequency_by_start('PRO'),
             self.tag_frequency('notfound'),
             self.spell_miss_check_frequency(),
             self.count_characters_frequency(['a', 'e', 'i', 'o', 'u']),
@@ -219,43 +220,6 @@ class StyloDocument(object):
             round(self.maas_A_measure(), 8),
             round(self.LN_measure(), 8),
             round(self.honores_H_measure(), 8),
+            self.noun_phrases(),
             self.author,
         )
-
-    def text_output(self):
-        print("##############################################")
-
-        print("Author: ", self.author)
-        print("\n")
-
-        print(">>> Phraseology Analysis <<<\n")
-
-        print("Lexical diversity        :", self.type_token_ratio())
-        print("Mean Word Length         :", self.mean_word_len())
-        print("Mean Sentence Length     :", self.mean_sentence_len())
-        print("STDEV Sentence Length    :", self.std_sentence_len())
-        print("Mean paragraph Length    :", self.mean_paragraph_len())
-        print("Document Length          :", self.document_len())
-        print("\n")
-
-        print(">>> Analise de pontuacoes (per 100 tokens) <<<\n")
-        print('Commas                   :', self.term_frequency(','))
-        print('Semicolons               :', self.term_frequency(';'))
-        print('Quotations               :', self.term_frequency('\"'))
-        print('Exclamations             :', self.term_frequency('!'))
-        print('Colons                   :', self.term_frequency(':'))
-        print('Hyphens                  :', self.term_frequency('-'))  # m-dash or n-dash?
-        print('Double Hyphens           :', self.term_frequency('--'))  # m-dash or n-dash?
-
-        print(">>> Analise lexica (per 100 tokens) <<<\n")
-        print('e                      :', self.term_frequency('e'))
-        print('mas                      :', self.term_frequency('mas'))
-        print('porém                  :', self.term_frequency('porém'))
-        print('se                       :', self.term_frequency('se'))
-        print('isto                     :', self.term_frequency('isto'))
-        print('more                     :', self.term_frequency('mais'))
-        print('precisa                     :', self.term_frequency('precisa'))
-        print('pode                    :', self.term_frequency('pode'))
-        print('esse                     :', self.term_frequency('esse'))
-        print('muito                     :', self.term_frequency('muito'))
-        print("\n")

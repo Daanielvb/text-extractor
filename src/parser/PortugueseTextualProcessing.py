@@ -1,7 +1,7 @@
 import nltk
 from nltk import tokenize, ne_chunk
 from nltk.stem import RSLPStemmer
-from nltk.corpus import floresta, genesis, machado, mac_morpho
+from nltk.corpus import floresta, mac_morpho, masc_tagged
 from pickle import load
 from src.util.FileUtil import *
 import numpy as np
@@ -13,7 +13,7 @@ from nltk import RegexpParser, Tree
 
 class PortugueseTextualProcessing:
     STOPWORDS = set(nltk.corpus.stopwords.words('portuguese'))
-    TAGGER = load(open('pttag.pkl', 'rb'))
+    TAGGER = load(open('pttag-mm.pkl', 'rb'))
     EMBEDDING_DIM = 100
     MAX_NUM_WORDS = 20000
 
@@ -26,7 +26,7 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def stem(tokenized_text):
-        """This stem is currently creating a lot of nonexistent words"""
+        """Warning: This stem is currently creating a lot of nonexistent words, do not use yet!"""
         return [RSLPStemmer().stem(token) for token in tokenized_text]
 
     @staticmethod
@@ -44,37 +44,21 @@ class PortugueseTextualProcessing:
         return result
 
     @staticmethod
-    def get_continuous_chunks(tokenized_text, chunk_func=ne_chunk):
-        # Defining a grammar & Parser
-        NP = "NP: {(<(v-fin|v-inf|v-pcp|v-ger)\w+>|<n\w?>)+.*<n\w?>}"
-        chunker = RegexpParser(NP)
-        tagged = PortugueseTextualProcessing.postag(tokenized_text, as_list=False)
-        cs = chunker.parse(tagged)
-        continuous_chunk = []
-        current_chunk = []
-
-        for subtree in cs:
-            if type(subtree) == Tree:
-                current_chunk.append(" ".join([token for token, pos in subtree.leaves()]))
-            elif current_chunk:
-                named_entity = " ".join(current_chunk)
-                if named_entity not in continuous_chunk:
-                    continuous_chunk.append(named_entity)
-                    current_chunk = []
-            else:
-                continue
-
-        return continuous_chunk
+    def get_number_of_noun_phrases(tokenized_text):
+        tag_string = ' '.join([tag[1] for tag in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)])
+        # NP = "NP: {(<V\w+>|<N\w?>)+.*<N\w?>}"
+        np_rgx = '(V\w+|N\w?) \w+ N'
+        matches = re.findall(np_rgx, tag_string)
+        return len(matches)
 
     @staticmethod
-    def build_tagger():
-        tsents = []
-        tsents.extend(floresta.tagged_sents())
-        tsents.extend(mac_morpho.tagged_sents())
-        tsents = [[(w.lower(), PortugueseTextualProcessing().simplify_tag(nltk.pos_tag(t))) for (w, t) in sent] for sent in tsents if
+    def build_tagger(corpus=mac_morpho, tagger_name='pttag-mm.pkl'):
+        #tsents.extend(floresta.tagged_sents())
+        tsents = corpus.tagged_sents()
+        tsents = [[(w.lower(), PortugueseTextualProcessing().simplify_tag(t)) for (w, t) in sent] for sent in tsents if
                   sent]
-        train = tsents[:6000]
-        test = tsents[6000:]
+        train = tsents[:35000]
+        test = tsents[35000:]
 
         print(len(train))
         print(len(test))
@@ -86,7 +70,7 @@ class PortugueseTextualProcessing:
         print(t1.evaluate(test))
         print(t2.evaluate(test))
         print(t3.evaluate(test))
-        FileUtil.write_pickle_file('pttag.pkl', t3)
+        FileUtil.write_pickle_file(tagger_name, t3)
         return t3
 
     @staticmethod

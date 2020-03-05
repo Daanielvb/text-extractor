@@ -30,7 +30,7 @@ class CSVReader:
                 filewriter.writerow(row)
 
     @staticmethod
-    def read_csv(file):
+    def read_csv(file, verbose=False):
         print('writing the following file:' + file)
         results = []
         with open(file, encoding='utf-8') as f:
@@ -38,12 +38,14 @@ class CSVReader:
             line_count = 0
             for row in reader:
                 if line_count == 0:
-                    print(f'Column names are {", ".join(row)}')
+                    if verbose:
+                        print(f'Column names are {", ".join(row)}')
                     line_count += 1
                 else:
                     if row:
                         results.append(StyloDocument(row[0], row[1]))
-                        print('Line count:' + str(line_count) + ' Text content:' + row[0])
+                        if verbose:
+                            print('Line count:' + str(line_count) + ' Text content:' + row[0])
                         line_count += 1
         return results
 
