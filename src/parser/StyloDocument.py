@@ -33,8 +33,16 @@ class StyloDocument(object):
                 count += self.tagfdist[tag]
         return count/self.tagfdist.N()
 
+    def get_total_not_found(self):
+        """"The wn is not being reliable so far"""
+        nf_tokens = self.get_tokens_by_tag('notfound')
+        return len([i for i in nf_tokens if len(wn.synsets(i, lang='por')) == 0])
+
     def tag_frequency(self, tag):
         return self.tagfdist.freq(tag)
+
+    def get_tokens_by_tag(self, tag):
+        return [i[0][0] for i in self.tagged_sentences if i[0][1] == tag]
 
     def term_per_thousand(self, term):
         """
@@ -64,6 +72,10 @@ class StyloDocument(object):
     def std_paragraph_len(self):
         return np.std(self.paragraph_word_length)
 
+    #Number of words
+    #Number of sentences
+    #Number of paragraphs
+
     def vocabulary(self):
         return [v for v in sorted(set(self.sentences)) if v not in self.punctuation]
 
@@ -85,7 +97,7 @@ class StyloDocument(object):
     def document_len(self):
         return sum(self.sentence_chars)
 
-    def get_phrases(self):
+    def get_prases(self):
         return [i for i in self.file_content.split('.') if i != '']
 
     def count_characters_frequency(self, character_list):
@@ -145,6 +157,14 @@ class StyloDocument(object):
     def noun_phrases(self):
         return PortugueseTextualProcessing().get_number_of_noun_phrases(self.tokens) / len(self.text)
 
+    def repeated_words_frequency(self):
+        repeated_words = list(filter(lambda x: x[1] >= 2, FreqDist(PortugueseTextualProcessing().remove_stopwords(self.tokens)).items()))
+        return len(repeated_words)/len(self.text)
+
+    def stop_word_freq(self):
+        clean_words = PortugueseTextualProcessing().remove_stopwords(self.tokens)
+        return len(self.tokens) - len(clean_words) / len(self.text)
+
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
     @classmethod
@@ -152,17 +172,18 @@ class StyloDocument(object):
         return (
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
              'StdevTamParagrafos',
-             'Ponto','Virgulas', 'PontoEVirgula','Exclamacoes', 'DoisPontos', 'Travessao', 'E',
-             'Mas', 'Porem', 'Se', 'Isto', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
+             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'Travessao', 'PalavrasUnicasCada100',
+             'Mas', 'Porem', 'FrequenciaDeParagrafos', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
              'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj', 'FreqPronomes', 'FreqTermosNaoTageados',
              'FreqPalavrasErradas','FreqVogais', 'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU',
              'FrequenciaConsoantes','FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams',
              'FrequenciaDeQuadrigrams','TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC',
-             'HerdanV', 'MedidaK','DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'FrequenciaFrasesNominais', 'Author']
+             'HerdanV', 'MedidaK','DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'FrequenciaFrasesNominais', 'FrequenciaPalavrasDuplicadas',
+             'FrequenciaStopWords', 'Author']
         )
 
     def csv_output(self):
-        # 55 {} + class {} (T56)
+        # 56 {} + class {} (T57)
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
             round(self.type_token_ratio(), 8),
@@ -174,15 +195,14 @@ class StyloDocument(object):
             # self.document_len(),
             self.term_per_hundred('.'),
             self.term_per_hundred(','),
-            self.term_per_hundred(';'),
+            #self.term_per_hundred(';'),
             self.term_per_hundred('!'),
             self.term_per_hundred(':'),
             self.term_per_hundred('-'),
-            self.term_per_hundred('e'),
+            self.unique_words_per_hundred(),
             self.term_per_hundred('mas'),
             self.term_per_hundred('porém'),
-            self.term_per_hundred('se'),
-            self.term_per_hundred('isto'),
+            len(self.paragraphs)/len(self.text),
             self.term_per_hundred('mais'),
             self.term_per_hundred('precisa'),
             self.term_per_hundred('pode'),
@@ -220,6 +240,8 @@ class StyloDocument(object):
             round(self.maas_A_measure(), 8),
             round(self.LN_measure(), 8),
             round(self.honores_H_measure(), 8),
-            self.noun_phrases(),
+            round(self.noun_phrases(), 8),
+            round(self.repeated_words_frequency(), 8),
+            round(self.stop_word_freq(), 8),
             self.author,
         )

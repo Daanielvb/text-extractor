@@ -9,6 +9,8 @@ import spatial
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from nltk import RegexpParser, Tree
+from nltk.corpus import wordnet as wn
+from nltk.stem import SnowballStemmer
 
 
 class PortugueseTextualProcessing:
@@ -28,6 +30,10 @@ class PortugueseTextualProcessing:
     def stem(tokenized_text):
         """Warning: This stem is currently creating a lot of nonexistent words, do not use yet!"""
         return [RSLPStemmer().stem(token) for token in tokenized_text]
+
+    @staticmethod
+    def another_stem(tokenized_text):
+        return [SnowballStemmer("portuguese").stem(token) for token in tokenized_text]
 
     @staticmethod
     def remove_stopwords(tokenized_text):
