@@ -97,7 +97,7 @@ class StyloDocument(object):
     def document_len(self):
         return sum(self.sentence_chars)
 
-    def get_prases(self):
+    def get_phrases(self):
         return [i for i in self.file_content.split('.') if i != '']
 
     def count_characters_frequency(self, character_list):
@@ -171,21 +171,21 @@ class StyloDocument(object):
     def csv_header(cls):
         return (
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
-             'StdevTamParagrafos',
-             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'Travessao', 'PalavrasUnicasCada100',
-             'Mas', 'Porem', 'FrequenciaDeParagrafos', 'Mais', 'Precisa', 'Pode', 'Esse', 'Muito', 'FreqAdjetivos', 'FreqAdv',
-             'FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj', 'FreqPronomes', 'FreqTermosNaoTageados',
-             'FreqPalavrasErradas','FreqVogais', 'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU',
-             'FrequenciaConsoantes','FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams',
-             'FrequenciaDeQuadrigrams','TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC',
-             'HerdanV', 'MedidaK','DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'FrequenciaFrasesNominais', 'FrequenciaPalavrasDuplicadas',
+             'StdevTamParagrafos','Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'Travessao', 'PalavrasUnicasCada100',
+             'FrequenciaDeParagrafos', 'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb',
+             'FreqVerbosPtcp', 'FreqConj', 'FreqPronomes', 'FreqTermosNaoTageados','FreqPalavrasErradas','FreqVogais',
+             'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU','FrequenciaConsoantes',
+             'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams', 'FrequenciaDeQuadrigrams',
+             'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK',
+             'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'FrequenciaFrasesNominais', 'FrequenciaPalavrasDuplicadas',
              'FrequenciaStopWords', 'Author']
         )
 
     def csv_output(self):
-        # 56 {} + class {} (T57)
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
+        # 49 features (including author)
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},'{}'".format(
             round(self.type_token_ratio(), 8),
             round(self.mean_word_len(), 8),
             round(self.mean_sentence_len(), 8),
@@ -200,14 +200,14 @@ class StyloDocument(object):
             self.term_per_hundred(':'),
             self.term_per_hundred('-'),
             self.unique_words_per_hundred(),
-            self.term_per_hundred('mas'),
-            self.term_per_hundred('porém'),
+            #self.term_per_hundred('mas'),
+            #self.term_per_hundred('porém'),
             len(self.paragraphs)/len(self.text),
-            self.term_per_hundred('mais'),
-            self.term_per_hundred('precisa'),
-            self.term_per_hundred('pode'),
-            self.term_per_hundred('esse'),
-            self.term_per_hundred('muito'),
+            #self.term_per_hundred('mais'),
+            #self.term_per_hundred('precisa'),
+            #self.term_per_hundred('pode'),
+            #self.term_per_hundred('esse'),
+            #self.term_per_hundred('muito'),
             self.tag_frequency('ADJ'),
             self.tag_frequency('ADV'),
             self.tag_frequency('ART'),
