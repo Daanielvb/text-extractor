@@ -198,4 +198,8 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
 if __name__ == '__main__':
     # TODO: Check current accuracy using neural networks versus stylometric data
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
-    save_converted_stylo_data()
+    #save_converted_stylo_data()
+    df = pd.read_csv('../../data/parsed-data/data.csv')
+    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
+    CSVReader().export_dataframe(df, 'selected-data.csv')
+

@@ -163,7 +163,7 @@ class StyloDocument(object):
 
     def stop_word_freq(self):
         clean_words = PortugueseTextualProcessing().remove_stopwords(self.tokens)
-        return len(self.tokens) - len(clean_words) / len(self.text)
+        return (len(self.tokens) - len(clean_words)) / len(self.text)
 
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
@@ -215,7 +215,7 @@ class StyloDocument(object):
             self.tag_frequency('PREP'),
             self.tag_frequency('PCP'),  # verbo no participio
             self.get_class_frequency_by_start('V'),
-            self.get_class_frequency_by_start('K'),
+            self.get_class_frequency_by_start('K'), #conjunções
             self.get_class_frequency_by_start('PRO'),
             self.tag_frequency('notfound'),
             self.spell_miss_check_frequency(),
