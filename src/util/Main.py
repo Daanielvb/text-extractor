@@ -12,6 +12,9 @@ from sklearn.model_selection import StratifiedKFold
 from src.classifiers.NeuralNetwork import *
 from src.classifiers.RFClassifier import *
 from src.classifiers.SimpleNeuralNetwork import *
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.model_selection import cross_validate
+from keras.wrappers.scikit_learn import KerasClassifier
 
 
 def extract_text_from_original_works(base_path='../../data/students_exercises'):
@@ -104,9 +107,11 @@ def run_stylometric_pipeline(dataset='../../data/parsed-data/stylo-data.csv'):
     df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
     nn = SimpleNeuralNetwork(df)
     accs = []
-    for i in range(0, 100):
-        accs.append(nn.split_and_train())
-    print (np.mean(accs))
+    for i in range(0, 20):
+        accs.append(nn.simple_split_train())
+    print(np.mean(accs))
+    print(np.std(accs))
+
 
 def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
     df = pd.read_csv(dataset)
@@ -199,7 +204,5 @@ if __name__ == '__main__':
     # TODO: Check current accuracy using neural networks versus stylometric data
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
     #save_converted_stylo_data()
-    df = pd.read_csv('../../data/parsed-data/data.csv')
-    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
-    CSVReader().export_dataframe(df, 'selected-data.csv')
+    run_stylometric_pipeline()
 

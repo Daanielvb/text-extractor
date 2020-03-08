@@ -81,18 +81,18 @@ class NeuralNetwork:
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         return self.model
 
-    def build_baseline_model(self, emd_matrix, long_sent_size, vocab_len, number_of_classes, emb_size=100):
+    def build_baseline_model(self, emd_matrix, longest_sent_size, vocab_size,
+                             number_of_classes, emb_size=100):
         self.model = Sequential()
-        embedding_layer = Embedding(vocab_len, emb_size, weights=[emd_matrix], input_length=long_sent_size,
-                                        trainable=False)
+        embedding_layer = Embedding(vocab_size, emb_size, weights=[emd_matrix],
+                                    input_length=longest_sent_size, trainable=False)
         self.model.add(embedding_layer)
         self.model.add(Dropout(0.3))
         self.model.add(Flatten())
-
-        # softmax performing better than relu
         self.model.add(Dense(number_of_classes, activation='softmax'))
 
-        self.model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+        self.model.compile(optimizer='rmsprop',
+                           loss='categorical_crossentropy', metrics=['accuracy'])
         return self.model
 
     def evaluate_model(self, X_test, y_test):
