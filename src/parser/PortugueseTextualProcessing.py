@@ -15,6 +15,7 @@ from nltk.stem import SnowballStemmer
 
 class PortugueseTextualProcessing:
     STOPWORDS = set(nltk.corpus.stopwords.words('portuguese'))
+    CUSTOM_STOPWORDS = FileUtil().get_words_from_file('custom_stopwords.txt')
     TAGGER = load(open('pttag-mm.pkl', 'rb'))
     EMBEDDING_DIM = 100
     MAX_NUM_WORDS = 20000
@@ -53,8 +54,22 @@ class PortugueseTextualProcessing:
     def get_number_of_noun_phrases(tokenized_text):
         tag_string = ' '.join([tag[1] for tag in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)])
         # NP = "NP: {(<V\w+>|<N\w?>)+.*<N\w?>}"
+        #'(ART|PROADJ) ADJ\w+ N'
         np_rgx = '(V\w+|N\w?) \w+ N'
         matches = re.findall(np_rgx, tag_string)
+        return len(matches)
+
+    @staticmethod
+    #TODO: Investigate: https://realpython.com/natural-language-processing-spacy-python/#verb-phrase-detection
+    def get_number_of_verb_phrases(tokenized_text):
+        """A verb phrase consists of an auxiliary, or helping, verb and a main verb. The helping verb always precedes the main verb
+        Some sentences will feature a subject or a modifier placed in between a verb phrase’s helping and main verbs.
+        Note that the subject or modifier is not considered part of the verb phrase."""
+        tag_string = ' '.join([tag[1] for tag in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)])
+        #V NP | V NP PP
+
+        vp_rgx = 'V\w+ ADV*V+'
+        matches = re.findall(vp_rgx, tag_string)
         return len(matches)
 
     @staticmethod

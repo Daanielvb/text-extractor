@@ -13,6 +13,11 @@ class FileUtil:
         pass
 
     @staticmethod
+    def get_words_from_file(file_path):
+        file = open(file_path, 'r')
+        return [line.split('\n')[0] for line in file.readlines()]
+
+    @staticmethod
     def get_files_by_extension(folder_path, extensions):
         result = []
         for f in FileUtil().find_files(folder_path, extensions):

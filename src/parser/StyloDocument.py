@@ -7,6 +7,10 @@ from spellchecker import SpellChecker
 
 class StyloDocument(object):
 
+    #TODO: the mean number of
+    # higher level constituents per word and the number of words before the main
+    # verb. The index that displayed the largest effect size for syntactic complexity
+    # was
     DEFAULT_AUTHOR = "Unknown"
 
     def __init__(self, file_content, author=DEFAULT_AUTHOR):
