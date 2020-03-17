@@ -76,6 +76,10 @@ class StyloDocument(object):
     def std_paragraph_len(self):
         return np.std(self.paragraph_word_length)
 
+    def flesh_index(self):
+        idx, value = PortugueseTextualProcessing().get_ptBR_flesch_index(self.tokens, self.get_phrases())
+        return idx
+
     #Number of words
     #Number of sentences
     #Number of paragraphs
@@ -169,6 +173,10 @@ class StyloDocument(object):
         clean_words = PortugueseTextualProcessing().remove_stopwords(self.tokens)
         return (len(self.tokens) - len(clean_words)) / len(self.text)
 
+    def get_logical_operator_frequency(self):
+        return len([token for token in self.tokens if token in PortugueseTextualProcessing.LOGICAL_OPERATORS]) \
+               / len(self.text)
+
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
     @classmethod
@@ -182,14 +190,14 @@ class StyloDocument(object):
              'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams', 'FrequenciaDeQuadrigrams',
              'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK',
              'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'FrequenciaFrasesNominais', 'FrequenciaPalavrasDuplicadas',
-             'FrequenciaStopWords', 'Author']
+             'FrequenciaStopWords', 'BRFleshIndex', 'FreqOperadoresLogicos', 'Author']
         )
 
     def csv_output(self):
-        # 49 features (including author)
+        # 50 features (including author)
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},'{}'".format(
+               "{},{},{},{},{},{},{},{},{},{},'{}'".format(
             round(self.type_token_ratio(), 8),
             round(self.mean_word_len(), 8),
             round(self.mean_sentence_len(), 8),
@@ -247,5 +255,7 @@ class StyloDocument(object):
             round(self.noun_phrases(), 8),
             round(self.repeated_words_frequency(), 8),
             round(self.stop_word_freq(), 8),
+            self.flesh_index(),
+            self.get_logical_operator_frequency(),
             self.author,
         )

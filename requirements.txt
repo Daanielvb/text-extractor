@@ -16,3 +16,4 @@ imbalanced-learn
 pyspellchecker
 imblearn
 gensim
+pyphen

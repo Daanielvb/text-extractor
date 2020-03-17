@@ -203,6 +203,5 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
 if __name__ == '__main__':
     # TODO: Check current accuracy using neural networks versus stylometric data
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
-    #save_converted_stylo_data()
-    run_stylometric_pipeline()
+    save_converted_stylo_data()
 

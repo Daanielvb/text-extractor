@@ -11,6 +11,8 @@ from keras.preprocessing.sequence import pad_sequences
 from nltk import RegexpParser, Tree
 from nltk.corpus import wordnet as wn
 from nltk.stem import SnowballStemmer
+import pyphen
+from collections import defaultdict
 
 
 class PortugueseTextualProcessing:
@@ -19,6 +21,10 @@ class PortugueseTextualProcessing:
     TAGGER = load(open('pttag-mm.pkl', 'rb'))
     EMBEDDING_DIM = 100
     MAX_NUM_WORDS = 20000
+    PT_DICT = pyphen.Pyphen(lang='pt_BR')
+    LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
+                         'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
+                         'uma vez que', 'fosse']
 
     def __init__(self):
         pass
@@ -58,6 +64,45 @@ class PortugueseTextualProcessing:
         np_rgx = '(V\w+|N\w?) \w+ N'
         matches = re.findall(np_rgx, tag_string)
         return len(matches)
+
+    @staticmethod
+    def break_in_syllables(word):
+        return PortugueseTextualProcessing().PT_DICT.inserted(word).split('-')
+
+    @staticmethod
+    def get_syllable_counts(tokens):
+        words = defaultdict()
+        count = 0
+        for token in tokens:
+            if token not in words.keys():
+                words[token] = []
+            syllable_count = len(PortugueseTextualProcessing().break_in_syllables(token))
+            count += syllable_count
+            words[token].append(syllable_count)
+        return words, count
+
+    @staticmethod
+    def get_ptBR_flesch_index(tokens, phrases):
+        """ILF = 248.835 – (1.015 x ASL) – (84.6 x ASW)
+         ASL é o número de palavras dividido pelo número de sentenças e ASW é o
+        número de sílabas dividido pelo número de palavras
+        """
+        _, syllable_count = PortugueseTextualProcessing().get_syllable_counts(tokens)
+        phrases_count = len(phrases)
+        words_count = len(tokens)
+        index = 248.835 - (1.015 * (words_count / phrases_count)) - (84.6 * (syllable_count / words_count))
+        return index, PortugueseTextualProcessing().get_readability_level(index)
+
+    @staticmethod
+    def get_readability_level(index):
+        if index < 25:
+            return "Muito fácil - Ensino superior"
+        elif 25 < index < 50:
+            return "Díficil - Ensino médio"
+        elif 50 < index < 75:
+            return "Fácil - 6 a 9 ano"
+        else:
+            return "Muito fácil - 1 a 5o ano"
 
     @staticmethod
     #TODO: Investigate: https://realpython.com/natural-language-processing-spacy-python/#verb-phrase-detection
