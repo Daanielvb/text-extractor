@@ -25,6 +25,8 @@ class PortugueseTextualProcessing:
     LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
                          'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
                          'uma vez que', 'fosse']
+    CONTENT_TAGS = ['N', 'ADJ', 'ADV', 'V']
+    FUNCTIONAL_TAGS = ['ART', 'PREP', 'PRON','K']
 
     def __init__(self):
         pass
@@ -58,6 +60,13 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def get_number_of_noun_phrases(tokenized_text):
+        """ text = "João comprou um carro esportivo
+        tokens = nltk.word_tokenize(text)
+        tagged = tagger.tag(tokens)
+        gramatica = 'rPADRAO: {<N><ADJ>+}
+        analiseGramatical = nltk.RegexpParser(gramatica)
+        analiseGramatical.parse(tagged)
+        (S João/NPROP comprou/V um/ART (PADRAO carro/N esportivo/ADJ))"""
         tag_string = ' '.join([tag[1] for tag in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)])
         # NP = "NP: {(<V\w+>|<N\w?>)+.*<N\w?>}"
         #'(ART|PROADJ) ADJ\w+ N'
@@ -87,11 +96,18 @@ class PortugueseTextualProcessing:
          ASL é o número de palavras dividido pelo número de sentenças e ASW é o
         número de sílabas dividido pelo número de palavras
         """
-        _, syllable_count = PortugueseTextualProcessing().get_syllable_counts(tokens)
-        phrases_count = len(phrases)
-        words_count = len(tokens)
-        index = 248.835 - (1.015 * (words_count / phrases_count)) - (84.6 * (syllable_count / words_count))
+        index = 248.835 - (1.015 * (PortugueseTextualProcessing().words_per_phrases(tokens, phrases)) - \
+                (84.6 * (PortugueseTextualProcessing().syllables_per_word(tokens))))
         return index, PortugueseTextualProcessing().get_readability_level(index)
+
+    @staticmethod
+    def words_per_phrases(tokens, phrases):
+        return len(phrases)/len(tokens)
+
+    @staticmethod
+    def syllables_per_word(tokens):
+        _, syllable_count = PortugueseTextualProcessing().get_syllable_counts(tokens)
+        return syllable_count / len(tokens)
 
     @staticmethod
     def get_readability_level(index):
@@ -119,7 +135,6 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def build_tagger(corpus=mac_morpho, tagger_name='pttag-mm.pkl'):
-        #tsents.extend(floresta.tagged_sents())
         tsents = corpus.tagged_sents()
         tsents = [[(w.lower(), PortugueseTextualProcessing().simplify_tag(t)) for (w, t) in sent] for sent in tsents if
                   sent]

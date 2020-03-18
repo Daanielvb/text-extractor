@@ -30,12 +30,15 @@ class StyloDocument(object):
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
         self.spell = SpellChecker(language='pt')
 
-    def get_class_frequency_by_start(self, tag_start):
+    def get_tag_count_by_start(self, tag_start):
         count = 0
         for tag in self.tagfdist.keys():
             if tag.startswith(tag_start):
                 count += self.tagfdist[tag]
-        return count/self.tagfdist.N()
+        return count
+
+    def get_class_frequency_by_start(self, tag_start):
+        return self.get_tag_count_by_start(tag_start)/self.tagfdist.N()
 
     def get_total_not_found(self):
         """"The wn is not being reliable so far"""
@@ -80,10 +83,6 @@ class StyloDocument(object):
         idx, value = PortugueseTextualProcessing().get_ptBR_flesch_index(self.tokens, self.get_phrases())
         return idx
 
-    #Number of words
-    #Number of sentences
-    #Number of paragraphs
-
     def vocabulary(self):
         return [v for v in sorted(set(self.sentences)) if v not in self.punctuation]
 
@@ -107,6 +106,10 @@ class StyloDocument(object):
 
     def get_phrases(self):
         return [i for i in self.file_content.split('.') if i != '']
+
+    def mean_syllables_per_word(self):
+        _, syllable_count = PortugueseTextualProcessing().get_syllable_counts(self.tokens)
+        return syllable_count/len(self.tokens)
 
     def count_characters_frequency(self, character_list):
         return (len([word for word in self.file_content if word in character_list])) / len(self.text)
@@ -177,27 +180,34 @@ class StyloDocument(object):
         return len([token for token in self.tokens if token in PortugueseTextualProcessing.LOGICAL_OPERATORS]) \
                / len(self.text)
 
+    def get_tags_freq(self, tags):
+        count = 0
+        for tag in tags:
+            count += self.get_tag_count_by_start(tag)
+        return count/len(self.tokens)
+
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
     @classmethod
     def csv_header(cls):
         return (
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
-             'StdevTamParagrafos','Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'Travessao', 'PalavrasUnicasCada100',
-             'FrequenciaDeParagrafos', 'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb',
-             'FreqVerbosPtcp', 'FreqConj', 'FreqPronomes', 'FreqTermosNaoTageados','FreqPalavrasErradas','FreqVogais',
+             'StdevTamParagrafos','Ponto','Virgulas', 'Exclamacoes', 'DoisPontos','FrequenciaDeParagrafos',
+             'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj',
+             'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados','FreqPalavrasErradas','FreqVogais',
              'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU','FrequenciaConsoantes',
              'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams', 'FrequenciaDeQuadrigrams',
              'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK',
              'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'FrequenciaFrasesNominais', 'FrequenciaPalavrasDuplicadas',
-             'FrequenciaStopWords', 'BRFleshIndex', 'FreqOperadoresLogicos', 'Author']
+             'FrequenciaStopWords', 'BRFleshIndex', 'FreqOperadoresLogicos','MediaSilabasPorPalavra',
+             'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais' ,'Author']
         )
 
     def csv_output(self):
-        # 50 features (including author)
-        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},{},'{}'".format(
+        # 51 features (including author)
+        return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
             round(self.type_token_ratio(), 8),
             round(self.mean_word_len(), 8),
             round(self.mean_sentence_len(), 8),
@@ -207,19 +217,9 @@ class StyloDocument(object):
             # self.document_len(),
             self.term_per_hundred('.'),
             self.term_per_hundred(','),
-            #self.term_per_hundred(';'),
             self.term_per_hundred('!'),
             self.term_per_hundred(':'),
-            self.term_per_hundred('-'),
-            self.unique_words_per_hundred(),
-            #self.term_per_hundred('mas'),
-            #self.term_per_hundred('porém'),
             len(self.paragraphs)/len(self.text),
-            #self.term_per_hundred('mais'),
-            #self.term_per_hundred('precisa'),
-            #self.term_per_hundred('pode'),
-            #self.term_per_hundred('esse'),
-            #self.term_per_hundred('muito'),
             self.tag_frequency('ADJ'),
             self.tag_frequency('ADV'),
             self.tag_frequency('ART'),
@@ -229,6 +229,7 @@ class StyloDocument(object):
             self.get_class_frequency_by_start('V'),
             self.get_class_frequency_by_start('K'), #conjunções
             self.get_class_frequency_by_start('PRO'),
+            self.get_class_frequency_by_start('PRO')/self.tag_frequency('PREP'),
             self.tag_frequency('notfound'),
             self.spell_miss_check_frequency(),
             self.count_characters_frequency(['a', 'e', 'i', 'o', 'u']),
@@ -257,5 +258,8 @@ class StyloDocument(object):
             round(self.stop_word_freq(), 8),
             self.flesh_index(),
             self.get_logical_operator_frequency(),
+            self.mean_syllables_per_word(),
+            self.get_tags_freq(PortugueseTextualProcessing.CONTENT_TAGS),
+            self.get_tags_freq(PortugueseTextualProcessing.FUNCTIONAL_TAGS),
             self.author,
         )
