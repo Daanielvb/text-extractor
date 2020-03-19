@@ -13,6 +13,7 @@ from nltk.corpus import wordnet as wn
 from nltk.stem import SnowballStemmer
 import pyphen
 from collections import defaultdict
+from src.parser.syllable.Silva2011SS import *
 
 
 class PortugueseTextualProcessing:
@@ -22,6 +23,7 @@ class PortugueseTextualProcessing:
     EMBEDDING_DIM = 100
     MAX_NUM_WORDS = 20000
     PT_DICT = pyphen.Pyphen(lang='pt_BR')
+    SILVA_SYLLABLE_SEPARATOR = Silva2011SyllableSeparator()
     LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
                          'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
                          'uma vez que', 'fosse']
@@ -76,7 +78,13 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def break_in_syllables(word):
-        return PortugueseTextualProcessing().PT_DICT.inserted(word).split('-')
+        print(word)
+        # TODO: Find a strategy for better usage on syllabes (size/tag)
+        silva = [s for s in PortugueseTextualProcessing().SILVA_SYLLABLE_SEPARATOR.separate(word) if s != '']
+        pt_dic = PortugueseTextualProcessing().PT_DICT.inserted(word).split('-')
+        print('silva: '+ str(silva))
+        print('ptdoc: '+ str(pt_dic))
+        return pt_dic
 
     @staticmethod
     def get_syllable_counts(tokens):

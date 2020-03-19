@@ -1,27 +1,3 @@
-#!/usr/bin/env python3
-#-*- encoding:utf-8 -*-
-
-# silva2011.py - Syllable separation using the algorithm described in Silva
-# [2011].
-# Copyright (C) 2014  Alessandro Bokan
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option)
-# any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Authors:  Alessandro Bokan <alessandro.bokan@gmail.com>
-#           Andre Cunha      <andre.lv.cunha@gmail.com> (minor modifications)
-
-
 from .cases import case1, case2, case3, case4, case5, case6, case7, case8
 from .tonic import tonic_vowel
 from .api import SyllableSeparator
@@ -84,8 +60,10 @@ class Silva2011SyllableSeparator(SyllableSeparator):
             return [w]
 
         while p0 <= (len(w) - 1):
+            if not p:
+                return w
             # Rule 1:
-            if p[k] + 1 < len(w)\
+            if p[k] and p[k] + 1 < len(w)\
                     and w[p0] in V\
                     and not w[p[k]] in ['ã', 'õ']\
                     and w[p[k] + 1] in V\

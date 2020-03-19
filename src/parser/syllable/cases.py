@@ -40,8 +40,8 @@ def case2(w, p, p0, pVt, k, c):
 def case3(w, p, p0, pVt, k, c):
     w = w[:p[k] + 1] + '-' + w[p[k] + 1:]
     p0 = p[k] + 1
-    k += 1
-    c += 1
+    if len(p) > k + 1 : k +=1
+    if len(p) > c + 1: c += 1
     p[k] = p[k] + c
     pVt += 1
     return w, p0, k, c, p, pVt
@@ -60,8 +60,8 @@ def case4(w, p, p0, pVt, k, c):
 def case5(w, p, p0, pVt, k, c):
     w = w[:p[k] + 3] + '-' + w[p[k] + 3:]  # Case 5
     p0 = p[k] + 3
-    k += 1
-    c += 1
+    if len(p) > k + 1 : k +=1
+    if len(p) > c + 1: c += 1
     p[k] = p[k] + c
     pVt += 1
     return w, p0, k, c, p, pVt
@@ -75,8 +75,8 @@ def case6(w, p0):
 def case7(w, p, p0, pVt, k, c):
     w = w[:p[k] + 3] + '-' + w[p[k] + 3:]  # Case 5
     p0 = p[k] + 3
-    k += 1
-    c += 1
+    if len(p) > k + 1 : k +=1
+    if len(p) > c + 1: c += 1
     p[k] = p[k] + c
     pVt += 1
     return w, p0, k, c, p, pVt
@@ -85,8 +85,8 @@ def case7(w, p, p0, pVt, k, c):
 def case8(w, p, p0, pVt, k, c):
     w = w[:p[k] + 1] + '-' + w[p[k] + 1:]
     p0 = p[k] + 1
-    k += 1
-    c += 1
+    if len(p) > k + 1 : k +=1
+    if len(p) > c + 1: c += 1
     p[k] = p[k] + c
     pVt += 1
     return w, p0, k, c, p, pVt

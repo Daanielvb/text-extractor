@@ -204,7 +204,7 @@ class StyloDocument(object):
         )
 
     def csv_output(self):
-        # 51 features (including author)
+        # 53 features (including author)
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
