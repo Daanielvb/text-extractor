@@ -6,12 +6,32 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import NearMiss
+from src.util.CSVReader import *
 
 
 class ModelUtil:
 
     def __init__(self):
         pass
+
+    @staticmethod
+    def convert_into_binary(df, author_class):
+        class_samples = [item for item in df.loc[df['Author'] == author_class].values]
+        other_classes = [item for item in df.loc[df['Author'] != author_class].values]
+
+        text = []
+        is_author = []
+
+        for item in class_samples:
+            text.append(item[0])
+            is_author.append(1)
+        for item in other_classes:
+            text.append(item[0])
+            is_author.append(0)
+
+        content = {'Text': text, 'isAuthor': is_author}
+        new_df = pd.DataFrame(content, columns=['Text', 'isAuthor'])
+        CSVReader().export_dataframe(new_df, 'dataset_author_' + str(author_class) + '.csv')
 
     @staticmethod
     def decode_labels(label_encoder, encoded_array):

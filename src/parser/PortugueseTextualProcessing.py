@@ -79,7 +79,7 @@ class PortugueseTextualProcessing:
     @staticmethod
     def break_in_syllables(word):
         print(word)
-        # TODO: Find a strategy for better usage on syllabes (size/tag)
+        # TODO: Find a strategy for better usage on syllables (size/tag)
         silva = [s for s in PortugueseTextualProcessing().SILVA_SYLLABLE_SEPARATOR.separate(word) if s != '']
         pt_dic = PortugueseTextualProcessing().PT_DICT.inserted(word).split('-')
         print('silva: '+ str(silva))
