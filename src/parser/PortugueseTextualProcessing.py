@@ -62,6 +62,7 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def get_number_of_noun_phrases(tokenized_text):
+        # TODO : Improve this method
         """ text = "João comprou um carro esportivo
         tokens = nltk.word_tokenize(text)
         tagged = tagger.tag(tokens)
@@ -78,12 +79,12 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def break_in_syllables(word):
-        print(word)
+        #print(word)
         # TODO: Find a strategy for better usage on syllables (size/tag)
-        silva = [s for s in PortugueseTextualProcessing().SILVA_SYLLABLE_SEPARATOR.separate(word) if s != '']
+        #silva = [s for s in PortugueseTextualProcessing().SILVA_SYLLABLE_SEPARATOR.separate(word) if s != '']
         pt_dic = PortugueseTextualProcessing().PT_DICT.inserted(word).split('-')
-        print('silva: '+ str(silva))
-        print('ptdoc: '+ str(pt_dic))
+        #print('silva: '+ str(silva))
+        #print('ptdoc: '+ str(pt_dic))
         return pt_dic
 
     @staticmethod
@@ -140,6 +141,10 @@ class PortugueseTextualProcessing:
         vp_rgx = 'V\w+ ADV*V+'
         matches = re.findall(vp_rgx, tag_string)
         return len(matches)
+
+    # TODO
+    def num_words_before_main_verb(self):
+        pass
 
     @staticmethod
     def build_tagger(corpus=mac_morpho, tagger_name='pttag-mm.pkl'):

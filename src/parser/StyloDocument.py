@@ -195,19 +195,19 @@ class StyloDocument(object):
              'StdevTamParagrafos','Ponto','Virgulas', 'Exclamacoes', 'DoisPontos','FrequenciaDeParagrafos',
              'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj',
              'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados','FreqPalavrasErradas','FreqVogais',
-             'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU','FrequenciaConsoantes',
+             #'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU','FrequenciaConsoantes',
              'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams', 'FrequenciaDeQuadrigrams',
              'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK',
-             'DugastU', 'MaasA', 'MedidaLN', 'HonoresH', 'FrequenciaFrasesNominais', 'FrequenciaPalavrasDuplicadas',
+             'DugastU', 'MaasA', 'HonoresH', 'FrequenciaFrasesNominais', 'FrequenciaPalavrasDuplicadas',
              'FrequenciaStopWords', 'BRFleshIndex', 'FreqOperadoresLogicos','MediaSilabasPorPalavra',
-             'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais' ,'Author']
+             'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais', 'Author']
         )
 
     def csv_output(self):
         # 53 features (including author)
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
+               "{},{},{},{},{},{},{},{},{},'{}'".format(
             round(self.type_token_ratio(), 8),
             round(self.mean_word_len(), 8),
             round(self.mean_sentence_len(), 8),
@@ -229,16 +229,16 @@ class StyloDocument(object):
             self.get_class_frequency_by_start('V'),
             self.get_class_frequency_by_start('K'), #conjunções
             self.get_class_frequency_by_start('PRO'),
-            self.get_class_frequency_by_start('PRO')/self.tag_frequency('PREP'),
+            self.get_class_frequency_by_start('PRO')/self.tag_frequency('PREP'), #used in french texts
             self.tag_frequency('notfound'),
             self.spell_miss_check_frequency(),
             self.count_characters_frequency(['a', 'e', 'i', 'o', 'u']),
-            self.count_characters_frequency(['a']),
-            self.count_characters_frequency(['e']),
-            self.count_characters_frequency(['i']),
-            self.count_characters_frequency(['o']),
-            self.count_characters_frequency(['u']),
-            self.count_consonant_frequency(),
+            # self.count_characters_frequency(['a']),
+            # self.count_characters_frequency(['e']),
+            # self.count_characters_frequency(['i']),
+            # self.count_characters_frequency(['o']),
+            # self.count_characters_frequency(['u']),
+            # self.count_consonant_frequency(),
             round(self.local_hapax_legommena_frequency(), 8),
             self.collocations_frequency(2),
             self.collocations_frequency(3),
@@ -251,7 +251,7 @@ class StyloDocument(object):
             round(self.K_measure(), 8),
             round(self.dugast_U_measure(), 8),
             round(self.maas_A_measure(), 8),
-            round(self.LN_measure(), 8),
+            #round(self.LN_measure(), 8),
             round(self.honores_H_measure(), 8),
             round(self.noun_phrases(), 8),
             round(self.repeated_words_frequency(), 8),

@@ -31,7 +31,7 @@ class CSVReader:
 
     @staticmethod
     def read_csv(file, verbose=False):
-        print('writing the following file:' + file)
+        print('reading the following file:' + file)
         results = []
         with open(file, encoding='utf-8') as f:
             reader = csv.reader(f)
