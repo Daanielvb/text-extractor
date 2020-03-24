@@ -208,5 +208,7 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
 
 if __name__ == '__main__':
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
-    save_converted_stylo_data()
+    df = pd.read_csv('../../data/parsed-data/data.csv')
+    df = PortugueseTextualProcessing().generate_stopwords_df(df)
+    CSVReader().export_dataframe(df, '../../data/parsed-data/data-without-stopwords.csv')
 
