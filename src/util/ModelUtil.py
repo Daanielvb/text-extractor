@@ -5,7 +5,6 @@ import matplotlib as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing
 from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import NearMiss
 from src.util.CSVReader import *
 
 
@@ -125,10 +124,22 @@ class ModelUtil:
         return validation_data, X, Y
 
     @staticmethod
-    def reduce_majority_class_samples(X, Y):
-        nr = NearMiss()
-        X, y = nr.fit(X, Y)
-        return X, y
+    def build_weighted_matrix(corpus, glove_embedding):
+        """Will return a matrix of N elements (corpus size) x [number of words x embedding_size].
+        eg: With a 50 features embedding, the phrase
+        "I will return" would become an array like this [[x0..x50], [x0..x50], [x0..x50]]
+        """
+        weighted_documents = []
+        for idx, text in enumerate(corpus):
+            phrase = []
+            for word in text.split(' '):
+                document = np.zeros((100))
+                embedding_vector = glove_embedding.get(word.lower())
+                if embedding_vector is not None:
+                    document = embedding_vector[:100]
+                phrase.append(document)
+            weighted_documents.append(phrase)
+        return weighted_documents
 
     @staticmethod
     def increase_minority_class_samples(X, Y):
