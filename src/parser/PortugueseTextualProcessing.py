@@ -79,13 +79,10 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def break_in_syllables(word):
-        #print(word)
-        # TODO: Find a strategy for better usage on syllables (size/tag)
-        #silva = [s for s in PortugueseTextualProcessing().SILVA_SYLLABLE_SEPARATOR.separate(word) if s != '']
-        pt_dic = PortugueseTextualProcessing().PT_DICT.inserted(word).split('-')
-        #print('silva: '+ str(silva))
-        #print('ptdoc: '+ str(pt_dic))
-        return pt_dic
+        """"Silva algorithm does not work very well with ss and rr syllables"""
+        if 'ss' in word or 'rr' in word:
+            return PortugueseTextualProcessing().PT_DICT.inserted(word).split('-')
+        return [s for s in PortugueseTextualProcessing().SILVA_SYLLABLE_SEPARATOR.separate(word) if s != '']
 
     @staticmethod
     def get_syllable_counts(tokens):
