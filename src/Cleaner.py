@@ -11,8 +11,8 @@ class Cleaner:
     TEACHER_PATTERN = "((Professor|Professora|Docente) *:+\D*)\n*"
     COURSE_PATTERN = "(Disciplina|Materia|Cadeira|Curso) *:+\D*\n*"
     PERIOD_PATTERN = "(Periodo|Período|Ano|Ano/Semestre|Semestre) *:+\w*\n*"
-    INSTITUTION_PATTERN = "(CONGREGAÇÃO DE SANTA DOROTÉIA DO BRASIL|FACULDADE FRASSINETTI DO RECIFE|FAFIRE)\n*"
-    DATE_PATTERN = "RECIFE[, ]?\d*"
+    INSTITUTION_PATTERN = "(congregação de santa dorotéia do brasil|faculdade frassinetti do recife|fafire)\n*"
+    DATE_PATTERN = "recife[, ]?\d*"
 
     def __init__(self):
         pass
@@ -21,7 +21,7 @@ class Cleaner:
     def remove_student_names(file_content):
         result = []
         for std in StudentConstant.STOPWORDS:
-            file_content = re.sub(r"\b%s\b" % std.upper(), '', file_content)
+            file_content = re.sub(r"\b%s\b" % std.lower(), '', file_content)
         result.append(file_content)
         return result
 

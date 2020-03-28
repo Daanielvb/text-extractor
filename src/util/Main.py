@@ -208,22 +208,27 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
 
 if __name__ == '__main__':
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
+
+
     df = pd.read_csv('../../data/parsed-data/data-without-stopwords.csv')
+    df = PortugueseTextualProcessing().generate_stopwords_df(df)
 
-    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
+    CSVReader().export_dataframe(df, 'data-without-stopwords.csv')
 
-    tokenizer, padded_sentences, max_sentence_len \
-        = PortugueseTextualProcessing().convert_corpus_to_number(df)
-
-    # ModelUtil().save_tokenizer(tokenizer)
-    vocab_len = len(tokenizer.word_index) + 1
-
-    glove_embedding = PortugueseTextualProcessing().load_vector(tokenizer)
-
-    corpus = df['Text']
-
-    w_matrix = ModelUtil().build_weighted_matrix(corpus, glove_embedding)
-
-    padded_sentences = pad_sequences(w_matrix, vocab_len, padding='post')
-    CSVReader().export_dataframe(df, '../../data/parsed-data/data-without-stopwords.csv')
+    # df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
+    #
+    # tokenizer, padded_sentences, max_sentence_len \
+    #     = PortugueseTextualProcessing().convert_corpus_to_number(df)
+    #
+    # # ModelUtil().save_tokenizer(tokenizer)
+    # vocab_len = len(tokenizer.word_index) + 1
+    #
+    # glove_embedding = PortugueseTextualProcessing().load_vector(tokenizer)
+    #
+    # corpus = df['Text']
+    #
+    # w_matrix = ModelUtil().build_weighted_matrix(corpus, glove_embedding)
+    #
+    # padded_sentences = pad_sequences(w_matrix, vocab_len, padding='post')
+    # CSVReader().export_dataframe(df, '../../data/parsed-data/data-without-stopwords.csv')
 

@@ -15,7 +15,7 @@ class FileUtil:
     @staticmethod
     def get_words_from_file(file_path):
         file = open(file_path, 'r')
-        return [line.split('\n')[0] for line in file.readlines()]
+        return [line.split('\n')[0].lower() for line in file.readlines()]
 
     @staticmethod
     def get_files_by_extension(folder_path, extensions):
@@ -50,7 +50,7 @@ class FileUtil:
         result = []
         for path in file_paths:
             with open(path, 'r', errors='ignore') as file:
-                result.append(file.read().upper())
+                result.append(file.read().lower())
         return result
 
     @staticmethod

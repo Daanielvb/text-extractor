@@ -30,7 +30,7 @@ class PDFReader(FileUtil):
             pdf_content = []
             for page in PDFPage.get_pages(fp):
                 interpreter.process_page(page)
-                data = retstr.getvalue().upper()
+                data = retstr.getvalue().lower()
                 pdf_content.append(data)
             result.append(' '.join(pdf_content))
         return result

@@ -15,7 +15,7 @@ class DOCReader(FileUtil):
         for file in file_paths:
             print('extracting content from file:' + file)
             extracted_text = docx2txt.process(file)
-            result.append(extracted_text.upper())
+            result.append(extracted_text.lower())
         return result
 
     @staticmethod
