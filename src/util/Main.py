@@ -62,7 +62,7 @@ def save_converted_stylo_data():
                                      CSVReader.read_csv('../../data/parsed-data/data.csv', verbose=False))
 
 
-def save_converted_stylo_data(idx):
+def save_converted_stylo_data_binary(idx):
     CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo-data' + str(idx) + '.csv',
                                      CSVReader.read_csv('../../data/parsed-data/binary/text/dataset_author_' + str(idx) + '.csv', verbose=False))
 
