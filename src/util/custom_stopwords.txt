@@ -2,7 +2,7 @@ dinabel
 discente
 disciplina
 disciplinas
-dorotÃ©ia
+dorotéia
 doroteia
 professor
 professora:
@@ -19,8 +19,12 @@ metodologia
 ensino
 ciencia
 ciencias
-ciÃªncia
-ciÃªncias
+ciência
+ciências
 sobre
 discente:
 autor:
+fone
+921
+(81)3423-3066
+(81)2122-3500
