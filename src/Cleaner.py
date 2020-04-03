@@ -13,6 +13,7 @@ class Cleaner:
     PERIOD_PATTERN = "(Periodo|Período|Ano|Ano/Semestre|Semestre) *:+\w*\n*"
     INSTITUTION_PATTERN = "(congregação de santa dorotéia do brasil|faculdade frassinetti do recife|fafire)\n*"
     DATE_PATTERN = "recife[, ]?\d*"
+    URL_PATTERN = r"http\S+"
 
     def __init__(self):
         pass
@@ -26,7 +27,7 @@ class Cleaner:
         return result
 
     @staticmethod
-    def remove_headers(text_list):
+    def remove_patterns(text_list):
         result = []
         for text in text_list:
             # text = re.sub(Cleaner.STUDENT_PATTERN, '', text, flags=re.IGNORECASE)
@@ -37,6 +38,7 @@ class Cleaner:
             text = re.sub(Cleaner.INSTITUTION_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.PERIOD_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.DATE_PATTERN, '', text, flags=re.IGNORECASE)
+            text = re.sub(Cleaner.URL_PATTERN, '', text, flags=re.IGNORECASE)
             # TODO: Verify if results are better using PortugueseTextualProcessing().remove_stopwords()
             result.append(Cleaner().format(text))
         return result

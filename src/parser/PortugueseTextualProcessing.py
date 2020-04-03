@@ -62,6 +62,7 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def get_number_of_noun_phrases(tokenized_text):
+
         # TODO : Improve this method
         """ text = "João comprou um carro esportivo
         tokens = nltk.word_tokenize(text)
@@ -69,7 +70,14 @@ class PortugueseTextualProcessing:
         gramatica = 'rPADRAO: {<N><ADJ>+}
         analiseGramatical = nltk.RegexpParser(gramatica)
         analiseGramatical.parse(tagged)
-        (S João/NPROP comprou/V um/ART (PADRAO carro/N esportivo/ADJ))"""
+        (S João/NPROP comprou/V um/ART (PADRAO carro/N esportivo/ADJ))
+        Modifiers per Noun Phrase	0.248
+        Noun Phrase Incidence	445.960
+        Words before Main Verb	1.750
+
+        Determinante(ART|PROADJ) | Nome(N) | opcional Elemento modificador (adj)
+        ART|N|PRP
+        """
         tag_string = ' '.join([tag[1] for tag in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)])
         # NP = "NP: {(<V\w+>|<N\w?>)+.*<N\w?>}"
         #'(ART|PROADJ) ADJ\w+ N'

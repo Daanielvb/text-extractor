@@ -38,7 +38,7 @@ class PDFReader(FileUtil):
     @staticmethod
     def convert_pdfs(base_path):
         file_names = PDFReader().get_files_by_extension(base_path, PDFReader().extensions)
-        content = Cleaner().remove_headers(PDFReader().extract_content(file_names))
+        content = Cleaner().remove_patterns(PDFReader().extract_content(file_names))
         return content, PDFReader().get_file_name(file_names)
 
 

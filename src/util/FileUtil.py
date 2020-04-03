@@ -42,7 +42,7 @@ class FileUtil:
     @staticmethod
     def convert_files(base_path):
         files = FileUtil().get_files_by_extension(base_path, FileUtil().extensions)
-        content = Cleaner().remove_headers(FileUtil.extract_file_content(files))
+        content = Cleaner().remove_patterns(FileUtil.extract_file_content(files))
         return content, FileUtil.get_file_name(files)
 
     @staticmethod

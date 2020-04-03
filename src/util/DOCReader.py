@@ -21,5 +21,5 @@ class DOCReader(FileUtil):
     @staticmethod
     def convert_docs(base_path):
         file_names = DOCReader().get_files_by_extension(base_path, DOCReader().extensions)
-        content = Cleaner().remove_headers(DOCReader().extract_content(file_names))
+        content = Cleaner().remove_patterns(DOCReader().extract_content(file_names))
         return content, DOCReader().get_file_name(file_names)
