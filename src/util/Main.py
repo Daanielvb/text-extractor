@@ -57,7 +57,7 @@ def show_column_distribution(dataframe, class_name):
 
 
 def save_converted_stylo_data():
-    extract_text_from_original_works()
+    #extract_text_from_original_works()
     CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo-data.csv',
                                      CSVReader.read_csv('../../data/parsed-data/data.csv', verbose=False))
 
@@ -209,12 +209,7 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
 if __name__ == '__main__':
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
 
-
-    df = pd.read_csv('../../data/parsed-data/data-without-stopwords.csv')
-    df = PortugueseTextualProcessing().generate_stopwords_df(df)
-
-    CSVReader().export_dataframe(df, 'data-without-stopwords.csv')
-
+    save_converted_stylo_data()
     # df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
     #
     # tokenizer, padded_sentences, max_sentence_len \

@@ -10,6 +10,7 @@ from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from nltk import RegexpParser, Tree
 from nltk.corpus import wordnet as wn
+from nltk import RegexpParser
 from nltk.stem import SnowballStemmer
 import pyphen
 from collections import defaultdict
@@ -55,15 +56,15 @@ class PortugueseTextualProcessing:
         result = []
         for token in tokenized_text:
             if as_list:
-                result.append(PortugueseTextualProcessing().TAGGER.tag([token.lower()]))
+                tag = PortugueseTextualProcessing().TAGGER.tag([token.lower()])
+                result.append([(tag[0][0], 'PREP')]) if tag[0][1] == '' else result.append(tag)
             else:
-                result.append(PortugueseTextualProcessing().TAGGER.tag([token.lower()])[0])
+                tag = PortugueseTextualProcessing().TAGGER.tag([token.lower()])[0]
+                result.append((tag[0], 'PREP')) if tag[1] == '' else result.append(tag)
         return result
 
     @staticmethod
     def get_number_of_noun_phrases(tokenized_text):
-
-        # TODO : Improve this method
         """ text = "João comprou um carro esportivo
         tokens = nltk.word_tokenize(text)
         tagged = tagger.tag(tokens)
@@ -78,12 +79,39 @@ class PortugueseTextualProcessing:
         Determinante(ART|PROADJ) | Nome(N) | opcional Elemento modificador (adj)
         ART|N|PRP
         """
-        tag_string = ' '.join([tag[1] for tag in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)])
+        tag_string = ' '.join([tag[1] for tag
+                               in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)
+                               if tag[1] != 'notfound'])
         # NP = "NP: {(<V\w+>|<N\w?>)+.*<N\w?>}"
         #'(ART|PROADJ) ADJ\w+ N'
-        np_rgx = '(V\w+|N\w?) \w+ N'
+        #np_rgx = '(V\w+|N\w?) \w+ N'
+        # An optional determiner (DT), zero or more adjectives (JJ), and a noun (NN), proper noun (NP), or pronoun (PRN)
+        np_rgx = "((?:ART))? (?:\w+ ADJ) * +(?:N|NPROP|PROADJ) "
         matches = re.findall(np_rgx, tag_string)
         return len(matches)
+
+    @staticmethod
+    def get_continuous_chunks(tokenized_text):
+        # this regex is not working, change to another later
+        NP = "(?:(?:\w+ ART)?(?:\w+ ADJ) *)?\w + (?:N[NP] | PRN)"
+        chunker = RegexpParser(NP)
+        tagged_text = PortugueseTextualProcessing.postag(tokenized_text, as_list=False)
+        chunked = chunker.parse(tagged_text)
+        continuous_chunk = []
+        current_chunk = []
+
+        for subtree in chunked:
+            if type(subtree) == Tree:
+                current_chunk.append(" ".join([token for token, pos in subtree.leaves()]))
+            elif current_chunk:
+                named_entity = " ".join(current_chunk)
+                if named_entity not in continuous_chunk:
+                    continuous_chunk.append(named_entity)
+                    current_chunk = []
+            else:
+                continue
+
+        return continuous_chunk
 
     @staticmethod
     def break_in_syllables(word):

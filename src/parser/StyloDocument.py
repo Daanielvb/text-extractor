@@ -166,6 +166,7 @@ class StyloDocument(object):
         return (len(self.spell.unknown(self.text))) / len(self.text)
 
     def noun_phrases(self):
+        #test = PortugueseTextualProcessing().test_np(self.tokens)
         return PortugueseTextualProcessing().get_number_of_noun_phrases(self.tokens) / len(self.text)
 
     def repeated_words_frequency(self):
