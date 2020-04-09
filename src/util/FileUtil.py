@@ -3,6 +3,7 @@ import functools
 import itertools
 import fnmatch
 from pickle import dump
+import pickle
 from src.Cleaner import *
 
 
@@ -72,3 +73,11 @@ class FileUtil:
             return ''.join([name[0] for name in name.split(" ")[::-1]])
         else:
             return ''.join([name[0:3] for name in name.split(";")])
+
+    @staticmethod
+    def load_ner_pickle(filename='cat-min_lldelta_0.pickle'):
+        with open(filename, 'rb') as f:
+            u = pickle._Unpickler(f)
+            u.encoding = 'latin1'
+            tagger = u.load()
+        return tagger

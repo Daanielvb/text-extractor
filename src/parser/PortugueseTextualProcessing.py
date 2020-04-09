@@ -25,6 +25,7 @@ class PortugueseTextualProcessing:
     MAX_NUM_WORDS = 20000
     PT_DICT = pyphen.Pyphen(lang='pt_BR')
     SILVA_SYLLABLE_SEPARATOR = Silva2011SyllableSeparator()
+    NER_PT_TAGGER = FileUtil().load_ner_pickle()
     LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
                          'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
                          'uma vez que', 'fosse']
@@ -62,6 +63,28 @@ class PortugueseTextualProcessing:
                 tag = PortugueseTextualProcessing().TAGGER.tag([token.lower()])[0]
                 result.append((tag[0], 'PREP')) if tag[1] == '' else result.append(tag)
         return result
+
+    @staticmethod
+    def ner_chunks(tokens):
+        tagged_text = PortugueseTextualProcessing.postag(tokens, as_list=False)
+        chunked = PortugueseTextualProcessing().NER_PT_TAGGER.parse(tagged_text)
+        continuous_chunk = []
+        entities = []
+        current_chunk = []
+        for subtree in chunked:
+            if type(subtree) == Tree:
+                entities.append(subtree.label())
+                current_chunk.append(" ".join([token for token, pos in subtree.leaves()]))
+            elif current_chunk:
+                named_entity = " ".join(current_chunk)
+                if named_entity not in continuous_chunk:
+                    continuous_chunk.append(named_entity)
+                    current_chunk = []
+            else:
+                continue
+        return continuous_chunk
+
+
 
     @staticmethod
     def get_number_of_noun_phrases(tokenized_text):

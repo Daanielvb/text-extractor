@@ -27,6 +27,7 @@ class StyloDocument(object):
         self.punctuation = [".", ",", ";", "-", ":"]
         self.white_spaces = len(self.file_content.split(' '))
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
+        self.ner_sentences = PortugueseTextualProcessing.ner_chunks(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
         self.spell = SpellChecker(language='pt')
 
