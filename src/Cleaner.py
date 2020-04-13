@@ -51,3 +51,10 @@ class Cleaner:
         text = re.sub('\n{3,}', '\n\n', text)
         text = re.sub(r"[\t]*", "", text)
         return text.strip()
+
+    @staticmethod
+    def break_combined_words(text):
+        if '/' in text:
+            return text.split("/")
+        else:
+            return text

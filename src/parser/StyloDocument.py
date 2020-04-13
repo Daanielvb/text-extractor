@@ -14,6 +14,7 @@ class StyloDocument(object):
     DEFAULT_AUTHOR = "Unknown"
 
     def __init__(self, file_content, author=DEFAULT_AUTHOR):
+
         self.author = author
         self.file_content = file_content.lower()
         self.tokens = word_tokenize(self.file_content, language='portuguese')
@@ -25,10 +26,13 @@ class StyloDocument(object):
         self.paragraphs = [p for p in self.file_content.split("\n\n") if len(p) > 0 and not p.isspace()]
         self.paragraph_word_length = [len(p.split()) for p in self.paragraphs]
         self.punctuation = [".", ",", ";", "-", ":"]
+        self.ner_entities = ['ABSTRACCAO', 'ACONTECIMENTO', 'COISA', 'LOCAL',
+                             'ORGANIZACAO', 'OBRA', 'OUTRO', 'PESSOA', 'TEMPO', 'VALOR']
         self.white_spaces = len(self.file_content.split(' '))
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
-        self.ner_sentences = PortugueseTextualProcessing.ner_chunks(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
+        self.ner_tags = PortugueseTextualProcessing.ner_chunks(self.tokens)
+        self.ner_ftags = FreqDist(self.ner_tags)
         self.spell = SpellChecker(language='pt')
 
     def get_tag_count_by_start(self, tag_start):
@@ -49,16 +53,11 @@ class StyloDocument(object):
     def tag_frequency(self, tag):
         return self.tagfdist.freq(tag)
 
+    def entity_frequency(self, tag):
+        return self.ner_ftags.freq(tag)
+
     def get_tokens_by_tag(self, tag):
         return [i[0][0] for i in self.tagged_sentences if i[0][1] == tag]
-
-    def term_per_thousand(self, term):
-        """
-        term       X
-        -----  = ------
-          N       1000
-        """
-        return (self.fdist[term] * 1000) / self.fdist.N()
 
     def term_per_hundred(self, term):
         """
@@ -124,6 +123,7 @@ class StyloDocument(object):
         return (len(self.fdist.hapaxes()))/len(self.text.tokens)
 
     def collocations_frequency(self, size):
+        """words that often appear consecutively in the window_size"""
         return (len(self.text.collocation_list(window_size=size)))/len(self.text.tokens)
 
     def most_frequent_word_size(self):
@@ -188,40 +188,65 @@ class StyloDocument(object):
             count += self.get_tag_count_by_start(tag)
         return count/len(self.tokens)
 
+    def find_quotes(self):
+        """Improve this method to retrieve quotes based on Patterns and special words
+        egs: p.43;  segundo (autor, ano)
+        """
+        return self.count_characters_frequency(['“', '”']),
+
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     # TODO: Number of long words
     @classmethod
     def csv_header(cls):
         return (
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
-             'StdevTamParagrafos','Ponto','Virgulas', 'Exclamacoes', 'DoisPontos','FrequenciaDeParagrafos',
+             'StdevTamParagrafos', 'FrequenciaDeParagrafos' ,'FrequenciaPalavrasDuplicadas', 'MediaSilabasPorPalavra',
+
+             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'FreqCitacoes', 'FreqVogais',
+
              'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj',
-             'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados','FreqPalavrasErradas','FreqVogais',
-             #'FreqLetrasA', 'FreqLetrasE', 'FreqLetrasI', 'FreqLetrasO', 'FreqLetrasU','FrequenciaConsoantes',
-             'FrequenciaDeHapaxLegomenaLocal','FrequenciaDeBigrams', 'FrequenciaDeTrigrams', 'FrequenciaDeQuadrigrams',
-             'TamanhoMaisFrequenteDePalavras', 'TamanhoMaiorPalavra','GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK',
-             'DugastU', 'MaasA', 'HonoresH', 'FrequenciaFrasesNominais', 'FrequenciaPalavrasDuplicadas',
-             'FrequenciaStopWords', 'BRFleshIndex', 'FreqOperadoresLogicos','MediaSilabasPorPalavra',
-             'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais', 'Author']
+             'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados', 'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais',
+             'FrequenciaFrasesNominais',
+
+             'FreqTotalEntidadesNomeadas', 'FreqEAbstracao', 'FreqEAcontecimento', 'FreqECoisa', 'FreqELocal', 'FreqEOrganizacao',
+             'FreqEObra', 'FreqEOutro', 'FreqEPessoa', 'FreqETempo', 'FreqEValor',
+
+             'GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK', 'DugastU', 'MaasA', 'HonoresH',
+
+             'FreqPalavrasErradas', 'FrequenciaDeHapaxLegomenaLocal', 'FreqPalavrasComunsTam2', 'FreqPalavrasComunsTam3', 'FreqPalavrasComunsTam4',
+             'FrequenciaStopWords', 'BRFleshIndex', 'FreqOperadoresLogicos',
+
+             'Author']
         )
 
     def csv_output(self):
-        # 53 features (including author)
+        # TODO: Separate features into syntactical, lexical and so on..
+        # 55 features (including author)
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},{},{},{},{},'{}'".format(
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
+               "{},'{}'".format(
+
+            # Text style features - 9
             round(self.type_token_ratio(), 8),
             round(self.mean_word_len(), 8),
             round(self.mean_sentence_len(), 8),
             round(self.std_sentence_len(), 8),
             round(self.mean_paragraph_len(), 8),
             round(self.std_paragraph_len(), 8),
-            # self.document_len(),
+            len(self.paragraphs) / len(self.text),
+            round(self.repeated_words_frequency(), 8),
+            self.mean_syllables_per_word(),
+
+            # Term count features - 6
             self.term_per_hundred('.'),
             self.term_per_hundred(','),
             self.term_per_hundred('!'),
             self.term_per_hundred(':'),
-            len(self.paragraphs)/len(self.text),
+            self.count_characters_frequency(['“', '”']),
+            self.find_quotes(),
+
+            #POSTAG Features - 14
             self.tag_frequency('ADJ'),
             self.tag_frequency('ADV'),
             self.tag_frequency('ART'),
@@ -233,35 +258,55 @@ class StyloDocument(object):
             self.get_class_frequency_by_start('PRO'),
             self.get_class_frequency_by_start('PRO')/self.tag_frequency('PREP'), #used in french texts
             self.tag_frequency('notfound'),
-            self.spell_miss_check_frequency(),
-            self.count_characters_frequency(['a', 'e', 'i', 'o', 'u']),
-            # self.count_characters_frequency(['a']),
-            # self.count_characters_frequency(['e']),
-            # self.count_characters_frequency(['i']),
-            # self.count_characters_frequency(['o']),
-            # self.count_characters_frequency(['u']),
-            # self.count_consonant_frequency(),
-            round(self.local_hapax_legommena_frequency(), 8),
-            self.collocations_frequency(2),
-            self.collocations_frequency(3),
-            self.collocations_frequency(4),
-            self.mean_frequent_word_size(),
-            self.max_word_len(),
+            self.get_tags_freq(PortugueseTextualProcessing.CONTENT_TAGS),
+            self.get_tags_freq(PortugueseTextualProcessing.FUNCTIONAL_TAGS),
+            round(self.noun_phrases(), 8),
+
+            #NER Features - 11
+            round(len(self.ner_tags) / len(self.tokens), 8),
+            self.entity_frequency('ABSTRACCAO'),
+            self.entity_frequency('ACONTECIMENTO'),
+            self.entity_frequency('COISA'),
+            self.entity_frequency('LOCAL'),
+            self.entity_frequency('ORGANIZACAO'),
+            self.entity_frequency('OBRA'),
+            self.entity_frequency('OUTRO'),
+            self.entity_frequency('PESSOA'),
+            self.entity_frequency('TEMPO'),
+            self.entity_frequency('VALOR'),
+
+            # Text correlation features - 7
             round(self.guiraud_R_measure(), 8),
             round(self.herdan_C_measure(), 8),
             round(self.herdan_V_measure(), 8),
             round(self.K_measure(), 8),
             round(self.dugast_U_measure(), 8),
             round(self.maas_A_measure(), 8),
-            #round(self.LN_measure(), 8),
             round(self.honores_H_measure(), 8),
-            round(self.noun_phrases(), 8),
-            round(self.repeated_words_frequency(), 8),
+
+            # Misc Features - 8
+            self.spell_miss_check_frequency(),
+            round(self.local_hapax_legommena_frequency(), 8),
+            self.collocations_frequency(2),
+            self.collocations_frequency(3),
+            self.collocations_frequency(4),
             round(self.stop_word_freq(), 8),
             self.flesh_index(),
             self.get_logical_operator_frequency(),
-            self.mean_syllables_per_word(),
-            self.get_tags_freq(PortugueseTextualProcessing.CONTENT_TAGS),
-            self.get_tags_freq(PortugueseTextualProcessing.FUNCTIONAL_TAGS),
+
             self.author,
         )
+
+    def legacy_features(self):
+        """Remove features that are here for future reference"""
+        # self.count_characters_frequency(['a']),
+        # self.count_characters_frequency(['e']),
+        # self.count_characters_frequency(['i']),
+        # self.count_characters_frequency(['o']),
+        # self.count_characters_frequency(['u']),
+        # self.count_consonant_frequency(),
+        # self.mean_frequent_word_size(),
+        # self.max_word_len(),
+        # self.document_len(),
+        # round(self.LN_measure(), 8)
+        pass

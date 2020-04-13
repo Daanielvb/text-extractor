@@ -31,6 +31,7 @@ class PortugueseTextualProcessing:
                          'uma vez que', 'fosse']
     CONTENT_TAGS = ['N', 'ADJ', 'ADV', 'V']
     FUNCTIONAL_TAGS = ['ART', 'PREP', 'PRON','K']
+    DEFAULT_NOT_FOUND_TAG = 'notfound'
 
     def __init__(self):
         pass
@@ -66,14 +67,18 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def ner_chunks(tokens):
-        tagged_text = PortugueseTextualProcessing.postag(tokens, as_list=False)
+        tagged_text = [i for i in PortugueseTextualProcessing.postag(tokens, as_list=False) if i[1] != PortugueseTextualProcessing().DEFAULT_NOT_FOUND_TAG]
         chunked = PortugueseTextualProcessing().NER_PT_TAGGER.parse(tagged_text)
+        entities = [i.label() for i in chunked if type(i) == Tree]
+        # chunks = PortugueseTextualProcessing().extract_chunks(chunked)
+        return entities
+        
+    @staticmethod
+    def extract_chunks(chunked):
         continuous_chunk = []
-        entities = []
         current_chunk = []
         for subtree in chunked:
             if type(subtree) == Tree:
-                entities.append(subtree.label())
                 current_chunk.append(" ".join([token for token, pos in subtree.leaves()]))
             elif current_chunk:
                 named_entity = " ".join(current_chunk)
@@ -83,8 +88,6 @@ class PortugueseTextualProcessing:
             else:
                 continue
         return continuous_chunk
-
-
 
     @staticmethod
     def get_number_of_noun_phrases(tokenized_text):
@@ -104,7 +107,7 @@ class PortugueseTextualProcessing:
         """
         tag_string = ' '.join([tag[1] for tag
                                in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)
-                               if tag[1] != 'notfound'])
+                               if tag[1] != PortugueseTextualProcessing.DEFAULT_NOT_FOUND_TAG])
         # NP = "NP: {(<V\w+>|<N\w?>)+.*<N\w?>}"
         #'(ART|PROADJ) ADJ\w+ N'
         #np_rgx = '(V\w+|N\w?) \w+ N'
@@ -117,24 +120,10 @@ class PortugueseTextualProcessing:
     def get_continuous_chunks(tokenized_text):
         # this regex is not working, change to another later
         NP = "(?:(?:\w+ ART)?(?:\w+ ADJ) *)?\w + (?:N[NP] | PRN)"
-        chunker = RegexpParser(NP)
+        chunker = RegexpParser(NP)       
         tagged_text = PortugueseTextualProcessing.postag(tokenized_text, as_list=False)
         chunked = chunker.parse(tagged_text)
-        continuous_chunk = []
-        current_chunk = []
-
-        for subtree in chunked:
-            if type(subtree) == Tree:
-                current_chunk.append(" ".join([token for token, pos in subtree.leaves()]))
-            elif current_chunk:
-                named_entity = " ".join(current_chunk)
-                if named_entity not in continuous_chunk:
-                    continuous_chunk.append(named_entity)
-                    current_chunk = []
-            else:
-                continue
-
-        return continuous_chunk
+        return PortugueseTextualProcessing().extract_chunks(chunked)
 
     @staticmethod
     def break_in_syllables(word):
@@ -212,7 +201,7 @@ class PortugueseTextualProcessing:
 
         print(len(train))
         print(len(test))
-        t0 = nltk.DefaultTagger('notfound')
+        t0 = nltk.DefaultTagger(PortugueseTextualProcessing().DEFAULT_NOT_FOUND_TAG)
         t1 = nltk.UnigramTagger(train, backoff=t0)
         t2 = nltk.BigramTagger(test, backoff=t1)
         t3 = nltk.TrigramTagger(test, backoff=t2)

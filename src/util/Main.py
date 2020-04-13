@@ -15,6 +15,7 @@ from src.classifiers.SimpleNeuralNetwork import *
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.model_selection import cross_validate
 from keras.wrappers.scikit_learn import KerasClassifier
+#from polyglot.text import Text
 
 
 def extract_text_from_original_works(base_path='../../data/students_exercises'):
@@ -208,7 +209,8 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
 
 if __name__ == '__main__':
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
-
+    #text = Text("meu nome é daniel cirne", hint_language_code='pt')
+    #text.entities
     save_converted_stylo_data()
     # df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
     #
