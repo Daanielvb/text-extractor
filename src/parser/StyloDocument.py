@@ -17,7 +17,7 @@ class StyloDocument(object):
 
         self.author = author
         self.file_content = file_content.lower()
-        self.tokens = word_tokenize(self.file_content, language='portuguese')
+        self.tokens = PortugueseTextualProcessing.tokenize(self.file_content)
         self.text = Text(self.tokens)
         self.fdist = FreqDist(self.text)
         self.sentences = sent_tokenize(self.file_content, language='portuguese')

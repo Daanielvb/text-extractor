@@ -26,6 +26,7 @@ class PortugueseTextualProcessing:
     PT_DICT = pyphen.Pyphen(lang='pt_BR')
     SILVA_SYLLABLE_SEPARATOR = Silva2011SyllableSeparator()
     NER_PT_TAGGER = FileUtil().load_ner_pickle()
+    NER_TIME_TAGGER = FileUtil().load_ner_pickle('cat-entropy_cutoff_0.08.pickle')
     LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
                          'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
                          'uma vez que', 'fosse']
@@ -38,7 +39,29 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def tokenize(text):
-        return tokenize.word_tokenize(text, language='portuguese')
+        tokens = tokenize.word_tokenize(text, language='portuguese')
+        slash_tokens = [i for i in tokens if '/' in i]
+        if slash_tokens:
+            PortugueseTextualProcessing().separate_slash_tokens(tokens, slash_tokens)
+        return tokens
+
+    @staticmethod
+    def separate_slash_tokens(all_tokens, slash_text):
+        """Algorithm that converts all words with a slash in the middle in two separate words
+        eg: national research council/national academy of sciences -> national research council national
+        academy of sciences.
+        eg: This is my current website/ -> This is my current website
+        """
+        for idx, token in enumerate(all_tokens):
+            if token in slash_text:
+                inc = False
+                for part in token.split("/"):
+                    if part != '':
+                        if not inc:
+                            all_tokens[idx] = part
+                            inc = True
+                        else:
+                            all_tokens.insert(idx + 1, part)
 
     @staticmethod
     def stem(tokenized_text):
@@ -69,9 +92,21 @@ class PortugueseTextualProcessing:
     def ner_chunks(tokens):
         tagged_text = [i for i in PortugueseTextualProcessing.postag(tokens, as_list=False) if i[1] != PortugueseTextualProcessing().DEFAULT_NOT_FOUND_TAG]
         chunked = PortugueseTextualProcessing().NER_PT_TAGGER.parse(tagged_text)
-        entities = [i.label() for i in chunked if type(i) == Tree]
-        # chunks = PortugueseTextualProcessing().extract_chunks(chunked)
+        trees = [i for i in chunked if type(i) == Tree]
+        entities = [i.label() for i in trees]
+        # TODO: Remove OBRA with 1 token just punct (,) or ART, COISA with 1 token just punct (,), LOCAL 1 NUM and
+        # check cases for ORGANIZACAO
+        for i in trees:
+            print(i)
+        chunks = PortugueseTextualProcessing().extract_chunks(chunked)
         return entities
+
+    @staticmethod
+    def time_chunks(tagged_text):
+        chunked = PortugueseTextualProcessing().NER_TIME_TAGGER.parse(tagged_text)
+        trees = [i for i in chunked if type(i) == Tree and i.label() == 'TEMPO']
+        # TODO: Implement rule to remove cases with only one KC or NUM with 1 digit
+        return trees
         
     @staticmethod
     def extract_chunks(chunked):
