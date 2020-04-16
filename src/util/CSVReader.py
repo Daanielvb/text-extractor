@@ -51,4 +51,4 @@ class CSVReader:
 
     @staticmethod
     def export_dataframe(dataframe, file_name):
-        dataframe.to_csv(file_name, index=None, header=True)
+        dataframe.to_csv(file_name + '.csv', index=None, header=True)

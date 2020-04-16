@@ -30,7 +30,7 @@ class ModelUtil:
 
         content = {'Text': text, 'isAuthor': is_author}
         new_df = pd.DataFrame(content, columns=['Text', 'isAuthor'])
-        CSVReader().export_dataframe(new_df, 'dataset_author_' + str(author_class) + '.csv')
+        CSVReader().export_dataframe(new_df, 'dataset_author_' + str(author_class))
 
     @staticmethod
     def decode_labels(label_encoder, encoded_array):

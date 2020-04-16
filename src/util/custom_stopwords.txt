@@ -2,8 +2,8 @@ dinabel
 discente
 disciplina
 disciplinas
-congregaÃ§Ã£o
-dorotï¿½ia
+congregação
+dorotéia
 doroteia
 professor
 professora:
@@ -20,8 +20,8 @@ metodologia
 ensino
 ciencia
 ciencias
-ciï¿½ncia
-ciï¿½ncias
+ciência
+ciências
 sobre
 discente:
 autor:
@@ -32,5 +32,5 @@ fone
 (81)2122-3500
 2122-3500
 turma:
-biolÃ³gicas
+biológicas
 gabriel_erminio
