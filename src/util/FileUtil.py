@@ -15,7 +15,7 @@ class FileUtil:
 
     @staticmethod
     def get_words_from_file(file_path):
-        file = open(file_path, 'r')
+        file = open(file_path, 'r', encoding='iso-8859-1')
         return [line.split('\n')[0].lower() for line in file.readlines()]
 
     @staticmethod

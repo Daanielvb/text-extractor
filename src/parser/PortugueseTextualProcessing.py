@@ -25,8 +25,8 @@ class PortugueseTextualProcessing:
     MAX_NUM_WORDS = 20000
     PT_DICT = pyphen.Pyphen(lang='pt_BR')
     SILVA_SYLLABLE_SEPARATOR = Silva2011SyllableSeparator()
-    #NER_PT_TAGGER = FileUtil().load_ner_pickle()
-    #NER_TIME_TAGGER = FileUtil().load_ner_pickle('cat-entropy_cutoff_0.08.pickle')
+    NER_PT_TAGGER = FileUtil().load_ner_pickle()
+    NER_TIME_TAGGER = FileUtil().load_ner_pickle('cat-entropy_cutoff_0.08.pickle')
     LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
                          'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
                          'uma vez que', 'fosse']
@@ -96,8 +96,8 @@ class PortugueseTextualProcessing:
         entities = [i.label() for i in trees]
         # TODO: Remove OBRA with 1 token just punct (,) or ART, COISA with 1 token just punct (,), LOCAL 1 NUM and
         # check cases for ORGANIZACAO
-        for i in trees:
-            print(i)
+        # for i in trees:
+        #     print(i)
         chunks = PortugueseTextualProcessing().extract_chunks(chunked)
         return entities
 

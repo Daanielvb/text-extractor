@@ -200,9 +200,9 @@ class StyloDocument(object):
     def csv_header(cls):
         return (
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
-             'StdevTamParagrafos', 'FrequenciaDeParagrafos' ,'FrequenciaPalavrasDuplicadas', 'MediaSilabasPorPalavra',
+             'StdevTamParagrafos', 'FrequenciaDeParagrafos','FrequenciaPalavrasDuplicadas', 'MediaSilabasPorPalavra',
 
-             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'FreqCitacoes', 'FreqVogais',
+             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'FreqCitacoes',
 
              'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj',
              'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados', 'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais',
@@ -225,7 +225,7 @@ class StyloDocument(object):
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},'{}'".format(
+               "'{}'".format(
 
             # Text style features - 9
             round(self.type_token_ratio(), 8),
@@ -238,13 +238,12 @@ class StyloDocument(object):
             round(self.repeated_words_frequency(), 8),
             self.mean_syllables_per_word(),
 
-            # Term count features - 6
+            # Term count features - 5
             self.term_per_hundred('.'),
             self.term_per_hundred(','),
             self.term_per_hundred('!'),
             self.term_per_hundred(':'),
             self.count_characters_frequency(['“', '”']),
-            self.find_quotes(),
 
             #POSTAG Features - 14
             self.tag_frequency('ADJ'),
