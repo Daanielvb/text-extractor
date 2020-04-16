@@ -54,12 +54,12 @@ class PortugueseTextualProcessing:
         """
         for idx, token in enumerate(all_tokens):
             if token in slash_text:
-                inc = False
+                is_first = True
                 for part in token.split("/"):
                     if part != '':
-                        if not inc:
+                        if is_first:
                             all_tokens[idx] = part
-                            inc = True
+                            is_first = False
                         else:
                             all_tokens.insert(idx + 1, part)
 
