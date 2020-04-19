@@ -15,7 +15,7 @@ class StyloDocument(object):
 
     def __init__(self, file_content, author=DEFAULT_AUTHOR):
 
-        self.author = author
+        self.author = author.strip()
         self.file_content = file_content.lower()
         self.tokens = PortugueseTextualProcessing.tokenize(self.file_content)
         self.text = Text(self.tokens)
