@@ -28,6 +28,12 @@ def extract_text_from_original_works(base_path='../../data/students_exercises'):
     CSVReader.write_files('../../data/parsed-data/', file_paths, 'data.csv', files_content)
 
 
+def extract_text_from_original_works_val(base_path='../../data/varela_dataset'):
+    clean_txt_content, file_paths = FileUtil.convert_files(base_path)
+    file_contents = FileUtil.remove_first_line(clean_txt_content)
+    CSVReader.write_files('../../data/parsed-data/', file_paths, 'varela-data.csv', file_contents, author_naming=False)
+
+
 def prepare_train_data(dataframe):
     Meta_Y = dataframe.pop('Autor')
     Meta_X = dataframe
@@ -59,8 +65,8 @@ def show_column_distribution(dataframe, class_name):
 
 def save_converted_stylo_data():
     #extract_text_from_original_works()
-    CSVReader().write_stylo_features('../../data/parsed-data/', 'stylo-data.csv',
-                                     CSVReader.read_csv('../../data/parsed-data/data.csv', verbose=False))
+    CSVReader().write_stylo_features('../../data/parsed-data/', 'news-stylo-data.csv',
+                                     CSVReader.read_csv('../../data/parsed-data/news-dataset.csv', verbose=False))
 
 
 def save_converted_stylo_data_binary(idx):
@@ -109,13 +115,14 @@ def run_compiled_pipeline():
     print('accuracy % = ' + str((correct / 100) * 100))
 
 
-def run_stylometric_pipeline(dataset='../../data/parsed-data/stylo-data.csv'):
+def run_stylometric_pipeline(dataset='../../data/parsed-data/news-stylo-data.csv'):
     df = pd.read_csv(dataset)
-    df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
+    #df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
     nn = SimpleNeuralNetwork(df)
     accs = []
     for i in range(0, 20):
-        accs.append(nn.simple_split_train())
+        test, _ = nn.simple_split_train()
+        accs.append(test)
     print(np.mean(accs))
     print(np.std(accs))
 

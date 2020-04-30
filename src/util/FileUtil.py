@@ -68,11 +68,26 @@ class FileUtil:
         return result
 
     @staticmethod
+    def remove_first_line(files):
+        result = []
+        for file in files:
+            result.append(''.join(file.split('\n')[1:]))
+        return result
+
+    @staticmethod
     def convert_author_name(name):
+        name = name.lower()
         if ';' not in name:
             return ''.join([name[0] for name in name.split(" ")[::-1]])
         else:
             return ''.join([name[0:3] for name in name.split(";")])
+
+    @staticmethod
+    def another_author_convention(name):
+        name = name.replace(" ", "")
+        new_name = ''.join([i for i in name if not i.isdigit() and i.isupper()])
+        new_name += name[1:5].upper()
+        return new_name
 
     @staticmethod
     def load_ner_pickle(filename='cat-min_lldelta_0.pickle'):

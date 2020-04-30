@@ -9,14 +9,18 @@ class CSVReader:
         pass
 
     @staticmethod
-    def write_files(folder_path, files, file_name, file_contents):
+    def write_files(folder_path, files, file_name, file_contents, author_naming=True):
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
         with open(folder_path + file_name, 'w', encoding="utf-8") as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(['Text', 'Author'])
             for idx, content in enumerate(file_contents):
-                filewriter.writerow([content, FileUtil.convert_author_name(files[idx].lower())])
+                if not author_naming:
+                    author_name = FileUtil.another_author_convention(files[idx])
+                else:
+                    author_name = FileUtil.convert_author_name(files[idx])
+                filewriter.writerow([content, author_name])
 
     @staticmethod
     def write_stylo_features(folder_path, file_name, stylo_objects):
