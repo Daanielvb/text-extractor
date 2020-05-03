@@ -41,10 +41,14 @@ class FileUtil:
         return [os.path.splitext(os.path.basename(os.path.normpath(path)))[0] for path in file_paths]
 
     @staticmethod
+    def get_content_folder(file_paths):
+        return [os.path.basename(os.path.dirname(os.path.dirname(os.path.normpath(path)))) for path in file_paths]
+
+    @staticmethod
     def convert_files(base_path):
         files = FileUtil().get_files_by_extension(base_path, FileUtil().extensions)
         content = Cleaner().remove_patterns(FileUtil.extract_file_content(files))
-        return content, FileUtil.get_file_name(files)
+        return content, FileUtil.get_file_name(files), FileUtil().get_content_folder(files)
 
     @staticmethod
     def extract_file_content(file_paths):
@@ -85,8 +89,11 @@ class FileUtil:
     @staticmethod
     def another_author_convention(name):
         name = name.replace(" ", "")
+        print(name)
         new_name = ''.join([i for i in name if not i.isdigit() and i.isupper()])
-        new_name += name[1:5].upper()
+        new_name += name[-5:-2].upper()
+        #new_name += name[1:5].upper() + name[-5:-2].upper()
+        print(new_name)
         return new_name
 
     @staticmethod

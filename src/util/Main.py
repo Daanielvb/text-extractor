@@ -29,9 +29,10 @@ def extract_text_from_original_works(base_path='../../data/students_exercises'):
 
 
 def extract_text_from_original_works_val(base_path='../../data/varela_dataset'):
-    clean_txt_content, file_paths = FileUtil.convert_files(base_path)
+    clean_txt_content, file_paths, folders = FileUtil.convert_files(base_path)
     file_contents = FileUtil.remove_first_line(clean_txt_content)
-    CSVReader.write_files('../../data/parsed-data/', file_paths, 'varela-data.csv', file_contents, author_naming=False)
+    CSVReader.write_files('../../data/parsed-data/', file_paths, 'varela-data.csv', file_contents,
+                          author_naming=False, columns=['Text', 'Subject', 'Author'], folders=folders)
 
 
 def prepare_train_data(dataframe):
@@ -218,7 +219,9 @@ if __name__ == '__main__':
     # TODO: Check the usage of other pre-trained embeddings that were already downloaded
     #text = Text("meu nome é daniel cirne", hint_language_code='pt')
     #text.entities
-    save_converted_stylo_data()
+    extract_text_from_original_works_val()
+    df = pd.read_csv('../../data/parsed-data/varela-data.csv')
+    #print(df)
     # df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
     #
     # tokenizer, padded_sentences, max_sentence_len \

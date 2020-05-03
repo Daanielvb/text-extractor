@@ -42,15 +42,19 @@ class SimpleNeuralNetwork:
     def simple_split_train(self):
         self.build_classifier(number_of_features=len(self.X.columns), number_of_classes=len(set(self.encoded_Y)))
 
-        X, X_test, Y, y_test = train_test_split(self.X, self.Y, random_state=7, test_size=0.25)
+        X, X_test, Y, y_test = train_test_split(self.X, self.Y, random_state=7, test_size=0.3)
         X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, random_state=7, test_size=0.5)
 
-        self.model.fit(X, np_utils.to_categorical(self.le.transform(Y)), epochs=250, verbose=0)
+        self.model.fit(X, np_utils.to_categorical(self.le.transform(Y)), epochs=350, verbose=0)
 
         y_pred = self.le.inverse_transform(self.model.predict_classes(X_test))
-        score = accuracy_score(y_test, y_pred)
-        print("Test score: %.2f%%" % (score * 100))
-        return score
+        test_score = accuracy_score(y_test, y_pred)
+        print("Test score: %.2f%%" % (test_score * 100))
+
+        y_pred = self.le.inverse_transform(self.model.predict_classes(X_val))
+        val_score = accuracy_score(y_val, y_pred)
+        #print("Validation score: %.2f%%" % (val_score * 100))
+        return test_score, val_score
 
         # y_pred = self.le.inverse_transform(self.model.predict_classes(X_val))
         # score = accuracy_score(y_val, y_pred)
@@ -78,10 +82,10 @@ class SimpleNeuralNetwork:
 
     def build_classifier(self, number_of_features, number_of_classes=11):
         self.model = Sequential()
-        self.model.add(Dense(50, input_dim=number_of_features, activation='relu'))
+        self.model.add(Dense(32, input_dim=number_of_features, activation='relu'))
         self.model.add(Dropout(0.3))
-        # self.model.add(Dense(16, activation='relu'))
-        # self.model.add(Dropout(0.1))
+        self.model.add(Dense(16, activation='relu'))
+        self.model.add(Dropout(0.1))
         self.model.add(Dense(number_of_classes, activation='softmax'))
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 

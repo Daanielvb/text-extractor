@@ -17,3 +17,4 @@ pyspellchecker
 imblearn
 gensim
 pyphen
+polyglot
