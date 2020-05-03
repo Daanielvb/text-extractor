@@ -30,15 +30,15 @@ class CSVReader:
     def write_stylo_features(folder_path, file_name, stylo_objects):
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
-        with open(folder_path + file_name, 'w', encoding="utf-8") as csvfile:
-            filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+        with open(folder_path + file_name, 'w', encoding="utf-8") as csv_file:
+            filewriter = csv.writer(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(StyloDocument.csv_header())
             for stylo_obj in stylo_objects:
                 row = stylo_obj.csv_output().split(",")
                 filewriter.writerow(row)
 
     @staticmethod
-    def read_csv(file, verbose=False):
+    def transform_text_to_stylo_text(file, verbose=False):
         print('reading the following file:' + file)
         results = []
         with open(file, encoding='utf-8') as f:
@@ -51,7 +51,8 @@ class CSVReader:
                     line_count += 1
                 else:
                     if row:
-                        results.append(StyloDocument(row[0], row[1]))
+                        # results.append(StyloDocument(file_content=row[0], author=row[1], author=row[2]))
+                        results.append(StyloDocument(file_content=row[0], author=row[1]))
                         if verbose:
                             print('Line count:' + str(line_count) + ' Text content:' + row[0])
                         line_count += 1

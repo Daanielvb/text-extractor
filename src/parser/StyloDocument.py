@@ -195,7 +195,6 @@ class StyloDocument(object):
         return self.count_characters_frequency(['“', '”']),
 
     # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
-    # TODO: Number of long words
     @classmethod
     def csv_header(cls):
         return (
