@@ -215,11 +215,25 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
     #         model.predict_entries(val.reshape(1, 2139))
 
 
+def clean_and_get_size(df):
+    df['Text'] = df['Text'].str.replace('/r', '')
+    df['Text'] = df['Text'].str.replace('/n', ' ')
+    df['size'] = df['Text'].str.split().str.len()
+    # How to retrieve authors information
+    #df.groupby('Author')['size'].agg(['sum', 'mean'])
+    return df
+
+
 if __name__ == '__main__':
     #text = Text("meu nome é daniel cirne", hint_language_code='pt')
     #text.entities
-    extract_text_from_original_works_val()
-    df = pd.read_csv('../../data/parsed-data/varela-data.csv')
+    #extract_text_from_original_works_val()
+    all_df = pd.read_csv('../../data/parsed-data/data.csv')
+
+    df = pd.read_csv('../../data/parsed-data/selected-data.csv')
+
+    df = clean_and_get_size(df)
+    print(df)
     #print(df)
     # df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
     #
