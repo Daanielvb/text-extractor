@@ -54,10 +54,25 @@ class StyloDocument(object):
         return self.tagfdist.freq(tag)
 
     def entity_frequency(self, tag):
+        #print(self.get_long_short_sentence_ratio())
         return self.ner_ftags.freq(tag)
 
     def get_tokens_by_tag(self, tag):
         return [i[0][0] for i in self.tagged_sentences if i[0][1] == tag]
+
+    def get_long_sentence_freq(self):
+        return (len([i for i in self.sentence_word_length if i < PortugueseTextualProcessing.LONG_SENTENCE_SIZE]))/len(self.sentences)
+
+    def get_short_sentence_freq(self):
+        return (len([i for i in self.sentence_word_length if i < PortugueseTextualProcessing.SHORT_SENTENCE_SIZE]))/len(self.sentences)
+
+    def get_long_short_sentence_ratio(self):
+        """"RF FOR PAN 15"""
+        return len([i for i in self.sentence_word_length if i < PortugueseTextualProcessing.LONG_SENTENCE_SIZE])/(len([i for i in self.sentence_word_length if i < PortugueseTextualProcessing.SHORT_SENTENCE_SIZE]))
+
+    def get_initial_sentence_tags(self):
+        # TODO: Extract first words from each sentence and their tags
+        pass
 
     def term_per_hundred(self, term):
         """

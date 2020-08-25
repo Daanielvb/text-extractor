@@ -23,6 +23,8 @@ class PortugueseTextualProcessing:
     TAGGER = load(open('pttag-mm.pkl', 'rb'))
     EMBEDDING_DIM = 100
     MAX_NUM_WORDS = 20000
+    LONG_SENTENCE_SIZE = 12
+    SHORT_SENTENCE_SIZE = 6
     PT_DICT = pyphen.Pyphen(lang='pt_BR')
     SILVA_SYLLABLE_SEPARATOR = Silva2011SyllableSeparator()
     NER_PT_TAGGER = FileUtil().load_ner_pickle()
