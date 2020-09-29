@@ -182,6 +182,11 @@ class PortugueseTextualProcessing:
         return words, count
 
     @staticmethod
+    def get_monosyllable_counts(tokens):
+        words, count = PortugueseTextualProcessing.get_syllable_counts(tokens)
+        return len([w for w in words.items() if w[1][0] == 1])
+
+    @staticmethod
     def get_ptBR_flesch_index(tokens, phrases):
         """ILF = 248.835 – (1.015 x ASL) – (84.6 x ASW)
          ASL é o número de palavras dividido pelo número de sentenças e ASW é o

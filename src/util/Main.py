@@ -225,30 +225,14 @@ def clean_and_get_size(df):
 
 
 if __name__ == '__main__':
-    #text = Text("meu nome é daniel cirne", hint_language_code='pt')
-    #text.entities
-    #extract_text_from_original_works_val()
-    all_df = pd.read_csv('../../data/parsed-data/data.csv')
 
-    df = pd.read_csv('../../data/parsed-data/selected-data.csv')
+    #all_df = pd.read_csv('../../data/parsed-data/data.csv')
 
-    df = clean_and_get_size(df)
-    print(df)
+    #df = pd.read_csv('../../data/parsed-data/selected-data.csv')
+
+    save_converted_stylo_data(input_file='../../data/parsed-data/data.csv')
+
+
     #print(df)
-    # df = ModelUtil().remove_entries_based_on_threshold(df, 'Author', 3)
-    #
-    # tokenizer, padded_sentences, max_sentence_len \
-    #     = PortugueseTextualProcessing().convert_corpus_to_number(df)
-    #
-    # # ModelUtil().save_tokenizer(tokenizer)
-    # vocab_len = len(tokenizer.word_index) + 1
-    #
-    # glove_embedding = PortugueseTextualProcessing().load_vector(tokenizer)
-    #
-    # corpus = df['Text']
-    #
-    # w_matrix = ModelUtil().build_weighted_matrix(corpus, glove_embedding)
-    #
-    # padded_sentences = pad_sequences(w_matrix, vocab_len, padding='post')
     # CSVReader().export_dataframe(df, '../../data/parsed-data/data-without-stopwords.csv')
 

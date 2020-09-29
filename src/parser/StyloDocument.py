@@ -70,9 +70,9 @@ class StyloDocument(object):
         """"RF FOR PAN 15"""
         return len([i for i in self.sentence_word_length if i < PortugueseTextualProcessing.LONG_SENTENCE_SIZE])/(len([i for i in self.sentence_word_length if i < PortugueseTextualProcessing.SHORT_SENTENCE_SIZE]))
 
-    def get_initial_sentence_tags(self):
-        # TODO: Extract first words from each sentence and their tags
-        pass
+    def get_sentence_starting_tags_ratio(self, tag):
+        count = [i[0][1] for i in self.tagged_sentences].count(tag)
+        return count/len(self.sentences)
 
     def term_per_hundred(self, term):
         """
@@ -185,6 +185,9 @@ class StyloDocument(object):
         #test = PortugueseTextualProcessing().test_np(self.tokens)
         return PortugueseTextualProcessing().get_number_of_noun_phrases(self.tokens) / len(self.text)
 
+    def monosyllables(self):
+        return PortugueseTextualProcessing().get_monosyllable_counts(self.tokens) / len(self.text)
+
     def repeated_words_frequency(self):
         repeated_words = list(filter(lambda x: x[1] >= 2, FreqDist(PortugueseTextualProcessing().remove_stopwords(self.tokens)).items()))
         return len(repeated_words)/len(self.text)
@@ -239,9 +242,9 @@ class StyloDocument(object):
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "'{}'".format(
+               "{},{},'{}'".format(
 
-            # Text style features - 9
+            # Text style features - 10
             round(self.type_token_ratio(), 8),
             round(self.mean_word_len(), 8),
             round(self.mean_sentence_len(), 8),
@@ -251,6 +254,8 @@ class StyloDocument(object):
             len(self.paragraphs) / len(self.text),
             round(self.repeated_words_frequency(), 8),
             self.mean_syllables_per_word(),
+            self.monosyllables(),
+            self.get_sentence_starting_tags_ratio('N'),
 
             # Term count features - 5
             self.term_per_hundred('.'),
