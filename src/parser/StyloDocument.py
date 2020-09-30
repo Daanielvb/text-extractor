@@ -30,6 +30,9 @@ class StyloDocument(object):
         self.ner_entities = ['ABSTRACCAO', 'ACONTECIMENTO', 'COISA', 'LOCAL',
                              'ORGANIZACAO', 'OBRA', 'OUTRO', 'PESSOA', 'TEMPO', 'VALOR']
         self.white_spaces = len(self.file_content.split(' '))
+
+        #TODO: Change the tagging system to consider all the information we have
+        self.new_tags = PortugueseTextualProcessing.get_rich_tags(self.file_content)
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
         self.ner_tags = PortugueseTextualProcessing.ner_chunks(self.tokens)

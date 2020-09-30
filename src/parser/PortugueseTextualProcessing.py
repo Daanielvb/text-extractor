@@ -15,9 +15,11 @@ from nltk.stem import SnowballStemmer
 import pyphen
 from collections import defaultdict
 from src.parser.syllable.Silva2011SS import *
+import pt_core_news_sm
 
 
 class PortugueseTextualProcessing:
+    NLP = pt_core_news_sm.load()
     STOPWORDS = set(nltk.corpus.stopwords.words('portuguese'))
     CUSTOM_STOPWORDS = FileUtil().get_words_from_file('custom_stopwords.txt')
     TAGGER = load(open('pttag-mm.pkl', 'rb'))
@@ -46,6 +48,44 @@ class PortugueseTextualProcessing:
         if slash_tokens:
             PortugueseTextualProcessing().separate_slash_tokens(tokens, slash_tokens)
         return tokens
+
+    @staticmethod
+    def count_lemmas(text):
+        doc = PortugueseTextualProcessing.NLP(text)
+        return len([token for token in doc if token.text != token.lemma_])
+
+    @staticmethod
+    def get_rich_tags(text):
+        PortugueseTextualProcessing().count_lemmas(text)
+        doc = PortugueseTextualProcessing.NLP(text)
+        return [(token.lemma_, token.pos_, token.tag_) for token in doc]
+
+    @staticmethod
+    def get_gender(tag):
+        "X__Gender Fem}Masc"
+        pass
+
+    @staticmethod
+    def get_number(tag):
+        "Number=Plur Plur|Sing"
+        pass
+
+    @staticmethod
+    def get_person(tag):
+        #TODO: Check if we have values != 3
+        #TODO: Check if we have Voice != Pass
+        "Person=3"
+        pass
+
+    @staticmethod
+    def get_verb_form(tag):
+        "VerbForm=Ger|Inf|Fin"
+        pass
+
+    @staticmethod
+    def get_pron_type(tag):
+        "PronType=Rel|Art|Prs|Dem"
+        pass
 
     @staticmethod
     def separate_slash_tokens(all_tokens, slash_text):

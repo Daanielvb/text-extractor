@@ -66,7 +66,7 @@ def show_column_distribution(dataframe, class_name):
 
 
 def save_converted_stylo_data(input_file='../../data/parsed-data/news-dataset.csv', output_file='news-stylo-data.csv'):
-    extract_text_from_original_works()
+    #extract_text_from_original_works()
     CSVReader().write_stylo_features('../../data/parsed-data/', output_file,
                                      CSVReader.transform_text_to_stylo_text(input_file, verbose=False))
 
@@ -210,7 +210,7 @@ if __name__ == '__main__':
 
     #df = pd.read_csv('../../data/parsed-data/selected-data.csv')
 
-    save_converted_stylo_data(input_file='../../data/parsed-data/data.csv')
+    save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='student_data.csv')
 
 
     #print(df)
