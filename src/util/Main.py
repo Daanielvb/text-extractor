@@ -18,20 +18,21 @@ from keras.wrappers.scikit_learn import KerasClassifier
 #from polyglot.text import Text
 
 
-def extract_text_from_original_works(base_path='../../data/students_exercises'):
-    clean_txt_content, txt_file_names = FileUtil.convert_files(base_path)
-    clean_doc_content, doc_file_names = DOCReader().convert_docs(base_path)
-    clean_pdf_content, pdf_file_names = PDFReader().convert_pdfs(base_path)
+def extract_text_from_original_works(base_path='../../data/students_exercises', raw=False):
+    clean_txt_content, txt_file_names = FileUtil.convert_files(base_path, raw)
+    clean_doc_content, doc_file_names = DOCReader().convert_docs(base_path, raw)
+    clean_pdf_content, pdf_file_names = PDFReader().convert_pdfs(base_path, raw)
 
     files_content = FileUtil.merge_contents(clean_txt_content, clean_doc_content, clean_pdf_content)
     file_paths = FileUtil.merge_contents(txt_file_names, doc_file_names, pdf_file_names)
     CSVReader.write_files('../../data/parsed-data/', file_paths, 'data.csv', files_content)
 
 
-def extract_text_from_original_works_val(base_path='../../data/varela_dataset'):
-    clean_txt_content, file_paths, folders = FileUtil.convert_files(base_path)
-    file_contents = FileUtil.remove_first_line(clean_txt_content)
-    CSVReader.write_files('../../data/parsed-data/', file_paths, 'varela-data.csv', file_contents,
+def extract_text_from_original_works_val(base_path='../../data/varela_dataset', raw=False):
+    clean_txt_content, file_paths, folders = FileUtil.convert_files(base_path, raw)
+    if not raw:
+        clean_txt_content = FileUtil.remove_first_line(clean_txt_content)
+    CSVReader.write_files('../../data/parsed-data/', file_paths, 'varela-data.csv', clean_txt_content,
                           author_naming=False, columns=['Text', 'Subject', 'Author'], folders=folders)
 
 
@@ -65,7 +66,7 @@ def show_column_distribution(dataframe, class_name):
 
 
 def save_converted_stylo_data(input_file='../../data/parsed-data/news-dataset.csv', output_file='news-stylo-data.csv'):
-    # extract_text_from_original_works()
+    extract_text_from_original_works()
     CSVReader().write_stylo_features('../../data/parsed-data/', output_file,
                                      CSVReader.transform_text_to_stylo_text(input_file, verbose=False))
 
@@ -170,28 +171,7 @@ def run_complete_pipeline(dataset='../../data/parsed-data/data.csv'):
         epochs=250,
         batch_size=512)
 
-    # loss = history.history['loss']
-    # val_loss = history.history['val_loss']
-    # epochs = range(1, len(loss) + 1)
-    # matplotlib.pyplot.plot(epochs, loss, 'g', label='Training loss')
-    # matplotlib.pyplot.plot(epochs, val_loss, 'y', label='Validation loss')
-    # plt.title('Training and validation loss')
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Loss')
-    # plt.legend()
-    # plt.show()
-    #
-    # plt.clf()
-    # acc = history.history['acc']
-    # val_acc = history.history['val_acc']
-    # plt.plot(epochs, acc, 'g', label='Training acc')
-    # plt.plot(epochs, val_acc, 'y', label='Validation acc')
-    # plt.title('Training and validation accuracy')
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Accuracy')
-    # plt.legend()
-    # plt.show()
-    # saved_models = []
+
     for train_index, test_index in kfold.split(X, Y):
         # convert integers to dummy variables (i.e. one hot encoded)
         dummy_y = np_utils.to_categorical(Y)

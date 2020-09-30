@@ -27,7 +27,7 @@ class Cleaner:
         return result
 
     @staticmethod
-    def remove_patterns(text_list):
+    def remove_patterns(text_list, raw=False):
         result = []
         for text in text_list:
             # text = re.sub(Cleaner.STUDENT_PATTERN, '', text, flags=re.IGNORECASE)
@@ -40,11 +40,13 @@ class Cleaner:
             text = re.sub(Cleaner.DATE_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.URL_PATTERN, '', text, flags=re.IGNORECASE)
             # TODO: Verify if results are better using PortugueseTextualProcessing().remove_stopwords()
-            result.append(Cleaner().format(text))
+            if not raw:
+                text = Cleaner().remove_new_lines(text)
+            result.append(text)
         return result
 
     @staticmethod
-    def format(text):
+    def remove_new_lines(text):
         #text = re.sub('\n', ' ', text)
         regex = r"(\n{2,} )"
         text = re.sub(regex, '\n', text)

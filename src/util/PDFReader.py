@@ -1,6 +1,6 @@
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
-from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
+from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from src.util.FileUtil import *
 from src.Cleaner import *
@@ -14,7 +14,7 @@ class PDFReader(FileUtil):
         pass
 
     @staticmethod
-    def extract_content(files_path):
+    def extract_content(files_path, raw=False):
         result = []
         for file in files_path:
             fp = open(file, 'rb')
@@ -30,15 +30,18 @@ class PDFReader(FileUtil):
             pdf_content = []
             for page in PDFPage.get_pages(fp):
                 interpreter.process_page(page)
-                data = retstr.getvalue().lower()
+                if raw:
+                    data = retstr.getvalue()
+                else:
+                    data = retstr.getvalue().lower()
                 pdf_content.append(data)
             result.append(' '.join(pdf_content))
         return result
 
     @staticmethod
-    def convert_pdfs(base_path):
+    def convert_pdfs(base_path, raw):
         file_names = PDFReader().get_files_by_extension(base_path, PDFReader().extensions)
-        content = Cleaner().remove_patterns(PDFReader().extract_content(file_names))
+        content = Cleaner().remove_patterns(PDFReader().extract_content(file_names, raw), raw)
         return content, PDFReader().get_file_name(file_names)
 
 

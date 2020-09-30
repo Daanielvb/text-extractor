@@ -16,6 +16,7 @@ class StyloDocument(object):
     def __init__(self, file_content, author=DEFAULT_AUTHOR):
 
         self.author = author.strip()
+        self.raw_content = file_content
         self.file_content = file_content.lower()
         self.tokens = PortugueseTextualProcessing.tokenize(self.file_content)
         self.text = Text(self.tokens)
@@ -133,6 +134,10 @@ class StyloDocument(object):
         character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w',
                           'y', 'x', 'z']
         return (len([word for word in self.file_content if word in character_list])) / len(self.text)
+
+    def count_camel_case(self):
+        #TODO: Add original files and remove lower case conversion
+        return [word for word in self.raw_content if word[0].upper() and word[1].lower()]
 
     def local_hapax_legommena_frequency(self):
         return (len(self.fdist.hapaxes()))/len(self.text.tokens)
@@ -255,7 +260,7 @@ class StyloDocument(object):
             round(self.repeated_words_frequency(), 8),
             self.mean_syllables_per_word(),
             self.monosyllables(),
-            self.get_sentence_starting_tags_ratio('N'),
+            self.count_camel_case(),
 
             # Term count features - 5
             self.term_per_hundred('.'),

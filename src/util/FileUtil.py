@@ -45,17 +45,20 @@ class FileUtil:
         return [os.path.basename(os.path.dirname(os.path.dirname(os.path.normpath(path)))) for path in file_paths]
 
     @staticmethod
-    def convert_files(base_path):
+    def convert_files(base_path, raw=False):
         files = FileUtil().get_files_by_extension(base_path, FileUtil().extensions)
-        content = Cleaner().remove_patterns(FileUtil.extract_file_content(files))
+        content = Cleaner().remove_patterns(FileUtil.extract_file_content(files, raw), raw)
         return content, FileUtil.get_file_name(files), FileUtil().get_content_folder(files)
 
     @staticmethod
-    def extract_file_content(file_paths):
+    def extract_file_content(file_paths, raw=False):
         result = []
         for path in file_paths:
             with open(path, 'r', errors='ignore') as file:
-                result.append(file.read().lower())
+                if raw:
+                    result.append(file.read())
+                else:
+                    result.append(file.read().lower())
         return result
 
     @staticmethod
