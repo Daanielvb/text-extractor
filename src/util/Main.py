@@ -3,6 +3,7 @@ from src.util.DOCReader import *
 from src.util.CSVReader import *
 from src.util.ModelUtil import *
 from src.util.NgramUtil import *
+from src.util.GlobalFeatures import *
 import pandas as pd
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
@@ -199,18 +200,19 @@ def clean_and_get_size(df):
     return df
 
 
+def build_global_features():
+    all_df = pd.read_csv('../../data/parsed-data/data.csv')
+    ng = NgramUtil(all_df['Text'], [1, 3, 4, 5], [10, 3, 3, 3])
+    all_df = GlobalFeatures().calculate_global_hapax_legomena(all_df)
+    all_df = ng.upgrade_df_with_count(all_df)
+    return all_df
+
+
 if __name__ == '__main__':
 
-    all_df = pd.read_csv('../../data/parsed-data/data.csv')
-    ng = NgramUtil(all_df['Text'], [3, 4, 5], [3, 3, 3])
-    all_df = ng.upgrade_df_with_count(all_df)
-
+    df = build_global_features()
 
     #df = pd.read_csv('../../data/parsed-data/selected-data.csv')
-
     #save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='student_data.csv')
-
-
-    #print(df)
     # CSVReader().export_dataframe(df, '../../data/parsed-data/data-without-stopwords.csv')
 
