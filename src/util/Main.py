@@ -2,19 +2,14 @@ from src.util.PDFReader import *
 from src.util.DOCReader import *
 from src.util.CSVReader import *
 from src.util.ModelUtil import *
+from src.util.NgramUtil import *
 import pandas as pd
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 import matplotlib
-from sklearn.preprocessing import LabelEncoder
-from keras.utils import np_utils
-from sklearn.model_selection import StratifiedKFold
 from src.classifiers.NeuralNetwork import *
 from src.classifiers.RFClassifier import *
 from src.classifiers.SimpleNeuralNetwork import *
-from sklearn.pipeline import Pipeline, make_pipeline
-from sklearn.model_selection import cross_validate
-from keras.wrappers.scikit_learn import KerasClassifier
 #from polyglot.text import Text
 
 
@@ -206,11 +201,14 @@ def clean_and_get_size(df):
 
 if __name__ == '__main__':
 
-    #all_df = pd.read_csv('../../data/parsed-data/data.csv')
+    all_df = pd.read_csv('../../data/parsed-data/data.csv')
+    ng = NgramUtil(all_df['Text'], [3, 4, 5], [3, 3, 3])
+    all_df = ng.upgrade_df_with_count(all_df)
+
 
     #df = pd.read_csv('../../data/parsed-data/selected-data.csv')
 
-    save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='student_data.csv')
+    #save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='student_data.csv')
 
 
     #print(df)
