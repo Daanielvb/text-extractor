@@ -14,8 +14,8 @@ class Cleaner:
     INSTITUTION_PATTERN = "(congregação de santa dorotéia do brasil|faculdade frassinetti do recife|fafire)\n*"
     DATE_PATTERN = "recife[, ]?\d*"
     URL_PATTERN = r"http\S+"
-    #TODO: Replace (d d) for ( d d )
-    PARENTHESIS_CONTENT = r"\("
+    OPEN_PARENTHESIS = r"\("
+    CLOSING_PARENTHESIS = r"\)"
 
     def __init__(self):
         pass
@@ -37,7 +37,8 @@ class Cleaner:
             # text = re.sub(Cleaner.COURSE_PATTERN, '', text, flags=re.IGNORECASE)
             text = Cleaner().remove_student_names(text)[0]
             text = text.replace('"', "'")
-            text = re.sub()
+            text = re.sub(Cleaner.OPEN_PARENTHESIS, "( ", text)
+            text = re.sub(Cleaner.CLOSING_PARENTHESIS, " )", text)
             text = re.sub(Cleaner.INSTITUTION_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.PERIOD_PATTERN, '', text, flags=re.IGNORECASE)
             text = re.sub(Cleaner.DATE_PATTERN, '', text, flags=re.IGNORECASE)
