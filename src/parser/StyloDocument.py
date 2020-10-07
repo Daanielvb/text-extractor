@@ -38,6 +38,7 @@ class StyloDocument(object):
         self.ner_tags = PortugueseTextualProcessing.ner_chunks(self.tokens)
         self.ner_ftags = FreqDist(self.ner_tags)
         self.spell = SpellChecker(language='pt')
+        self.ROUNDING_FACTOR = 4
 
     def get_tag_count_by_start(self, tag_start):
         count = 0
@@ -130,8 +131,11 @@ class StyloDocument(object):
         _, syllable_count = PortugueseTextualProcessing().get_syllable_counts(self.tokens)
         return syllable_count/len(self.tokens)
 
-    def count_characters_frequency(self, character_list):
+    def characters_frequency(self, character_list):
         return (len([word for word in self.file_content if word in character_list])) / len(self.text)
+
+    def digits_frequency(self):
+        return (len([word for word in self.file_content if word.isdigit()])) / len(self.text)
 
     def count_consonant_frequency(self):
         character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w',
@@ -218,16 +222,17 @@ class StyloDocument(object):
         """Improve this method to retrieve quotes based on Patterns and special words
         egs: p.43;  segundo (autor, ano)
         """
-        return self.count_characters_frequency(['“', '”']),
+        return self.characters_frequency(['“', '”'])
 
-    # TODO: global Hapax legomena freq -  might need to have the whole text in a string in order to calculate that.
     @classmethod
     def csv_header(cls):
         return (
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
              'StdevTamParagrafos', 'FrequenciaDeParagrafos','FrequenciaPalavrasDuplicadas', 'MediaSilabasPorPalavra',
 
-             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'FreqCitacoes',
+             'FreqMonossilabas',
+
+             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'FreqCitacoes', 'FreqDigitos',
 
              'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj',
              'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados', 'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais',
@@ -246,31 +251,31 @@ class StyloDocument(object):
 
     def csv_output(self):
         # TODO: Separate features into syntactical, lexical and so on..
-        # 55 features (including author)
+        # 56 features + 1 class
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},'{}'".format(
 
             # Text style features - 10
-            round(self.type_token_ratio(), 8),
-            round(self.mean_word_len(), 8),
-            round(self.mean_sentence_len(), 8),
-            round(self.std_sentence_len(), 8),
-            round(self.mean_paragraph_len(), 8),
-            round(self.std_paragraph_len(), 8),
+            round(self.type_token_ratio(), self.ROUNDING_FACTOR),
+            round(self.mean_word_len(), self.ROUNDING_FACTOR),
+            round(self.mean_sentence_len(), self.ROUNDING_FACTOR),
+            round(self.std_sentence_len(), self.ROUNDING_FACTOR),
+            round(self.mean_paragraph_len(), self.ROUNDING_FACTOR),
+            round(self.std_paragraph_len(), self.ROUNDING_FACTOR),
             len(self.paragraphs) / len(self.text),
-            round(self.repeated_words_frequency(), 8),
+            round(self.repeated_words_frequency(), self.ROUNDING_FACTOR),
             self.mean_syllables_per_word(),
             self.monosyllables(),
-            self.count_camel_case(),
 
-            # Term count features - 5
+            # Term count features - 6
             self.term_per_hundred('.'),
             self.term_per_hundred(','),
             self.term_per_hundred('!'),
             self.term_per_hundred(':'),
-            self.count_characters_frequency(['“', '”']),
+            self.find_quotes(),
+            self.digits_frequency(),
 
             #POSTAG Features - 14
             self.tag_frequency('ADJ'),
@@ -286,10 +291,10 @@ class StyloDocument(object):
             self.tag_frequency('notfound'),
             self.get_tags_freq(PortugueseTextualProcessing.CONTENT_TAGS),
             self.get_tags_freq(PortugueseTextualProcessing.FUNCTIONAL_TAGS),
-            round(self.noun_phrases(), 8),
+            round(self.noun_phrases(), self.ROUNDING_FACTOR),
 
             #NER Features - 11
-            round(len(self.ner_tags) / len(self.tokens), 8),
+            round(len(self.ner_tags) / len(self.tokens), self.ROUNDING_FACTOR),
             self.entity_frequency('ABSTRACCAO'),
             self.entity_frequency('ACONTECIMENTO'),
             self.entity_frequency('COISA'),
@@ -301,22 +306,22 @@ class StyloDocument(object):
             self.entity_frequency('TEMPO'),
             self.entity_frequency('VALOR'),
 
-            # Text correlation features - 7
-            round(self.guiraud_R_measure(), 8),
-            round(self.herdan_C_measure(), 8),
-            round(self.herdan_V_measure(), 8),
-            round(self.K_measure(), 8),
-            round(self.dugast_U_measure(), 8),
-            round(self.maas_A_measure(), 8),
-            round(self.honores_H_measure(), 8),
+            # Vocabulary diversity features - 7
+            round(self.guiraud_R_measure(), self.ROUNDING_FACTOR),
+            round(self.herdan_C_measure(), self.ROUNDING_FACTOR),
+            round(self.herdan_V_measure(), self.ROUNDING_FACTOR),
+            round(self.K_measure(), self.ROUNDING_FACTOR),
+            round(self.dugast_U_measure(), self.ROUNDING_FACTOR),
+            round(self.maas_A_measure(), self.ROUNDING_FACTOR),
+            round(self.honores_H_measure(), self.ROUNDING_FACTOR),
 
             # Misc Features - 8
             self.spell_miss_check_frequency(),
-            round(self.local_hapax_legommena_frequency(), 8),
+            round(self.local_hapax_legommena_frequency(), self.ROUNDING_FACTOR),
             self.collocations_frequency(2),
             self.collocations_frequency(3),
             self.collocations_frequency(4),
-            round(self.stop_word_freq(), 8),
+            round(self.stop_word_freq(), self.ROUNDING_FACTOR),
             self.flesh_index(),
             self.get_logical_operator_frequency(),
 
