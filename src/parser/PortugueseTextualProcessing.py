@@ -37,6 +37,10 @@ class PortugueseTextualProcessing:
     CONTENT_TAGS = ['N', 'ADJ', 'ADV', 'V']
     FUNCTIONAL_TAGS = ['ART', 'PREP', 'PRON','K']
     DEFAULT_NOT_FOUND_TAG = 'notfound'
+    CASE_SENSITIVE_PATTERN = '[A-Z][a-z]*'
+    NUMBER_ONLY_PATTERN = '[0-9]'
+    RICH_TAG_TYPES = ['Gender', 'Number', 'Person', 'PronType', 'VerbForm', 'Voice', 'Tense']
+
 
     def __init__(self):
         pass
@@ -58,34 +62,29 @@ class PortugueseTextualProcessing:
     def get_rich_tags(text):
         PortugueseTextualProcessing().count_lemmas(text)
         doc = PortugueseTextualProcessing.NLP(text)
-        return [(token.lemma_, token.pos_, token.tag_) for token in doc]
+        tags = [(token.lemma_, token.pos_, token.tag_) for token in doc]
+        tagged_text = ''.join([tag[2] for tag in tags if "|" in tag[2]]).split("|")
+        parsed_tags = PortugueseTextualProcessing().get_all_tags(tagged_text)
+        return parsed_tags
 
     @staticmethod
-    def get_gender(tag):
-        "X__Gender Fem}Masc"
-        pass
+    def get_all_tags(tagged_text):
+        tags = []
+        for tag in PortugueseTextualProcessing().RICH_TAG_TYPES:
+            if tag != 'Person':
+                type_tags = PortugueseTextualProcessing().get_regular_tags(tag,
+                                                                           PortugueseTextualProcessing().CASE_SENSITIVE_PATTERN, tagged_text)
+                tags.append(''.join(type_tags).replace(tag + '=', ' ').split(' ')[1:])
+            else:
+                type_tags = PortugueseTextualProcessing().get_regular_tags(tag,
+                                                                           PortugueseTextualProcessing().NUMBER_ONLY_PATTERN,
+                                                                           tagged_text)
+                tags.append(''.join(type_tags).replace(tag + '=', ' ').split(' ')[1:])
+        return tags
 
     @staticmethod
-    def get_number(tag):
-        "Number=Plur Plur|Sing"
-        pass
-
-    @staticmethod
-    def get_person(tag):
-        #TODO: Check if we have values != 3
-        #TODO: Check if we have Voice != Pass
-        "Person=3"
-        pass
-
-    @staticmethod
-    def get_verb_form(tag):
-        "VerbForm=Ger|Inf|Fin"
-        pass
-
-    @staticmethod
-    def get_pron_type(tag):
-        "PronType=Rel|Art|Prs|Dem"
-        pass
+    def get_regular_tags(pattern, case, tagged_text):
+        return re.findall(pattern + '=' + case, ''.join(tagged_text))
 
     @staticmethod
     def separate_slash_tokens(all_tokens, slash_text):
