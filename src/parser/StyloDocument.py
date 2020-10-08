@@ -59,7 +59,6 @@ class StyloDocument(object):
         return self.tagfdist.freq(tag)
 
     def entity_frequency(self, tag):
-        #print(self.get_long_short_sentence_ratio())
         return self.ner_ftags.freq(tag)
 
     def get_tokens_by_tag(self, tag):
@@ -132,15 +131,15 @@ class StyloDocument(object):
         return syllable_count/len(self.tokens)
 
     def characters_frequency(self, character_list):
-        return (len([word for word in self.file_content if word in character_list])) / len(self.text)
+        return self.frequency([word for word in self.file_content if word in character_list])
 
     def digits_frequency(self):
-        return (len([word for word in self.file_content if word.isdigit()])) / len(self.text)
+        return self.frequency([word for word in self.file_content if word.isdigit()])
 
     def count_consonant_frequency(self):
         character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w',
                           'y', 'x', 'z']
-        return (len([word for word in self.file_content if word in character_list])) / len(self.text)
+        return self.frequency([word for word in self.file_content if word in character_list])
 
     def count_camel_case(self):
         #TODO: Add original files and remove lower case conversion
@@ -191,7 +190,7 @@ class StyloDocument(object):
         return (len(self.fdist.hapaxes()))/len(set(self.text))
 
     def spell_miss_check_frequency(self):
-        return (len(self.spell.unknown(self.text))) / len(self.text)
+        return self.frequency(self.spell.unknown(self.text))
 
     def noun_phrases(self):
         #test = PortugueseTextualProcessing().test_np(self.tokens)
@@ -202,15 +201,14 @@ class StyloDocument(object):
 
     def repeated_words_frequency(self):
         repeated_words = list(filter(lambda x: x[1] >= 2, FreqDist(PortugueseTextualProcessing().remove_stopwords(self.tokens)).items()))
-        return len(repeated_words)/len(self.text)
+        return self.frequency(repeated_words)
 
     def stop_word_freq(self):
         clean_words = PortugueseTextualProcessing().remove_stopwords(self.tokens)
         return (len(self.tokens) - len(clean_words)) / len(self.text)
 
     def get_logical_operator_frequency(self):
-        return len([token for token in self.tokens if token in PortugueseTextualProcessing.LOGICAL_OPERATORS]) \
-               / len(self.text)
+        return self.frequency([token for token in self.tokens if token in PortugueseTextualProcessing.LOGICAL_OPERATORS])
 
     def get_tags_freq(self, tags):
         count = 0
@@ -223,6 +221,9 @@ class StyloDocument(object):
         egs: p.43;  segundo (autor, ano)
         """
         return self.characters_frequency(['“', '”'])
+
+    def frequency(self, input_values):
+        return len(input_values) / len(self.text)
 
     @classmethod
     def csv_header(cls):
