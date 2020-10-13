@@ -23,7 +23,7 @@ import pt_core_news_sm
 class PortugueseTextualProcessing:
     NLP = pt_core_news_sm.load()
     STOPWORDS = set(nltk.corpus.stopwords.words('portuguese'))
-    CUSTOM_STOPWORDS = FileUtil().get_words_from_file('custom_stopwords.txt')
+    CUSTOM_STOPWORDS = FileUtil().get_words_from_file('../resources/custom_stopwords.txt')
     TAGGER = load(open('pttag-mm.pkl', 'rb'))
     EMBEDDING_DIM = 100
     MAX_NUM_WORDS = 20000
@@ -32,7 +32,7 @@ class PortugueseTextualProcessing:
     PT_DICT = pyphen.Pyphen(lang='pt_BR')
     SILVA_SYLLABLE_SEPARATOR = Silva2011SyllableSeparator()
     NER_PT_TAGGER = FileUtil().load_ner_pickle()
-    NER_TIME_TAGGER = FileUtil().load_ner_pickle('cat-entropy_cutoff_0.08.pickle')
+    NER_TIME_TAGGER = FileUtil().load_ner_pickle('../resources/cat-entropy_cutoff_0.08.pickle')
     LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
                          'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
                          'uma vez que', 'fosse']

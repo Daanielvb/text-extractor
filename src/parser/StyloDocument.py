@@ -192,7 +192,6 @@ class StyloDocument(object):
         return self.frequency(self.spell.unknown(self.text))
 
     def noun_phrases(self):
-        #test = PortugueseTextualProcessing().test_np(self.tokens)
         return PortugueseTextualProcessing().get_number_of_noun_phrases(self.tokens) / len(self.text)
 
     def monosyllables(self):

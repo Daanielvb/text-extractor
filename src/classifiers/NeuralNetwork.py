@@ -101,7 +101,7 @@ class NeuralNetwork:
         print("%s: %.2f%%" % (self.model.metrics_names[1], scores[1] * 100))
         return scores
 
-    def save_model(self, model_name='model.json', weights_name='model.h5'):
+    def save_model(self, model_name='model.json', weights_name='../resources/model.h5'):
         model_json = self.model.to_json()
         with open(model_name, "w") as json_file:
             json_file.write(model_json)
@@ -109,7 +109,7 @@ class NeuralNetwork:
         self.model.save_weights(weights_name)
         print("Saved model and weights to disk")
 
-    def load_model(self, model_path='model.json', weights_path='model.h5'):
+    def load_model(self, model_path='model.json', weights_path='../resources/model.h5'):
         # load json and create model
         json_file = open(model_path, 'r')
         loaded_model_json = json_file.read()

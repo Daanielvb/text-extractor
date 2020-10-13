@@ -1,11 +1,9 @@
-import numpy as np
 import pandas as pd
-import pickle
 import matplotlib as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing
 from imblearn.over_sampling import SMOTE
-from src.util.CSVReader import *
+from src.parser.CSVReader import *
 
 
 class ModelUtil:
@@ -41,22 +39,22 @@ class ModelUtil:
         return label_encoder.inverse_transform([class_value])
 
     @staticmethod
-    def save_encoder(label_encoder, encoder_file_name='label_encoder_classes.npy'):
+    def save_encoder(label_encoder, encoder_file_name='../resources/label_encoder_classes.npy'):
         np.save(encoder_file_name, label_encoder.classes_)
 
     @staticmethod
-    def load_encoder(encoder_file_name='label_encoder_classes.npy'):
+    def load_encoder(encoder_file_name='../resources/label_encoder_classes.npy'):
         encoder = LabelEncoder()
         encoder.classes_ = np.load(encoder_file_name, allow_pickle=True)
         return encoder
 
     @staticmethod
-    def save_tokenizer(tokenizer, tokenizer_file='tokenizer.pickle'):
+    def save_tokenizer(tokenizer, tokenizer_file='../resources/tokenizer.pickle'):
         with open(tokenizer_file, 'wb') as handle:
             pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
-    def load_tokenizer(tokenizer_file='tokenizer.pickle'):
+    def load_tokenizer(tokenizer_file='../resources/tokenizer.pickle'):
         with open(tokenizer_file, 'rb') as handle:
             tokenizer = pickle.load(handle)
         return tokenizer

@@ -2,8 +2,8 @@
 
 class RichTagFrequency:
 
-    def __init__(self, type, tagged_text):
-        self.type = type
+    def __init__(self, tag_type, tagged_text):
+        self.type = tag_type
         self.tagged_text = tagged_text
         self.size = len(set(self.tagged_text))
         self.count = self.build_counting()
@@ -13,12 +13,6 @@ class RichTagFrequency:
         for i in list(set(self.tagged_text)):
             count[i] = self.tagged_text.count(i)
         return count
-
-    def get_male(self):
-        return
-
-    def female_male(self):
-        return
 
 
 class RichTags:
@@ -55,7 +49,8 @@ class RichTags:
     def get_infinitive_verbs(self):
         return self.get_tag_freq_by_type('VerbForm', 'Inf')
 
-    def get_finitive_verbs(self):
+    def get_finite_verbs(self):
+        """https://ciberduvidas.iscte-iul.pt/consultorio/perguntas/as-formas-finitas-e-nao-finitas-dos-verbos/32776"""
         return self.get_tag_freq_by_type('VerbForm', 'Fin')
 
     def get_gerund_verbs(self):

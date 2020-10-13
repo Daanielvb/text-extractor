@@ -1,10 +1,7 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 from src.util.ModelUtil import *
 from sklearn.model_selection import StratifiedKFold
-from keras.utils import np_utils
 from sklearn import datasets, metrics, model_selection, svm
-import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 
 

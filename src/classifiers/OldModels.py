@@ -1,5 +1,4 @@
 from keras.models import Sequential, Model
-from keras.preprocessing.text import Tokenizer
 from keras.layers import Embedding, LSTM, Activation, Conv1D, MaxPool1D, Dense, Flatten, Dropout, GRU, Input, Concatenate, GlobalMaxPooling1D
 
 import numpy as np
