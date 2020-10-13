@@ -3,6 +3,8 @@ from nltk import tokenize, ne_chunk
 from nltk.stem import RSLPStemmer
 from nltk.corpus import floresta, mac_morpho, masc_tagged
 from pickle import load
+
+from src.model.RichTagFrequency import *
 from src.util.FileUtil import *
 import numpy as np
 import spatial
@@ -39,7 +41,7 @@ class PortugueseTextualProcessing:
     DEFAULT_NOT_FOUND_TAG = 'notfound'
     CASE_SENSITIVE_PATTERN = '[A-Z][a-z]*'
     NUMBER_ONLY_PATTERN = '[0-9]'
-    RICH_TAG_TYPES = ['Gender', 'Number', 'Person', 'PronType', 'VerbForm', 'Voice', 'Tense']
+    RICH_TAG_TYPES = ['Gender', 'Number', 'Person', 'PronType', 'VerbForm', 'Tense']
 
 
     def __init__(self):
@@ -60,26 +62,24 @@ class PortugueseTextualProcessing:
 
     @staticmethod
     def get_rich_tags(text):
-        PortugueseTextualProcessing().count_lemmas(text)
         doc = PortugueseTextualProcessing.NLP(text)
         tags = [(token.lemma_, token.pos_, token.tag_) for token in doc]
         tagged_text = ''.join([tag[2] for tag in tags if "|" in tag[2]]).split("|")
-        parsed_tags = PortugueseTextualProcessing().get_all_tags(tagged_text)
-        return parsed_tags
+        return PortugueseTextualProcessing().extract_tags(tagged_text)
 
     @staticmethod
-    def get_all_tags(tagged_text):
+    def extract_tags(tagged_text):
         tags = []
         for tag in PortugueseTextualProcessing().RICH_TAG_TYPES:
             if tag != 'Person':
                 type_tags = PortugueseTextualProcessing().get_regular_tags(tag,
                                                                            PortugueseTextualProcessing().CASE_SENSITIVE_PATTERN, tagged_text)
-                tags.append(''.join(type_tags).replace(tag + '=', ' ').split(' ')[1:])
             else:
                 type_tags = PortugueseTextualProcessing().get_regular_tags(tag,
                                                                            PortugueseTextualProcessing().NUMBER_ONLY_PATTERN,
                                                                            tagged_text)
-                tags.append(''.join(type_tags).replace(tag + '=', ' ').split(' ')[1:])
+            tags.append(RichTagFrequency(tag, ''.join(type_tags).replace(tag + '=', ' ').split(' ')[1:]))
+
         return tags
 
     @staticmethod

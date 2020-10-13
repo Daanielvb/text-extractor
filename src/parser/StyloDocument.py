@@ -31,8 +31,7 @@ class StyloDocument(object):
                              'ORGANIZACAO', 'OBRA', 'OUTRO', 'PESSOA', 'TEMPO', 'VALOR']
         self.white_spaces = len(self.file_content.split(' '))
 
-        #TODO: Change the tagging system to consider all the information we have
-        self.new_tags = PortugueseTextualProcessing.get_rich_tags(self.file_content)
+        self.rich_tags = RichTags(PortugueseTextualProcessing.get_rich_tags(self.file_content), len(self.text))
         self.tagged_sentences = PortugueseTextualProcessing.postag(self.tokens)
         self.tagfdist = FreqDist([b for [(a, b)] in self.tagged_sentences])
         self.ner_tags = PortugueseTextualProcessing.ner_chunks(self.tokens)
@@ -237,7 +236,7 @@ class StyloDocument(object):
 
              'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj',
              'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados', 'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais',
-             'FrequenciaFrasesNominais',
+             'FrequenciaFrasesNominais', 'FreqGenMasc', 'FreqGenFem',
 
              'FreqTotalEntidadesNomeadas', 'FreqEAbstracao', 'FreqEAcontecimento', 'FreqECoisa', 'FreqELocal', 'FreqEOrganizacao',
              'FreqEObra', 'FreqEOutro', 'FreqEPessoa', 'FreqETempo', 'FreqEValor',
@@ -252,11 +251,11 @@ class StyloDocument(object):
 
     def csv_output(self):
         # TODO: Separate features into syntactical, lexical and so on..
-        # 56 features + 1 class
+        # 58 features + 1 class
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},'{}'".format(
+               "{},{},{},{},'{}'".format(
 
             # Text style features - 10
             round(self.type_token_ratio(), self.ROUNDING_FACTOR),
@@ -278,7 +277,7 @@ class StyloDocument(object):
             self.find_quotes(),
             self.digits_frequency(),
 
-            #POSTAG Features - 14
+            #POSTAG Features - 16
             self.tag_frequency('ADJ'),
             self.tag_frequency('ADV'),
             self.tag_frequency('ART'),
@@ -293,6 +292,8 @@ class StyloDocument(object):
             self.get_tags_freq(PortugueseTextualProcessing.CONTENT_TAGS),
             self.get_tags_freq(PortugueseTextualProcessing.FUNCTIONAL_TAGS),
             round(self.noun_phrases(), self.ROUNDING_FACTOR),
+            self.rich_tags.get_male(),
+            self.rich_tags.get_female(),
 
             #NER Features - 11
             round(len(self.ner_tags) / len(self.tokens), self.ROUNDING_FACTOR),
