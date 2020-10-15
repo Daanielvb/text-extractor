@@ -17,6 +17,8 @@ from nltk.stem import SnowballStemmer
 import pyphen
 from collections import defaultdict
 from src.parser.syllable.Silva2011SS import *
+from spacy.matcher import Matcher
+from spacy.util import filter_spans
 import pt_core_news_sm
 
 
@@ -42,7 +44,6 @@ class PortugueseTextualProcessing:
     CASE_SENSITIVE_PATTERN = '[A-Z][a-z]*'
     NUMBER_ONLY_PATTERN = '[0-9]'
     RICH_TAG_TYPES = ['Gender', 'Number', 'Person', 'PronType', 'VerbForm', 'Tense']
-
 
     def __init__(self):
         pass
@@ -256,19 +257,21 @@ class PortugueseTextualProcessing:
             return "Muito fácil - 1 a 5o ano"
 
     @staticmethod
-    #TODO: Investigate: https://realpython.com/natural-language-processing-spacy-python/#verb-phrase-detection
-    def get_number_of_verb_phrases(tokenized_text):
+    def get_number_of_verb_phrases(text):
         """A verb phrase consists of an auxiliary, or helping, verb and a main verb. The helping verb always precedes the main verb
         Some sentences will feature a subject or a modifier placed in between a verb phrase’s helping and main verbs.
-        Note that the subject or modifier is not considered part of the verb phrase."""
-        tag_string = ' '.join([tag[1] for tag in PortugueseTextualProcessing.postag(tokenized_text, as_list=False)])
-        #V NP | V NP PP
+        Note that the subject or modifier is not considered part of the verb phrase.
+        https://stackoverflow.com/questions/47856247/extract-verb-phrases-using-spacy
+        """
+        matcher = Matcher(PortugueseTextualProcessing.NLP.vocab)
 
-        vp_rgx = 'V\w+ ADV*V+'
-        matches = re.findall(vp_rgx, tag_string)
-        return len(matches)
+        pattern = [{'POS': 'VERB', 'OP': '?'},
+                   {'POS': 'ADP', 'OP': '*'},
+                   {'POS': 'VERB', 'OP': '+'}]
+        matcher.add("Verb phrase", None, pattern)
+        doc = PortugueseTextualProcessing.NLP(text)
+        return matcher(doc)
 
-    # TODO
     def num_words_before_main_verb(self):
         pass
 

@@ -194,6 +194,9 @@ class StyloDocument(object):
     def noun_phrases(self):
         return PortugueseTextualProcessing().get_number_of_noun_phrases(self.tokens) / len(self.text)
 
+    def verb_phrases(self):
+        return self.frequency(PortugueseTextualProcessing().get_number_of_verb_phrases(self.file_content))
+
     def monosyllables(self):
         return PortugueseTextualProcessing().get_monosyllable_counts(self.tokens) / len(self.text)
 
@@ -235,7 +238,7 @@ class StyloDocument(object):
 
              'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj',
              'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados', 'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais',
-             'FrequenciaFrasesNominais', 'FreqGenMasc', 'FreqGenFem',
+             'FrequenciaFrasesNominais', 'FrequenciaFrasesVerbais', 'FreqGenMasc', 'FreqGenFem',
 
              'FreqTotalEntidadesNomeadas', 'FreqEAbstracao', 'FreqEAcontecimento', 'FreqECoisa', 'FreqELocal', 'FreqEOrganizacao',
              'FreqEObra', 'FreqEOutro', 'FreqEPessoa', 'FreqETempo', 'FreqEValor',
@@ -250,11 +253,11 @@ class StyloDocument(object):
 
     def csv_output(self):
         # TODO: Separate features into syntactical, lexical and so on..
-        # 58 features + 1 class
+        # 59 features + 1 class
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},'{}'".format(
+               "{},{},{},{},{},'{}'".format(
 
             # Text style features - 10
             round(self.type_token_ratio(), self.ROUNDING_FACTOR),
@@ -291,6 +294,7 @@ class StyloDocument(object):
             self.get_tags_freq(PortugueseTextualProcessing.CONTENT_TAGS),
             self.get_tags_freq(PortugueseTextualProcessing.FUNCTIONAL_TAGS),
             round(self.noun_phrases(), self.ROUNDING_FACTOR),
+            round(self.verb_phrases(), self.ROUNDING_FACTOR),
             self.rich_tags.get_male(),
             self.rich_tags.get_female(),
 

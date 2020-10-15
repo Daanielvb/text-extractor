@@ -207,6 +207,6 @@ if __name__ == '__main__':
     #df = build_global_features()
 
     #df = pd.read_csv('../../data/parsed-data/selected-data.csv')
-    save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='student_data.csv')
+    save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='stylo-data.csv')
     # CSVReader().export_dataframe(df, '../../data/parsed-data/data-without-stopwords.csv')
 
