@@ -34,6 +34,7 @@ class PortugueseTextualProcessing:
     PT_DICT = pyphen.Pyphen(lang='pt_BR')
     SILVA_SYLLABLE_SEPARATOR = Silva2011SyllableSeparator()
     NER_PT_TAGGER = FileUtil().load_ner_pickle()
+
     NER_TIME_TAGGER = FileUtil().load_ner_pickle('../resources/cat-entropy_cutoff_0.08.pickle')
     LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
                          'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
@@ -365,7 +366,7 @@ class PortugueseTextualProcessing:
                 [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessing.STOPWORDS)]))
         df['Text_without_stopwords'] = df['Text_without_stopwords'].apply(
             lambda x: ' '.join(
-                [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessing.CUSTOM_STOPWORDS)]))
+                [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessinCUSTOM_STOPWORDS)]))
         df['Text'] = df['Text_without_stopwords']
         df.pop('Text_without_stopwords')
         return df

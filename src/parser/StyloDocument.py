@@ -1,7 +1,7 @@
 from nltk import sent_tokenize, word_tokenize, Text
 from nltk.probability import FreqDist
 import math
-from src.parser.PortugueseTextualProcessing import *
+#from src.parser.PortugueseTextualProcessing import *
 from spellchecker import SpellChecker
 
 
