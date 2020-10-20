@@ -366,7 +366,7 @@ class PortugueseTextualProcessing:
                 [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessing.STOPWORDS)]))
         df['Text_without_stopwords'] = df['Text_without_stopwords'].apply(
             lambda x: ' '.join(
-                [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessinCUSTOM_STOPWORDS)]))
+                [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessin.CUSTOM_STOPWORDS)]))
         df['Text'] = df['Text_without_stopwords']
         df.pop('Text_without_stopwords')
         return df

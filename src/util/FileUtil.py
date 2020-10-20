@@ -28,8 +28,6 @@ class FileUtil:
     @staticmethod
     def find_files(dir_path: str = None, patterns: [str] = None) -> [str]:
         path = dir_path or "."
-        #C:\Users\DANIEL\repos\mestrado\text - extractor\data\students_exercises
-
         path_patterns = patterns or ["*"]
 
         for root_dir, dir_names, file_names in os.walk(path):
