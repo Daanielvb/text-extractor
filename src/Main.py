@@ -8,8 +8,8 @@ from src.classifiers.RFClassifier import *
 from src.classifiers.SimpleNeuralNetwork import *
 
 
-def extract_text_from_original_works(base_path='../../data/students_exercises', raw=False):
-    clean_txt_content, txt_file_names = FileUtil.convert_files(base_path, raw)
+def extract_text_from_original_works(base_path='../data/students_exercises', raw=False):
+    clean_txt_content, txt_file_names, _ = FileUtil.convert_files(base_path, raw)
     clean_doc_content, doc_file_names = DOCReader().convert_docs(base_path, raw)
     clean_pdf_content, pdf_file_names = PDFReader().convert_pdfs(base_path, raw)
 

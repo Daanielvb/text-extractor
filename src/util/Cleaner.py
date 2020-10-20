@@ -23,8 +23,8 @@ class Cleaner:
     @staticmethod
     def remove_student_names(file_content):
         result = []
-        for std in StudentConstant.STOPWORDS:
-            file_content = re.sub(r"\b%s\b" % std.lower(), '', file_content)
+        for stopword in StudentConstant.STOPWORDS:
+            file_content = re.sub(r"\b%s\b" % stopword, '', file_content, flags=re.IGNORECASE)
         result.append(file_content)
         return result
 

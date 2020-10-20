@@ -24,6 +24,8 @@ class StudentConstant:
         'evelynn', 'vatyciani',
         'gabriel', 'erminio', 'ermínio', 'silva',
         'gilson', 'lisboa', 'ferreira',
+        'iris','barreto','januario', 'da', 'silva',
+        'juvenal', 'damasceno', 'amaral', 'filho',
         'isaílda', 'isailda',
         'julia', 'marley',
         'thiphanny barros',
