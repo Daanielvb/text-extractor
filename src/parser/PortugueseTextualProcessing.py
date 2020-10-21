@@ -18,7 +18,6 @@ import pyphen
 from collections import defaultdict
 from src.parser.syllable.Silva2011SS import *
 from spacy.matcher import Matcher
-from spacy.util import filter_spans
 import pt_core_news_sm
 
 

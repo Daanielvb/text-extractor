@@ -194,17 +194,28 @@ def clean_and_get_size(df):
     return df
 
 
-def build_global_features():
-    all_df = pd.read_csv('../../data/parsed-data/data.csv')
-    ng = NgramUtil(all_df['Text'], [1, 3, 4, 5], [10, 3, 3, 3])
-    all_df = GlobalFeatures().calculate_global_hapax_legomena(all_df)
-    all_df = ng.upgrade_df_with_count(all_df)
-    return all_df
+def build_global_features(df, columns_to_drop=['Text', 'Author']):
+    ng = NgramUtil(df['Text'], [1, 3, 4, 5], [10, 3, 3, 3])
+    df = GlobalFeatures().calculate_global_hapax_legomena(df)
+    df = ng.upgrade_df_with_count(df)
+    df.drop(labels=columns_to_drop, axis=1, inplace=True)
+    return df
+
+
+def build_merged_df(df_name):
+    df_global = build_global_features(pd.read_csv('../../data/parsed-data/data.csv'))
+    df_stylo = pd.read_csv('../../data/parsed-data/stylo-data.csv')
+    df_merge = pd.merge(df_stylo, df_global, left_index=True, right_index=True)
+    author = df_merge.pop('Author')
+    df_merge['Author'] = author
+    CSVReader().export_dataframe(df_merge, df_name)
+    return df_merge
 
 
 if __name__ == '__main__':
-    extract_text_from_original_works(raw=True)
-    #df = build_global_features()
+    # TODO: Check why there are only 86 records instead of 106.
+    # build_merged_df('full-stylo-data')
+    df_stylo = pd.read_csv('../../data/parsed-data/full-stylo-data.csv')
 
     #df = pd.read_csv('../../data/parsed-data/selected-data.csv')
     #save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='stylo-data.csv')

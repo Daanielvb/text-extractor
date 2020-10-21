@@ -7,14 +7,9 @@ from spellchecker import SpellChecker
 
 class StyloDocument(object):
 
-    #TODO: the mean number of
-    # higher level constituents per word and the number of words before the main
-    # verb. The index that displayed the largest effect size for syntactic complexity
-    # was
     DEFAULT_AUTHOR = "Unknown"
 
     def __init__(self, file_content, author=DEFAULT_AUTHOR):
-
         self.author = author.strip()
         self.raw_content = file_content
         self.file_content = file_content.lower()
@@ -38,6 +33,7 @@ class StyloDocument(object):
         self.ner_ftags = FreqDist(self.ner_tags)
         self.spell = SpellChecker(language='pt')
         self.ROUNDING_FACTOR = 4
+        self.LINE_BREAKS = ['\n', '\t', '\r']
 
     def get_tag_count_by_start(self, tag_start):
         count = 0
@@ -135,14 +131,16 @@ class StyloDocument(object):
     def digits_frequency(self):
         return self.frequency([word for word in self.file_content if word.isdigit()])
 
+    def line_breaks_frequency(self):
+        return self.frequency([word for word in self.file_content if word in self.LINE_BREAKS])
+
     def count_consonant_frequency(self):
         character_list = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w',
                           'y', 'x', 'z']
         return self.frequency([word for word in self.file_content if word in character_list])
 
-    def count_camel_case(self):
-        #TODO: Add original files and remove lower case conversion
-        return [word for word in self.raw_content if word[0].upper() and word[1].lower()]
+    def camel_case_frequency(self):
+        return self.frequency([word for word in self.raw_content.split(' ') if word and word[0].isupper() and (len(word) == 1 or word[1].islower())])
 
     def local_hapax_legommena_frequency(self):
         return (len(self.fdist.hapaxes()))/len(self.text.tokens)
@@ -232,32 +230,34 @@ class StyloDocument(object):
             ['DiversidadeLexica', 'TamanhoMedioDasPalavras', 'TamanhoMedioSentencas', 'StdevSentencas', 'TamanhoMedioParagrafos',
              'StdevTamParagrafos', 'FrequenciaDeParagrafos','FrequenciaPalavrasDuplicadas', 'MediaSilabasPorPalavra',
 
-             'FreqMonossilabas',
+             'Monossilabas',
 
-             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'FreqCitacoes', 'FreqDigitos',
+             'Ponto','Virgulas', 'Exclamacoes', 'DoisPontos', 'Citacoes', 'QuebrasDeLinha', 'Digitos',
 
-             'FreqAdjetivos', 'FreqAdv','FreqArt', 'FreqSubs', 'FreqPrep', 'FreqVerb','FreqVerbosPtcp', 'FreqConj',
-             'FreqPronomes', 'PronomesPorPreposicao','FreqTermosNaoTageados', 'FreqPalavrasDeConteudo', 'FreqPalavrasFuncionais',
-             'FrequenciaFrasesNominais', 'FrequenciaFrasesVerbais', 'FreqGenMasc', 'FreqGenFem',
+             'Adjetivos', 'Adverbios','Artigos', 'Substantivos', 'Preposicoes', 'Verbos','VerbosPtcp', 'Conjuncoes',
+             'Pronomes', 'PronomesPorPreposicao','TermosNaoTageados', 'PalavrasDeConteudo', 'PalavrasFuncionais',
+             'FrasesNominais', 'FrasesVerbais', 'GenMasc', 'GenFem', 'SemGenero', 'Singular', 'Plural',
 
-             'FreqTotalEntidadesNomeadas', 'FreqEAbstracao', 'FreqEAcontecimento', 'FreqECoisa', 'FreqELocal', 'FreqEOrganizacao',
-             'FreqEObra', 'FreqEOutro', 'FreqEPessoa', 'FreqETempo', 'FreqEValor',
+             'PrimeiraPessoa', 'TerceiraPessoa','Passado','Presente','Futuro',
+
+             'TotalEntidadesNomeadas', 'EntAbstracao', 'EntAcontecimento', 'EntCoisa', 'EntLocal', 'EntOrganizacao',
+             'EntObra', 'EntOutro', 'EntPessoa', 'EntTempo', 'EntValor',
 
              'GuiraudR', 'HerdanC', 'HerdanV', 'MedidaK', 'DugastU', 'MaasA', 'HonoresH',
 
-             'FreqPalavrasErradas', 'FrequenciaDeHapaxLegomenaLocal', 'FreqPalavrasComunsTam2', 'FreqPalavrasComunsTam3', 'FreqPalavrasComunsTam4',
-             'FrequenciaStopWords', 'BRFleshIndex', 'FreqOperadoresLogicos',
+             'PalavrasErroOrtografico', 'HapaxLegomenaLocal', 'PalavrasComunsTam2', 'PalavrasComunsTam3', 'PalavrasComunsTam4',
+             'StopWords', 'BRFleshIndex', 'OperadoresLogicos', 'PalavrasCapitalizadas',
 
              'Author']
         )
 
     def csv_output(self):
         # TODO: Separate features into syntactical, lexical and so on..
-        # 59 features + 1 class
+        # 69 features + 1 class
         return "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}," \
-               "{},{},{},{},{},'{}'".format(
+               "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},'{}'".format(
 
             # Text style features - 10
             round(self.type_token_ratio(), self.ROUNDING_FACTOR),
@@ -271,15 +271,16 @@ class StyloDocument(object):
             self.mean_syllables_per_word(),
             self.monosyllables(),
 
-            # Term count features - 6
+            # Term count features - 7
             self.term_per_hundred('.'),
             self.term_per_hundred(','),
             self.term_per_hundred('!'),
             self.term_per_hundred(':'),
             self.find_quotes(),
+            self.line_breaks_frequency(),
             self.digits_frequency(),
 
-            #POSTAG Features - 16
+            #POSTAG Features - 24
             self.tag_frequency('ADJ'),
             self.tag_frequency('ADV'),
             self.tag_frequency('ART'),
@@ -297,6 +298,15 @@ class StyloDocument(object):
             round(self.verb_phrases(), self.ROUNDING_FACTOR),
             self.rich_tags.get_male(),
             self.rich_tags.get_female(),
+            self.rich_tags.get_unspecified_gender(),
+            self.rich_tags.get_singular(),
+            self.rich_tags.get_plural(),
+            self.rich_tags.get_first_person(),
+            self.rich_tags.get_third_person(),
+            self.rich_tags.get_past_tense(),
+            self.rich_tags.get_present_tense(),
+            self.rich_tags.get_future_tense(),
+
 
             #NER Features - 11
             round(len(self.ner_tags) / len(self.tokens), self.ROUNDING_FACTOR),
@@ -320,7 +330,7 @@ class StyloDocument(object):
             round(self.maas_A_measure(), self.ROUNDING_FACTOR),
             round(self.honores_H_measure(), self.ROUNDING_FACTOR),
 
-            # Misc Features - 8
+            # Misc Features - 9
             self.spell_miss_check_frequency(),
             round(self.local_hapax_legommena_frequency(), self.ROUNDING_FACTOR),
             self.collocations_frequency(2),
@@ -329,6 +339,7 @@ class StyloDocument(object):
             round(self.stop_word_freq(), self.ROUNDING_FACTOR),
             self.flesh_index(),
             self.get_logical_operator_frequency(),
+            self.camel_case_frequency(),
 
             self.author,
         )

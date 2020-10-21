@@ -42,7 +42,7 @@ class NgramUtil:
 
     def upgrade_df_with_count(self, df):
         for size in self.ngram_sizes:
-            df[str(size) + '-gram'] = [i[size]/len(df['Text'].str.split(' ')) for i in self.count_freq]
+            df['top ' + str(size) + '-gram'] = [i[size]/len(df['Text'].str.split(' ')) for i in self.count_freq]
         return df
 
 

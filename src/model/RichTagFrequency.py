@@ -74,6 +74,7 @@ class RichTags:
     def get_almost_perfect_past(self):
         return self.get_tag_freq_by_type('Tense', 'Pqp')
 
+    #TODO: Check what is the right name for this
     def get_almost_perfect_past(self):
         return self.get_tag_freq_by_type('Tense', 'Imp')
 
