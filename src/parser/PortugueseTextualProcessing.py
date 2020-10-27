@@ -266,7 +266,7 @@ class PortugueseTextualProcessing:
         matcher = Matcher(PortugueseTextualProcessing.NLP.vocab)
 
         pattern = [{'POS': 'VERB', 'OP': '?'},
-                   {'POS': 'ADP', 'OP': '*'},
+                   {'POS': 'ADV', 'OP': '*'},
                    {'POS': 'VERB', 'OP': '+'}]
         matcher.add("Verb phrase", None, pattern)
         doc = PortugueseTextualProcessing.NLP(text)
@@ -365,7 +365,7 @@ class PortugueseTextualProcessing:
                 [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessing.STOPWORDS)]))
         df['Text_without_stopwords'] = df['Text_without_stopwords'].apply(
             lambda x: ' '.join(
-                [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessin.CUSTOM_STOPWORDS)]))
+                [word for word in x.split(' ') if word.lower() not in (PortugueseTextualProcessing.CUSTOM_STOPWORDS)]))
         df['Text'] = df['Text_without_stopwords']
         df.pop('Text_without_stopwords')
         return df

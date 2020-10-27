@@ -212,10 +212,34 @@ def build_merged_df(df_name):
     return df_merge
 
 
+def build_author_verification_df(df, author_name):
+    author_df = df.copy()
+    author_df['is_author'] = author_df['Author'].apply(lambda x: int(x == author_name))
+    author_df.pop('Author')
+    return author_df
+
+
+def build_authors_verification_dfs(df):
+    authors_dict = dict()
+    authors = list(set((df['Author'])))
+    for author in authors:
+        authors_dict[author] = build_author_verification_df(df, author)
+    return authors_dict
+
+
 if __name__ == '__main__':
     # TODO: Check why there are only 86 records instead of 106.
-    # build_merged_df('full-stylo-data')
-    df_stylo = pd.read_csv('../../data/parsed-data/full-stylo-data.csv')
+
+    #save_converted_stylo_data('../../data/parsed-data/varela-data.csv', 'varela-stylo.csv')
+    df = pd.read_csv('../../data/parsed-data/full-stylo-data.csv')
+
+    results = build_authors_verification_dfs(df)
+
+
+
+
+
+    #df_stylo = pd.read_csv('../../data/parsed-data/full-stylo-data.csv')
 
     #df = pd.read_csv('../../data/parsed-data/selected-data.csv')
     #save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='stylo-data.csv')
