@@ -57,3 +57,21 @@ class Cleaner:
         text = re.sub('\n{3,}', '\n\n', text)
         text = re.sub(r"[\t]*", "", text)
         return text.strip()
+
+    @staticmethod
+    def remove_varela_authors(df):
+        regex_baleia = 'baleia - \d{1,2}\/\d{1,2}\/\d{2,4}'
+        regex_ana = 'ana cristina cavalcante\s*\d{1,2} \w{1,4} \d{2,4} - \S{3,5}(min)*'
+        regex_adriano = 'adriano gambarini - \d{1,2}\/\d{1,2}\/\d{2,4}'
+        regex_ivolnildo = 'ivon(i)*l(d)*o lavôr(\s)*\d{1,2} \w{1,4} \d{2,4} - \S{4,5}(min)*'
+        regex_mario = 'mário pinto(\s)*\d{1,2} \w{1,4} \d{2,4} - \S{4,5}(min)*'
+        regex_julio = "mais sobr julio preuss - \d{1,2}\/\d{1,2}\/\d{2,4}(julio preussescreveu o livro 'fotografia digital: da compra da câmera à impressão das fotos)*"
+        regex_roberto = 'roberto linsker - \d{1,2}\/\d{1,2}\/\d{2,4}'
+        df['Text'] = df['Text'].str.replace(regex_baleia, ' ')
+        df['Text'] = df['Text'].str.replace(regex_ana, ' ')
+        df['Text'] = df['Text'].str.replace(regex_adriano, ' ')
+        df['Text'] = df['Text'].str.replace(regex_ivolnildo, ' ')
+        df['Text'] = df['Text'].str.replace(regex_mario, ' ')
+        df['Text'] = df['Text'].str.replace(regex_julio, ' ')
+        df['Text'] = df['Text'].str.replace(regex_roberto, ' ')
+        return df
