@@ -18,14 +18,14 @@ import pyphen
 from collections import defaultdict
 from src.parser.syllable.Silva2011SS import *
 from spacy.matcher import Matcher
-import pt_core_news_sm
+import spacy
 
 
 class PortugueseTextualProcessing:
-    NLP = pt_core_news_sm.load()
+    NLP = spacy.load('pt_core_news_md')
     STOPWORDS = set(nltk.corpus.stopwords.words('portuguese'))
-    CUSTOM_STOPWORDS = FileUtil().get_words_from_file('../resources/custom_stopwords.txt')
-    TAGGER = load(open('pttag-mm.pkl', 'rb'))
+    CUSTOM_STOPWORDS = FileUtil().get_words_from_file('./resources/custom_stopwords.txt')
+    TAGGER = load(open('./util/pttag-mm.pkl', 'rb'))
     EMBEDDING_DIM = 100
     MAX_NUM_WORDS = 20000
     LONG_SENTENCE_SIZE = 12
@@ -34,7 +34,7 @@ class PortugueseTextualProcessing:
     SILVA_SYLLABLE_SEPARATOR = Silva2011SyllableSeparator()
     NER_PT_TAGGER = FileUtil().load_ner_pickle()
 
-    NER_TIME_TAGGER = FileUtil().load_ner_pickle('../resources/cat-entropy_cutoff_0.08.pickle')
+    NER_TIME_TAGGER = FileUtil().load_ner_pickle('./resources/cat-entropy_cutoff_0.08.pickle')
     LOGICAL_OPERATORS = ['e', 'nada', 'a menos que', 'ou', 'nunca', 'sem que', 'não', 'jamais', 'nem'
                          'caso', 'se', 'nenhum', 'nenhuma', 'então é porque', 'desde que', 'contanto que',
                          'uma vez que', 'fosse']

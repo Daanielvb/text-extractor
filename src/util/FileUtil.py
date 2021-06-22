@@ -100,7 +100,7 @@ class FileUtil:
         return new_name
 
     @staticmethod
-    def load_ner_pickle(filename='../resources/cat-min_lldelta_0.pickle'):
+    def load_ner_pickle(filename='./resources/cat-min_lldelta_0.pickle'):
         with open(filename, 'rb') as f:
             u = pickle._Unpickler(f)
             u.encoding = 'latin1'

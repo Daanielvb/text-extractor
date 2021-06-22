@@ -1,3 +1,32 @@
+# Requirements
+- Python 3.x
+- Gemsim, Numpy, NLTK, NLTK Trainer, Spacy, Sklearn, Pandas, Pyphen, Pyspellchecker 
+
+# Configuration
+- _It's highly recomended to create a virtualenv before installing the dependencies_
+
+- Dependencies
+```console
+pip3 install virtualenv
+virtualenv <YOU_NAME_IT>
+source <THE_NAME_ABOVE>/bin/activate
+pip install -r requirements.txt
+sh setup.sh
+```
+
+- NLTK setup (Within a python terminal)
+```python
+import nltk
+nltk.download('punkt')
+nltk.download('mac_morpho')
+nltk.download('stopwords')
+```
+_The step above should install the depds in your nltk_data folder (~/nltk_data)_
+
+
+#Usage
+- TBD
+
 # ML text-extractor
 
 - Extract textual document content from different sources (PDF, Docs and text files)

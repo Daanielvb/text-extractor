@@ -231,7 +231,7 @@ if __name__ == '__main__':
     # TODO: Check why there are only 86 records instead of 106.
 
     #save_converted_stylo_data('../../data/parsed-data/varela-data.csv', 'varela-stylo.csv')
-    df = pd.read_csv('../../data/parsed-data/full-stylo-data.csv')
+    df = pd.read_csv('../data/parsed-data/full-stylo-data.csv')
 
     results = build_authors_verification_dfs(df)
 
