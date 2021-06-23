@@ -1,9 +1,9 @@
 # Requirements
-- Python 3.x
+- Python 3.x and pip
 - Gemsim, Numpy, NLTK, NLTK Trainer, Spacy, Sklearn, Pandas, Pyphen, Pyspellchecker 
 
 # Configuration
-- _It's highly recomended to create a virtualenv before installing the dependencies_
+- _It's highly recommended creating a virtualenv before installing the dependencies_
 
 - Dependencies
 ```console
@@ -21,7 +21,7 @@ nltk.download('punkt')
 nltk.download('mac_morpho')
 nltk.download('stopwords')
 ```
-_The step above should install the depds in your nltk_data folder (~/nltk_data)_
+_The step above should install the dependencies in your nltk_data folder (~/nltk_data)_
 
 
 #Usage

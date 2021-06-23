@@ -4,8 +4,8 @@ from src.util.NgramUtil import *
 from src.util.GlobalFeatures import *
 from sklearn.svm import SVC
 from src.classifiers.NeuralNetwork import *
-from src.classifiers.RFClassifier import *
 from src.classifiers.SimpleNeuralNetwork import *
+from random import randint
 
 
 def extract_text_from_original_works(base_path='../data/students_exercises', raw=False):
@@ -79,7 +79,7 @@ def run_compiled_model(model, tokenizer, encoder, X_predict, y_expected):
 
 def run_compiled_pipeline():
     df = pd.read_csv('../../data/parsed-data/data2.csv')
-    from random import randint
+
     # TODO: Check if null tokens is a good approach for unseen content
     # TODO: Perform validation with unseen data
     # TODO: See if its possible to use Random Forest with our embedding matrix
@@ -228,20 +228,16 @@ def build_authors_verification_dfs(df):
 
 
 if __name__ == '__main__':
-    # TODO: Check why there are only 86 records instead of 106.
+    # TODO: Implement an argparse to define which operation needs to be run
+    # Options are 1) Extract all textual content from raw files (PDF, CSV, TXT) and output textual content
+    # just like extract_text_from_original_works()
+    # 2) Transform textual content into stylometric content
+    # args input folder path, output path
 
     #save_converted_stylo_data('../../data/parsed-data/varela-data.csv', 'varela-stylo.csv')
     df = pd.read_csv('../data/parsed-data/full-stylo-data.csv')
 
     results = build_authors_verification_dfs(df)
-
-
-
-
-
-    #df_stylo = pd.read_csv('../../data/parsed-data/full-stylo-data.csv')
-
-    #df = pd.read_csv('../../data/parsed-data/selected-data.csv')
     #save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='stylo-data.csv')
     # CSVReader().export_dataframe(df, '../../data/parsed-data/data-without-stopwords.csv')
 
