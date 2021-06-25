@@ -6,16 +6,17 @@ from sklearn.svm import SVC
 from src.classifiers.NeuralNetwork import *
 from src.classifiers.SimpleNeuralNetwork import *
 from random import randint
+import argparse
 
 
-def extract_text_from_original_works(base_path='../data/students_exercises', raw=False):
+def extract_text_from_original_works(output_file='data.csv', base_path='../data/students_exercises', raw=False):
     clean_txt_content, txt_file_names, _ = FileUtil.convert_files(base_path, raw)
     clean_doc_content, doc_file_names = DOCReader().convert_docs(base_path, raw)
     clean_pdf_content, pdf_file_names = PDFReader().convert_pdfs(base_path, raw)
 
     files_content = FileUtil.merge_contents(clean_txt_content, clean_doc_content, clean_pdf_content)
     file_paths = FileUtil.merge_contents(txt_file_names, doc_file_names, pdf_file_names)
-    CSVReader.write_files('../data/parsed-data/', file_paths, 'data.csv', files_content)
+    CSVReader.write_files('../data/parsed-data/', file_paths, output_file, files_content)
 
 
 def extract_text_from_original_works_val(base_path='../../data/varela_dataset', raw=False):
@@ -228,16 +229,28 @@ def build_authors_verification_dfs(df):
 
 
 if __name__ == '__main__':
-    # TODO: Implement an argparse to define which operation needs to be run
-    # Options are 1) Extract all textual content from raw files (PDF, CSV, TXT) and output textual content
-    # just like extract_text_from_original_works()
-    # 2) Transform textual content into stylometric content
-    # args input folder path, output path
+    parser = argparse.ArgumentParser()
 
-    #save_converted_stylo_data('../../data/parsed-data/varela-data.csv', 'varela-stylo.csv')
-    df = pd.read_csv('../data/parsed-data/full-stylo-data.csv')
+    parser.add_argument("o", type=str, help="the output file name")
+    parser.add_argument("i", type=str, help="the input file")
+    parser.add_argument("b", type=str, help="the base path")
+    parser.add_argument("c", type=int, default=1, help="The operation performed, 1) extract all textual content from raw files (PDF, CSV, TXT) and "
+                                                       "write output as textual csv, 2) Tranform input textual CSV to stylometric CSV; "
+                                                       "3) combination of both operations 1 and 2 sequentially")
+    args = parser.parse_args()
 
-    results = build_authors_verification_dfs(df)
-    #save_converted_stylo_data(input_file='../../data/parsed-data/data.csv', output_file='stylo-data.csv')
-    # CSVReader().export_dataframe(df, '../../data/parsed-data/data-without-stopwords.csv')
+
+    op_file_name = args.o
+    base_path = args.b
+    input_file = args.i
+    option = args.c
+    if args.option == 1:
+        extract_text_from_original_works(output_file=op_file_name, base_path=base_path)
+    elif args.option == 2:
+        CSVReader().write_stylo_features('../data/parsed-data/', op_file_name,
+                                         CSVReader.transform_text_to_stylo_text(input_file, verbose=False))
+    elif args.option == 3:
+        extract_text_from_original_works(output_file=op_file_name, base_path=base_path)
+        CSVReader().write_stylo_features('../../data/parsed-data/', input_file,
+                                         CSVReader.transform_text_to_stylo_text(base_path + op_file_name, verbose=False))
 
